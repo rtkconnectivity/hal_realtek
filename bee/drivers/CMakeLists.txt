@@ -1,0 +1,1 @@
+add_subdirectory_ifdef(CONFIG_RTK_GPIO gpio)

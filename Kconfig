@@ -1,0 +1,87 @@
+config RTK_UART
+	bool "RTK MCU serial driver"
+	default n
+
+	help
+	  This option enables the uart driver for RTK family of
+	  processors.
+
+config RTK_GPIO
+	bool "RTK MCU gpio driver"
+	default n
+
+	help
+	  This option enables the gpio driver for RTK family of
+	  processors.
+
+config RTK_TIM
+	bool "RTK MCU tim driver"
+	default n
+
+	help
+	  This option enables the tim driver for RTK family of
+	  processors.
+
+config RTK_ENHTIM
+	bool "RTK MCU enhtim driver"
+	default n
+
+	help
+	  This option enables the enhtim driver for RTK family of
+	  processors.
+
+config RTK_DMA
+	bool "RTK MCU dma driver"
+	default n
+
+	help
+	  This option enables the dma driver for RTK family of
+	  processors.
+
+config RTK_RTC
+	bool "RTK MCU rtc driver"
+	default n
+
+	help
+	  This option enables the rtc driver for RTK family of
+	  processors.
+
+config RTK_ADC
+	bool "RTK MCU adc driver"
+	default n
+
+	help
+	  This option enables the adc driver for RTK family of
+	  processors.
+
+config RTK_AON_QDEC
+	bool "RTK MCU aon qdec driver"
+	default n
+
+	help
+	  This option enables the aon qdec driver for RTK family of
+	  processors.
+
+config RTK_SPI
+	bool "RTK MCU spi driver"
+	default n
+
+	help
+	  This option enables the spi driver for RTK family of
+	  processors.
+
+config RTK_KEYSCAN
+	bool "RTK MCU keyscan driver"
+	default n
+
+	help
+	  This option enables the keyscan driver for RTK family of
+	  processors.
+
+config RTK_I2C
+	bool "RTK MCU i2c driver"
+	default n
+
+	help
+	  This option enables the i2c driver for RTK family of
+	  processors.

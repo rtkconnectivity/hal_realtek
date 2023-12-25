@@ -1,0 +1,2 @@
+add_subdirectory_ifdef(src)
+zephyr_include_directories(inc)
