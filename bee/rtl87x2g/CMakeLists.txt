@@ -1,3 +1,3 @@
-add_subdirectory_ifdef(boot)
-add_subdirectory_ifdef(osif)
+add_subdirectory(boot)
+add_subdirectory(osif)
 

@@ -1,2 +1,3 @@
-add_subdirectory_ifdef(drivers)
+add_subdirectory(drivers)
+zephyr_include_directories(drivers)
 add_subdirectory_ifdef(CONFIG_SOC_SERIES_RTL87X2G rtl87x2g)

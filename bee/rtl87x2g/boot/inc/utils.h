@@ -21,7 +21,7 @@ extern "C" {
 *============================================================================*/
 #include <stdint.h>
 #include <stdbool.h>
-#include "nsc/utils_nsc.h"
+#include "utils_nsc.h"
 
 /** @defgroup PLATFORM_UTILS  Platform utils
   * @brief
