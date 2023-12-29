@@ -1,0 +1,87 @@
+config REALTEK_UART
+	bool "RealTek MCU serial driver"
+	default n
+
+	help
+	  This option enables the uart driver for RealTek family of
+	  processors.
+
+config REALTEK_GPIO
+	bool "RealTek MCU gpio driver"
+	default n
+
+	help
+	  This option enables the gpio driver for RealTek family of
+	  processors.
+
+config REALTEK_TIM
+	bool "RealTek MCU tim driver"
+	default n
+
+	help
+	  This option enables the tim driver for RealTek family of
+	  processors.
+
+config REALTEK_ENHTIM
+	bool "RealTek MCU enhtim driver"
+	default n
+
+	help
+	  This option enables the enhtim driver for RealTek family of
+	  processors.
+
+config REALTEK_DMA
+	bool "RealTek MCU dma driver"
+	default n
+
+	help
+	  This option enables the dma driver for RealTek family of
+	  processors.
+
+config REALTEK_RTC
+	bool "RealTek MCU rtc driver"
+	default n
+
+	help
+	  This option enables the rtc driver for RealTek family of
+	  processors.
+
+config REALTEK_ADC
+	bool "RealTek MCU adc driver"
+	default n
+
+	help
+	  This option enables the adc driver for RealTek family of
+	  processors.
+
+config REALTEK_AON_QDEC
+	bool "RealTek MCU aon qdec driver"
+	default n
+
+	help
+	  This option enables the aon qdec driver for RealTek family of
+	  processors.
+
+config REALTEK_SPI
+	bool "RealTek MCU spi driver"
+	default n
+
+	help
+	  This option enables the spi driver for RealTek family of
+	  processors.
+
+config REALTEK_KEYSCAN
+	bool "RealTek MCU keyscan driver"
+	default n
+
+	help
+	  This option enables the keyscan driver for RealTek family of
+	  processors.
+
+config REALTEK_I2C
+	bool "RealTek MCU i2c driver"
+	default n
+
+	help
+	  This option enables the i2c driver for RealTek family of
+	  processors.
