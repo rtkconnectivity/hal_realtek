@@ -43,7 +43,7 @@ void RCC_PeriphClockCmd(uint32_t APBPeriph, uint32_t APBPeriph_Clock, Functional
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
     uint32_t tmp_1 = APBPeriph & 0x800;
-    uint32_t tmp_2 = APBPeriph & 0x100;
+    // uint32_t tmp_2 = APBPeriph & 0x100;
     uint32_t apbRegOff = (APBPeriph & (0XFF));
     uint32_t clk = APBPeriph_Clock;
     uint32_t clk_func = APBPeriph_Clock;
@@ -141,7 +141,7 @@ void RCC_PeriFunctionConfig(uint32_t APBPeriph, uint32_t APBPeriph_Clock, Functi
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
     uint32_t tmp_1 = APBPeriph & 0x800;
-    uint32_t tmp_2 = APBPeriph & 0x100;
+    // uint32_t tmp_2 = APBPeriph & 0x100;
     uint32_t apbRegOff = (APBPeriph & (0XFF));
     uint32_t clk = APBPeriph_Clock;
     uint32_t clk_func = APBPeriph_Clock;
@@ -199,8 +199,8 @@ void RCC_PeriClockConfig(uint32_t APBPeriph, uint32_t APBPeriph_Clock, Functiona
     /* Check the parameters. */
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-    uint32_t tmp_1 = APBPeriph & 0x800;
-    uint32_t tmp_2 = APBPeriph & 0x100;
+    // uint32_t tmp_1 = APBPeriph & 0x800;
+    // uint32_t tmp_2 = APBPeriph & 0x100;
     uint32_t apbRegOff = (APBPeriph & (0XFF));
     uint32_t clk_func = APBPeriph_Clock;
 

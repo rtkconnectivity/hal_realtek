@@ -1,0 +1,2 @@
+zephyr_library_sources(rtl_common/rtl_keyscan.c)
+zephyr_library_sources_ifdef(CONFIG_SOC_SERIES_RTL87X2G rtl87x2g/rtl87x2g_keyscan.c)

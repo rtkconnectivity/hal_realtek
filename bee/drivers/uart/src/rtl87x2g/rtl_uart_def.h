@@ -591,21 +591,21 @@ typedef union
  * \{
  * \ingroup     UART_Exported_Constants
  */
-#define ovsr_adj                    UART_OvsrAdj
-#define div                         UART_Div
-#define ovsr                        UART_Ovsr
-#define wordLen                     UART_WordLen
-#define parity                      UART_Parity
-#define stopBits                    UART_StopBits
-#define autoFlowCtrl                UART_HardwareFlowControl
-#define txTriggerLevel              UART_TxThdLevel
-#define rxTriggerLevel              UART_RxThdLevel
-#define dmaEn                       UART_DmaEn
-#define idle_time                   UART_IdleTime
-#define TxWaterlevel                UART_TxWaterLevel
-#define RxWaterlevel                UART_RxWaterLevel
-#define TxDmaEn                     UART_TxDmaEn
-#define RxDmaEn                     UART_RxDmaEn
+#define UART_OvsrAdj                ovsr_adj
+#define UART_Div                    div
+#define UART_Ovsr                   ovsr
+#define UART_WordLen                wordLen
+#define UART_Parity                 parity
+#define UART_StopBits               stopBits                    
+#define UART_HardwareFlowControl    autoFlowCtrl                
+#define UART_TxThdLevel             txTriggerLevel              
+#define UART_RxThdLevel             rxTriggerLevel              
+#define UART_DmaEn                  dmaEn                       
+#define UART_IdleTime               idle_time                   
+#define UART_TxWaterLevel           TxWaterlevel                
+#define UART_RxWaterLevel           RxWaterlevel                
+#define UART_TxDmaEn                TxDmaEn                     
+#define UART_RxDmaEn                RxDmaEn                     
 
 /** End of UART_InitStruct_Wrapper
   * \}

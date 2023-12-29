@@ -243,7 +243,7 @@ void Pad_Config(uint8_t                 Pin_Num,
                 PAD_OUTPUT_ENABLE_Mode  AON_PAD_E,
                 PAD_OUTPUT_VAL          AON_PAD_O)
 {
-    uint32_t tmp_value = 0;
+    // uint32_t tmp_value = 0;
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
     uint32_t reg_value;
@@ -580,7 +580,7 @@ uint8_t System_WakeupDebounceStatus(uint8_t Pin_Num)
   */
 void System_WakeupDebounceClear(uint8_t Pin_Num)
 {
-    uint8_t int_status = RESET;
+    // uint8_t int_status = RESET;
 
     uint32_t reg_value = 0;
     uint32_t reg_addr = PAD_DEBOUNCE_WKUP_STS;

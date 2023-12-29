@@ -1,87 +1,87 @@
-config RTK_UART
-	bool "RTK MCU serial driver"
+config REALTEK_UART
+	bool "Realtek MCU serial driver"
 	default n
 
 	help
-	  This option enables the uart driver for RTK family of
+	  This option enables the uart driver for Realtek family of
 	  processors.
 
-config RTK_GPIO
-	bool "RTK MCU gpio driver"
+config REALTEK_GPIO
+	bool "Realtek MCU gpio driver"
 	default n
 
 	help
-	  This option enables the gpio driver for RTK family of
+	  This option enables the gpio driver for Realtek family of
 	  processors.
 
-config RTK_TIM
-	bool "RTK MCU tim driver"
+config REALTEK_TIM
+	bool "Realtek MCU tim driver"
 	default n
 
 	help
-	  This option enables the tim driver for RTK family of
+	  This option enables the tim driver for Realtek family of
 	  processors.
 
-config RTK_ENHTIM
-	bool "RTK MCU enhtim driver"
+config REALTEK_ENHTIM
+	bool "Realtek MCU enhtim driver"
 	default n
 
 	help
-	  This option enables the enhtim driver for RTK family of
+	  This option enables the enhtim driver for Realtek family of
 	  processors.
 
-config RTK_DMA
-	bool "RTK MCU dma driver"
+config REALTEK_DMA
+	bool "Realtek MCU dma driver"
 	default n
 
 	help
-	  This option enables the dma driver for RTK family of
+	  This option enables the dma driver for Realtek family of
 	  processors.
 
-config RTK_RTC
-	bool "RTK MCU rtc driver"
+config REALTEK_RTC
+	bool "Realtek MCU rtc driver"
 	default n
 
 	help
-	  This option enables the rtc driver for RTK family of
+	  This option enables the rtc driver for Realtek family of
 	  processors.
 
-config RTK_ADC
-	bool "RTK MCU adc driver"
+config REALTEK_ADC
+	bool "Realtek MCU adc driver"
 	default n
 
 	help
-	  This option enables the adc driver for RTK family of
+	  This option enables the adc driver for Realtek family of
 	  processors.
 
-config RTK_AON_QDEC
-	bool "RTK MCU aon qdec driver"
+config REALTEK_QDEC
+	bool "Realtek MCU qdec driver"
 	default n
 
 	help
-	  This option enables the aon qdec driver for RTK family of
+	  This option enables the qdec driver for Realtek family of
 	  processors.
 
-config RTK_SPI
-	bool "RTK MCU spi driver"
+config REALTEK_SPI
+	bool "Realtek MCU spi driver"
 	default n
 
 	help
-	  This option enables the spi driver for RTK family of
+	  This option enables the spi driver for Realtek family of
 	  processors.
 
-config RTK_KEYSCAN
-	bool "RTK MCU keyscan driver"
+config REALTEK_KEYSCAN
+	bool "Realtek MCU keyscan driver"
 	default n
 
 	help
-	  This option enables the keyscan driver for RTK family of
+	  This option enables the keyscan driver for Realtek family of
 	  processors.
 
-config RTK_I2C
-	bool "RTK MCU i2c driver"
+config REALTEK_I2C
+	bool "Realtek MCU i2c driver"
 	default n
 
 	help
-	  This option enables the i2c driver for RTK family of
+	  This option enables the i2c driver for Realtek family of
 	  processors.
