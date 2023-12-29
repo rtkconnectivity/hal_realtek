@@ -169,7 +169,7 @@ void GPIO_ExtDebCmd(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, FunctionalState NewS
     /* Configure Debounce register */
     GPIO_Debounce_TypeDef *GPIOx_DEB = GPIOx == GPIOA ? GPIOA_DEB : GPIOB_DEB;
 
-    if (NewState == GPIO_INT_DEBOUNCE_DISABLE)
+    if (NewState == DISABLE)
     {
         GPIOx_DEB->GPIO_DEB_FUN_CTL &= (~GPIO_Pin_Swap);
 

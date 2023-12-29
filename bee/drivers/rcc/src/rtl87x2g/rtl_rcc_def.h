@@ -22,9 +22,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/* ================================================================================ */
-/* ================                  RCC  Defines                  ================ */
-/* ================================================================================ */
+/*============================================================================*
+ *                          RCC Defines
+ *============================================================================*/
 /** \defgroup RCC_Exported_Constants RCC Exported Constants
   * \brief
   * \{
@@ -51,7 +51,7 @@ extern "C" {
   */
 
 /*============================================================================*
- *                         Constants
+ *                         RCC Constants
  *============================================================================*/
 
 /** \defgroup RCC_Exported_Constants RCC Exported Constants
@@ -96,19 +96,19 @@ extern "C" {
 #define APBPeriph_ETH_CLOCK                 ((uint32_t)(1 << 13))
 #define APBPeriph_PPE_CLOCK                 ((uint32_t)(1 << 11))
 #define APBPeriph_KEYSCAN_CLOCK             ((uint32_t)(1 << 7))
-#define APBPeriph_24BADC_CLOCK              ((uint32_t)(1 << 3))
+#define APBPeriph_HRADC_CLOCK               ((uint32_t)(1 << 3))
 #define APBPeriph_ADC_CLOCK                 ((uint32_t)(1 << 1))
 
-#define APBPeriph_CAN_CLOCK                  ((uint32_t)(1 << 24))
-#define APBPeriph_IR_CLOCK                   ((uint32_t)(1 << 19))
-#define APBPeriph_ISO7816_CLOCK              ((uint32_t)(1 << 9))
-#define APBPeriph_GPIOB_CLOCK                ((uint32_t)(1 << 5))
-#define APBPeriph_GPIOA_CLOCK                ((uint32_t)(1 << 1))
+#define APBPeriph_CAN_CLOCK                 ((uint32_t)(1 << 24))
+#define APBPeriph_IR_CLOCK                  ((uint32_t)(1 << 19))
+#define APBPeriph_ISO7816_CLOCK             ((uint32_t)(1 << 9))
+#define APBPeriph_GPIOB_CLOCK               ((uint32_t)(1 << 5))
+#define APBPeriph_GPIOA_CLOCK               ((uint32_t)(1 << 1))
 
-#define APBPeriph_DISP_CLOCK                 ((uint32_t)(1 << 23))
-#define APBPeriph_RTZIP_CLOCK                ((uint32_t)(1 << 7))
+#define APBPeriph_DISP_CLOCK                ((uint32_t)(1 << 23))
+#define APBPeriph_IMDC_CLOCK                ((uint32_t)(1 << 7))
 
-#define APBPeriph_TIMER_CLOCK                 ((uint32_t)(1 << 31))
+#define APBPeriph_TIMER_CLOCK               ((uint32_t)(1 << 31))
 
 #define APBPeriph_ENHTIMER_CLOCK            ((uint32_t)(1 << 31))
 #define APBPeriph_ENHTIMER_PWM1_CLOCK       ((uint32_t)(1 << 29))
@@ -208,7 +208,7 @@ extern "C" {
 #define APBPeriph_ETH                   ((uint32_t)(0x7))
 #define APBPeriph_PPE                   ((uint32_t)(0x7))
 #define APBPeriph_KEYSCAN               ((uint32_t)(0x7))
-#define APBPeriph_24BADC                ((uint32_t)(0x7))
+#define APBPeriph_HRADC                 ((uint32_t)(0x7))
 #define APBPeriph_ADC                   ((uint32_t)(0x7))
 
 #define APBPeriph_CAN                   ((uint32_t)(0x808))
@@ -218,9 +218,9 @@ extern "C" {
 #define APBPeriph_GPIOA                 ((uint32_t)(0x8))
 
 #define APBPeriph_DISP                  ((uint32_t)(0x809))
-#define APBPeriph_RTZIP                 ((uint32_t)(0x809))
+#define APBPeriph_IMDC                  ((uint32_t)(0x809))
 
-#define APBPeriph_TIMER                ((uint32_t)(0xA))
+#define APBPeriph_TIMER                 ((uint32_t)(0xA))
 
 #define APBPeriph_ENHTIMER              ((uint32_t)(0x11))
 #define APBPeriph_ENHTIMER_PWM1         ((uint32_t)(0x11))

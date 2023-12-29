@@ -1,1 +1,1 @@
-add_subdirectory_ifdef(CONFIG_SOC_FAMILY_RTK_BEE bee)
+add_subdirectory_ifdef(CONFIG_SOC_FAMILY_REALTEK_BEE bee)
