@@ -1,0 +1,1 @@
+zephyr_library_sources_ifdef(CONFIG_SOC_SERIES_RTL87X2G rtl_common/rtl_aon_qdec.c rtl_common/rtl_aon_qdec.c)
