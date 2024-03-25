@@ -1,0 +1,5 @@
+config REALTEK_USING_SDK_LIB
+	bool "RealTek sdk library"
+	help
+	  This option enables the sdk library.
+
