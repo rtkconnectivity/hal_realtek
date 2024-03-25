@@ -1,0 +1,7 @@
+menuconfig REALTEK_NVIC
+	bool "REALTEK MCU nvic driver"
+	default n
+
+	help
+	  This option enables the nvic driver for REALTEK family of
+	  processors.

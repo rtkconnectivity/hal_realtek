@@ -1,0 +1,10 @@
+menuconfig REALTEK_SPI
+	bool "REALTEK MCU spi driver"
+	default n
+	select REALTEK_RCC
+	select REALTEK_PINMUX
+	select REALTEK_NVIC
+
+	help
+	  This option enables the spi driver for REALTEK family of
+	  processors.

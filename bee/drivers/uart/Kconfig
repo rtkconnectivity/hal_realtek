@@ -1,0 +1,10 @@
+menuconfig REALTEK_UART
+	bool "REALTEK MCU uart driver"
+	default n
+	select REALTEK_RCC
+	select REALTEK_PINMUX
+	select REALTEK_NVIC
+
+	help
+	  This option enables the uart driver for REALTEK family of
+	  processors.
