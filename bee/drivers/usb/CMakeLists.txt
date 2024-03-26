@@ -1,0 +1,1 @@
+add_subdirectory_ifdef(CONFIG_REALTEK_USING_USB_HAL usb_hal)
