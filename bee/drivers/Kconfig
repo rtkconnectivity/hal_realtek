@@ -12,4 +12,5 @@ rsource "i2c/Kconfig"
 rsource "keyscan/Kconfig"
 rsource "qdec/Kconfig"
 rsource "spi/Kconfig"
+rsource "usb/Kconfig"
 endmenu
