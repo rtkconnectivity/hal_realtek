@@ -3,5 +3,4 @@ menuconfig REALTEK_PINMUX
 	default n
 
 	help
-	  This option enables the pinmux driver for REALTEK family of
-	  processors.
+	  This option enables the pinmux driver for REALTEK MCU.

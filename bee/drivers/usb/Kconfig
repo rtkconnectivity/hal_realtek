@@ -7,4 +7,4 @@ config REALTEK_USING_USB_HAL
 	default y if REALTEK_USB
     select REALTEK_USING_SDK_LIB
 	help
-		This option enables the usb hal library.
+		This option enables the usb hal library for REALTEK MCU.
