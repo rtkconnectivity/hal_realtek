@@ -6,5 +6,4 @@ menuconfig REALTEK_DMA
 	select REALTEK_NVIC
 
 	help
-	  This option enables the dma driver for REALTEK family of
-	  processors.
+	  This option enables the dma driver for REALTEK MCU.

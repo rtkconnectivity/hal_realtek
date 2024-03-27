@@ -1,3 +1,3 @@
 zephyr_library()
 
-zephyr_library_sources_ifdef(CONFIG_REALTEK_QDEC_AON_QDEC rtl_aon_qdec.c)
+zephyr_library_sources_ifdef(CONFIG_REALTEK_AON_QDEC rtl_aon_qdec.c)

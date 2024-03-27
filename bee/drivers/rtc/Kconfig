@@ -7,5 +7,4 @@ menuconfig REALTEK_RTC
 	select REALTEK_NVIC
 
 	help
-	  This option enables the rtc driver for REALTEK family of
-	  processors.
+	  This option enables the rtc driver for REALTEK MCU.

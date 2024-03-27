@@ -1,35 +1,21 @@
 menuconfig REALTEK_TIM
-	bool "REALTEK MCU tim/enhtim driver"
-	default n
-
-	help
-	  This option enables the tim/enhtim driver for REALTEK family of
-	  processors.
-
-menuconfig REALTEK_TIM_TIM
 	bool "REALTEK MCU tim driver"
 	default n
 
-	select REALTEK_TIM
 	select REALTEK_RCC
 	select REALTEK_PINMUX
 	select REALTEK_NVIC
-	select RTK_USING_SDK_LIB
 
 	help
-	  This option enables the tim driver for REALTEK family of
-	  processors.
+	  This option enables the tim driver for REALTEK MCU.
 
-menuconfig REALTEK_TIM_ENHTIM
+menuconfig REALTEK_ENHTIM
 	bool "REALTEK MCU enhtim driver"
 	default n
 
-	select REALTEK_TIM
 	select REALTEK_RCC
 	select REALTEK_PINMUX
 	select REALTEK_NVIC
-	select RTK_USING_SDK_LIB
 
 	help
-	  This option enables the enhtim driver for REALTEK family of
-	  processors.
+	  This option enables the enhtim driver for REALTEK MCU.
