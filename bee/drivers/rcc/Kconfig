@@ -3,5 +3,4 @@ menuconfig REALTEK_RCC
 	default n
 
 	help
-	  This option enables the rcc driver for REALTEK family of
-	  processors.
+	  This option enables the rcc driver for REALTEK MCU.

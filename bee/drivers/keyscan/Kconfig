@@ -6,5 +6,4 @@ menuconfig REALTEK_KEYSCAN
 	select REALTEK_NVIC
 
 	help
-	  This option enables the keyscan driver for REALTEK family of
-	  processors.
+	  This option enables the keyscan driver for REALTEK MCU.

@@ -1,24 +1,10 @@
-
-menuconfig REALTEK_QDEC
-	bool "REALTEK MCU qdec driver"
-	default n
-
-	help
-	  This option enables the qdec driver for REALTEK family of
-	  processors.
-
-
-menuconfig REALTEK_QDEC_AON_QDEC
+menuconfig REALTEK_AON_QDEC
 	bool "REALTEK MCU aon qdec driver"
 	default n
 
-	select REALTEK_QDEC
 	select REALTEK_RCC
 	select REALTEK_PINMUX
 	select REALTEK_NVIC
-	select RTK_USING_SDK_LIB
 
 	help
-	  This option enables the aon qdec driver for REALTEK family of
-	  processors.
-
+	  This option enables the aon qdec driver for REALTEK MCU.

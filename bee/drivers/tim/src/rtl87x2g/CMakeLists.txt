@@ -1,4 +1,4 @@
 zephyr_library()
 
-zephyr_library_sources_ifdef(CONFIG_REALTEK_TIM_TIM rtl87x2g_tim.c)
-zephyr_library_sources_ifdef(CONFIG_REALTEK_TIM_ENHTIM rtl87x2g_enh_tim.c)
+zephyr_library_sources_ifdef(CONFIG_REALTEK_TIM rtl87x2g_tim.c)
+zephyr_library_sources_ifdef(CONFIG_REALTEK_ENHTIM rtl87x2g_enh_tim.c)

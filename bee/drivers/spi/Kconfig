@@ -6,5 +6,4 @@ menuconfig REALTEK_SPI
 	select REALTEK_NVIC
 
 	help
-	  This option enables the spi driver for REALTEK family of
-	  processors.
+	  This option enables the spi driver for REALTEK MCU.
