@@ -14,9 +14,8 @@
 #ifndef RTL_GDMA_DEF_H
 #define RTL_GDMA_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -125,6 +124,18 @@ typedef struct
  *                         GDMA Declaration
  *============================================================================*/
 #define GDMA0              ((GDMA_TypeDef        *) GDMA0_REG_BASE)
+#define GDMA0_CHANNEL_REG_BASE             RXI350_DMAC0_CFG_REG_BASE
+#define GDMA0_REG_BASE                     (GDMA0_CHANNEL_REG_BASE + 0x02c0)
+#define GDMA0_Channel0_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0000)
+#define GDMA0_Channel1_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0058)
+#define GDMA0_Channel2_BASE                (GDMA0_CHANNEL_REG_BASE + 0x00b0)
+#define GDMA0_Channel3_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0108)
+#define GDMA0_Channel4_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0160)
+#define GDMA0_Channel5_BASE                (GDMA0_CHANNEL_REG_BASE + 0x01b8)
+#define GDMA0_Channel6_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0210)
+#define GDMA0_Channel7_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0268)
+#define GDMA0_Channel8_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0400)
+#define GDMA0_Channel9_BASE                (GDMA0_CHANNEL_REG_BASE + 0x0458)
 #define GDMA_Channel0      ((GDMA_ChannelTypeDef *) GDMA0_Channel0_BASE)
 #define GDMA_Channel1      ((GDMA_ChannelTypeDef *) GDMA0_Channel1_BASE)
 #define GDMA_Channel2      ((GDMA_ChannelTypeDef *) GDMA0_Channel2_BASE)
@@ -148,7 +159,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t SAR: 32;
+        uint32_t SAR: 32;
     } b;
 } GDMA_SARx_TypeDef;
 
@@ -163,7 +174,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t CURR_SAR: 32;
+        const uint32_t CURR_SAR: 32;
     } b;
 } GDMA_CURR_SARx_TypeDef;
 
@@ -178,7 +189,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t DAR: 32;
+        uint32_t DAR: 32;
     } b;
 } GDMA_DARx_TypeDef;
 
@@ -193,7 +204,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t CURR_DAR: 32;
+        const uint32_t CURR_DAR: 32;
     } b;
 } GDMA_CURR_DARx_TypeDef;
 
@@ -209,8 +220,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t reserved_0: 2;
-        __IO uint32_t LOC: 30;
+        uint32_t reserved_0: 2;
+        uint32_t LOC: 30;
     } b;
 } GDMA_LLPx_TypeDef;
 
@@ -223,7 +234,7 @@ typedef union
    10:9    R/W    SINC                0x0
    13:11   R/W    DEST_MSIZE          0x1
    16:14   R/W    SRC_MSIZE           0x1
-   17      R/W    SRC_SCATTER_EN      0x0
+   17      R/W    SRC_GATHER_EN       0x0
    18      R/W    DST_SCATTER_EN      0x0
    19      R/W    reserved20          0x0
    22:20   R/W    TT_FC               0x0
@@ -238,21 +249,21 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t INT_EN: 1;
-        __IO uint32_t DST_TR_WIDTH: 3;
-        __IO uint32_t SRC_TR_WIDTH: 3;
-        __IO uint32_t DINC: 2;
-        __IO uint32_t SINC: 2;
-        __IO uint32_t DEST_MSIZE: 3;
-        __IO uint32_t SRC_MSIZE: 3;
-        __IO uint32_t SRC_SCATTER_EN: 1;
-        __IO uint32_t DST_SCATTER_EN: 1;
-        __IO uint32_t reserved_2: 1;
-        __IO uint32_t TT_FC: 3;
-        __I uint32_t reserved_1: 4;
-        __IO uint32_t LLP_DST_EN: 1;
-        __IO uint32_t LLP_SRC_EN: 1;
-        __I uint32_t reserved_0: 3;
+        uint32_t INT_EN: 1;
+        uint32_t DST_TR_WIDTH: 3;
+        uint32_t SRC_TR_WIDTH: 3;
+        uint32_t DINC: 2;
+        uint32_t SINC: 2;
+        uint32_t DEST_MSIZE: 3;
+        uint32_t SRC_MSIZE: 3;
+        uint32_t SRC_GATHER_EN: 1;
+        uint32_t DST_SCATTER_EN: 1;
+        uint32_t reserved_2: 1;
+        uint32_t TT_FC: 3;
+        const uint32_t reserved_1: 4;
+        uint32_t LLP_DST_EN: 1;
+        uint32_t LLP_SRC_EN: 1;
+        const uint32_t reserved_0: 3;
     } b;
 } GDMA_CTL_LOWx_TypeDef;
 
@@ -267,7 +278,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t TRANS_DATA_CNT: 32;
+        const uint32_t TRANS_DATA_CNT: 32;
     } b;
 } GDMA_CTL_HIGHx_R_TypeDef;
 
@@ -283,8 +294,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t BLOCK_TS: 16;
-        __O uint32_t reserved_0: 16;
+        uint32_t BLOCK_TS: 16;
+        uint32_t reserved_0: 16;
     } b;
 } GDMA_CTL_HIGHx_W_TypeDef;
 
@@ -312,21 +323,21 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t INACTIVE: 1;
-        __I uint32_t SRC_PCTL_OVER: 1;
-        __I uint32_t DST_PCTL_OVER: 1;
-        __I uint32_t reserved_2: 1;
-        __IO uint32_t CH_PRIOR: 4;
-        __IO uint32_t CH_SUSP: 1;
-        __I uint32_t FIFO_EMPTY: 1;
-        __IO uint32_t HS_SEL_DST: 1;
-        __IO uint32_t HS_SEL_SRC: 1;
-        __I uint32_t reserved_1: 6;
-        __IO uint32_t DST_HS_POL: 1;
-        __IO uint32_t SRC_HS_POL: 1;
-        __IO uint32_t reserved_0: 10;
-        __IO uint32_t RELOAD_SRC: 1;
-        __IO uint32_t RELOAD_DST: 1;
+        const uint32_t INACTIVE: 1;
+        const uint32_t SRC_PCTL_OVER: 1;
+        const uint32_t DST_PCTL_OVER: 1;
+        const uint32_t reserved_2: 1;
+        uint32_t CH_PRIOR: 4;
+        uint32_t CH_SUSP: 1;
+        const uint32_t FIFO_EMPTY: 1;
+        uint32_t HS_SEL_DST: 1;
+        uint32_t HS_SEL_SRC: 1;
+        const uint32_t reserved_1: 6;
+        uint32_t DST_HS_POL: 1;
+        uint32_t SRC_HS_POL: 1;
+        uint32_t reserved_0: 10;
+        uint32_t RELOAD_SRC: 1;
+        uint32_t RELOAD_DST: 1;
     } b;
 } GDMA_CFG_LOWx_TypeDef;
 
@@ -354,20 +365,20 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t reserved_4: 1;
-        __IO uint32_t reserved_3: 1;
-        __I uint32_t reserved_2: 1;
-        __IO uint32_t PROTCTL: 1;
-        __I uint32_t reserved_1: 3;
-        __IO uint32_t SRC_PER: 4;
-        __IO uint32_t DEST_PER: 4;
-        __IO uint32_t ExtendedSRC_PER1: 1;
-        __IO uint32_t ExtendedDEST_PER1: 1;
-        __IO uint32_t ExtendedSRC_PER2: 1;
-        __IO uint32_t ExtendedDEST_PER2: 1;
-        __IO uint32_t ExtendedSRC_PER3: 1;
-        __IO uint32_t ExtendedDEST_PER3: 1;
-        __I uint32_t reserved_0: 11;
+        uint32_t reserved_4: 1;
+        uint32_t reserved_3: 1;
+        const uint32_t reserved_2: 1;
+        uint32_t PROTCTL: 1;
+        const uint32_t reserved_1: 3;
+        uint32_t SRC_PER: 4;
+        uint32_t DEST_PER: 4;
+        uint32_t ExtendedSRC_PER1: 1;
+        uint32_t ExtendedDEST_PER1: 1;
+        uint32_t ExtendedSRC_PER2: 1;
+        uint32_t ExtendedDEST_PER2: 1;
+        uint32_t ExtendedSRC_PER3: 1;
+        uint32_t ExtendedDEST_PER3: 1;
+        const uint32_t reserved_0: 11;
     } b;
 } GDMA_CFG_HIGHx_TypeDef;
 
@@ -382,8 +393,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t SGSN: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t SGSN: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } GDMA_SGR_TypeDef;
 
@@ -399,8 +410,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t DSSN: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t DSSN: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } GDMA_DSR_TypeDef;
 
@@ -415,7 +426,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t STATUS: 32;
+        const uint32_t STATUS: 32;
     } b;
 } GDMA_StatusTfr_TypeDef;
 
@@ -430,7 +441,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t STATUS: 32;
+        const uint32_t STATUS: 32;
     } b;
 } GDMA_StatusBlock_TypeDef;
 
@@ -445,7 +456,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t STATUS: 32;
+        const uint32_t STATUS: 32;
     } b;
 } GDMA_StatusSrcTran_TypeDef;
 
@@ -460,7 +471,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t STATUS: 32;
+        const uint32_t STATUS: 32;
     } b;
 } GDMA_StatusDstTran_TypeDef;
 
@@ -475,7 +486,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t STATUS: 32;
+        const uint32_t STATUS: 32;
     } b;
 } GDMA_StatusErr_TypeDef;
 
@@ -493,10 +504,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t INT_MASK_L: 8;
-        __O uint32_t INT_MASK_WE_L: 8;
-        __IO uint32_t INT_MASK_H: 8;
-        __O uint32_t INT_MASK_WE_H: 8;
+        uint32_t INT_MASK_L: 8;
+        uint32_t INT_MASK_WE_L: 8;
+        uint32_t INT_MASK_H: 8;
+        uint32_t INT_MASK_WE_H: 8;
     } b;
 } GDMA_MaskTfr_TypeDef;
 
@@ -514,10 +525,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t INT_MASK_L: 8;
-        __O uint32_t INT_MASK_WE_L: 8;
-        __IO uint32_t INT_MASK_H: 8;
-        __O uint32_t INT_MASK_WE_H: 8;
+        uint32_t INT_MASK_L: 8;
+        uint32_t INT_MASK_WE_L: 8;
+        uint32_t INT_MASK_H: 8;
+        uint32_t INT_MASK_WE_H: 8;
     } b;
 } GDMA_MaskBlock_TypeDef;
 
@@ -535,10 +546,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t INT_MASK_L: 8;
-        __O uint32_t INT_MASK_WE_L: 8;
-        __IO uint32_t INT_MASK_H: 8;
-        __O uint32_t INT_MASK_WE_H: 8;
+        uint32_t INT_MASK_L: 8;
+        uint32_t INT_MASK_WE_L: 8;
+        uint32_t INT_MASK_H: 8;
+        uint32_t INT_MASK_WE_H: 8;
     } b;
 } GDMA_MaskSrcTran_TypeDef;
 
@@ -556,10 +567,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t INT_MASK_L: 8;
-        __O uint32_t INT_MASK_WE_L: 8;
-        __IO uint32_t INT_MASK_H: 8;
-        __O uint32_t INT_MASK_WE_H: 8;
+        uint32_t INT_MASK_L: 8;
+        uint32_t INT_MASK_WE_L: 8;
+        uint32_t INT_MASK_H: 8;
+        uint32_t INT_MASK_WE_H: 8;
     } b;
 } GDMA_MaskDstTran_TypeDef;
 
@@ -577,10 +588,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t INT_MASK_L: 8;
-        __O uint32_t INT_MASK_WE_L: 8;
-        __IO uint32_t INT_MASK_H: 8;
-        __O uint32_t INT_MASK_WE_H: 8;
+        uint32_t INT_MASK_L: 8;
+        uint32_t INT_MASK_WE_L: 8;
+        uint32_t INT_MASK_H: 8;
+        uint32_t INT_MASK_WE_H: 8;
     } b;
 } GDMA_MaskErr_TypeDef;
 
@@ -595,7 +606,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t CLEAR: 32;
+        uint32_t CLEAR: 32;
     } b;
 } GDMA_ClearTfr_TypeDef;
 
@@ -610,7 +621,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t CLEAR: 32;
+        uint32_t CLEAR: 32;
     } b;
 } GDMA_ClearBlock_TypeDef;
 
@@ -625,7 +636,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t CLEAR: 32;
+        uint32_t CLEAR: 32;
     } b;
 } GDMA_ClearSrcTran_TypeDef;
 
@@ -640,7 +651,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t CLEAR: 32;
+        uint32_t CLEAR: 32;
     } b;
 } GDMA_ClearDstTran_TypeDef;
 
@@ -655,7 +666,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t CLEAR: 32;
+        uint32_t CLEAR: 32;
     } b;
 } GDMA_ClearErr_TypeDef;
 
@@ -671,8 +682,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t DMAC_EN: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t DMAC_EN: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } GDMA_DmaCfgReg_TypeDef;
 
@@ -690,10 +701,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t CH_EN_L: 8;
-        __O uint32_t CH_EN_WE_L: 8;
-        __IO uint32_t CH_EN_H: 8;
-        __O uint32_t CH_EN_WE_H: 8;
+        uint32_t CH_EN_L: 8;
+        uint32_t CH_EN_WE_L: 8;
+        uint32_t CH_EN_H: 8;
+        uint32_t CH_EN_WE_H: 8;
     } b;
 } GDMA_ChEnReg_TypeDef;
 
@@ -710,9 +721,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t OSR: 8;
-        __IO uint32_t OSW: 8;
-        __I uint32_t reserved_0: 16;
+        uint32_t OSR: 8;
+        uint32_t OSW: 8;
+        const uint32_t reserved_0: 16;
     } b;
 } GDMA_DmaOsNum_TypeDef;
 

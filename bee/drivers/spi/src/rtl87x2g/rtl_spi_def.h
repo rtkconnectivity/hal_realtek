@@ -14,9 +14,8 @@
 #ifndef RTL_SPI_DEF_H
 #define RTL_SPI_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -144,19 +143,19 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t dfs: 4;
-        __IO uint32_t frf: 2;
-        __IO uint32_t scph: 1;
-        __IO uint32_t scpol: 1;
-        __IO uint32_t tmod: 2;
-        __IO uint32_t slv_oe: 1;
-        __IO uint32_t srl: 1;
-        __IO uint32_t cfs: 4;
-        __IO uint32_t dfs_32: 5;
-        __I uint32_t spi_frf: 2;
-        __I uint32_t reserved_1: 1;
-        __IO uint32_t sste: 1;
-        __I uint32_t reserved_0: 7;
+        const uint32_t dfs: 4;
+        uint32_t frf: 2;
+        uint32_t scph: 1;
+        uint32_t scpol: 1;
+        uint32_t tmod: 2;
+        uint32_t slv_oe: 1;
+        uint32_t srl: 1;
+        uint32_t cfs: 4;
+        uint32_t dfs_32: 5;
+        const uint32_t spi_frf: 2;
+        const uint32_t reserved_1: 1;
+        uint32_t sste: 1;
+        const uint32_t reserved_0: 7;
     } b;
 } SPI_M_CTRL0_TypeDef;
 
@@ -182,18 +181,18 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dfs: 4;
-        __I uint32_t reserved_3: 2;
-        __IO uint32_t scph: 1;
-        __IO uint32_t scpol: 1;
-        __I uint32_t reserved_2: 2;
-        __IO uint32_t slv_oe: 1;
-        __I uint32_t reserved_1: 10;
-        __IO uint32_t tx_byte_swap: 1;
-        __IO uint32_t tx_bit_swap: 1;
-        __IO uint32_t rx_byte_swap: 1;
-        __IO uint32_t rx_bit_swap: 1;
-        __I uint32_t reserved_0: 7;
+        uint32_t dfs: 4;
+        const uint32_t reserved_3: 2;
+        uint32_t scph: 1;
+        uint32_t scpol: 1;
+        const uint32_t reserved_2: 2;
+        uint32_t slv_oe: 1;
+        const uint32_t reserved_1: 10;
+        uint32_t tx_byte_swap: 1;
+        uint32_t tx_bit_swap: 1;
+        uint32_t rx_byte_swap: 1;
+        uint32_t rx_bit_swap: 1;
+        const uint32_t reserved_0: 7;
     } b;
 } SPI_S_CTRL0_TypeDef;
 
@@ -209,8 +208,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ndf: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t ndf: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } SPI_M_CTRL1_TypeDef;
 
@@ -226,8 +225,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t spi_en: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t spi_en: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_SPIENR_TypeDef;
 
@@ -243,8 +242,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ser: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t ser: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_M_SER_TypeDef;
 
@@ -260,8 +259,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t sckdv: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t sckdv: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } SPI_M_BAUDR_TypeDef;
 
@@ -277,8 +276,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t tft: 6;
-        __I uint32_t reserved_0: 26;
+        uint32_t tft: 6;
+        const uint32_t reserved_0: 26;
     } b;
 } SPI_TXFTLR_TypeDef;
 
@@ -294,8 +293,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rft: 6;
-        __I uint32_t reserved_0: 26;
+        uint32_t rft: 6;
+        const uint32_t reserved_0: 26;
     } b;
 } SPI_RXFTLR_TypeDef;
 
@@ -311,8 +310,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txtfl: 7;
-        __I uint32_t reserved_0: 25;
+        const uint32_t txtfl: 7;
+        const uint32_t reserved_0: 25;
     } b;
 } SPI_TXFLR_TypeDef;
 
@@ -328,8 +327,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rxtfl: 7;
-        __I uint32_t reserved_0: 25;
+        const uint32_t rxtfl: 7;
+        const uint32_t reserved_0: 25;
     } b;
 } SPI_RXFLR_TypeDef;
 
@@ -351,14 +350,14 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t busy: 1;
-        __I uint32_t tfnf: 1;
-        __I uint32_t tfe: 1;
-        __I uint32_t rfne: 1;
-        __I uint32_t rff: 1;
-        __I uint32_t txe: 1;
-        __I uint32_t dcol: 1;
-        __I uint32_t reserved_0: 25;
+        const uint32_t busy: 1;
+        const uint32_t tfnf: 1;
+        const uint32_t tfe: 1;
+        const uint32_t rfne: 1;
+        const uint32_t rff: 1;
+        const uint32_t txe: 1;
+        const uint32_t dcol: 1;
+        const uint32_t reserved_0: 25;
     } b;
 } SPI_M_SR_TypeDef;
 
@@ -380,14 +379,14 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t busy: 1;
-        __I uint32_t tfnf: 1;
-        __I uint32_t tfe: 1;
-        __I uint32_t rfne: 1;
-        __I uint32_t rff: 1;
-        __I uint32_t txe: 1;
-        __I uint32_t reserved_1: 1;
-        __I uint32_t reserved_0: 25;
+        const uint32_t busy: 1;
+        const uint32_t tfnf: 1;
+        const uint32_t tfe: 1;
+        const uint32_t rfne: 1;
+        const uint32_t rff: 1;
+        const uint32_t txe: 1;
+        const uint32_t reserved_1: 1;
+        const uint32_t reserved_0: 25;
     } b;
 } SPI_S_SR_TypeDef;
 
@@ -408,13 +407,13 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t txeim: 1;
-        __IO uint32_t txoim: 1;
-        __IO uint32_t rxuim: 1;
-        __IO uint32_t rxoim: 1;
-        __IO uint32_t rxfim: 1;
-        __IO uint32_t mstim: 1;
-        __I uint32_t reserved_0: 26;
+        uint32_t txeim: 1;
+        uint32_t txoim: 1;
+        uint32_t rxuim: 1;
+        uint32_t rxoim: 1;
+        uint32_t rxfim: 1;
+        uint32_t mstim: 1;
+        const uint32_t reserved_0: 26;
     } b;
 } SPI_M_IMR_TypeDef;
 
@@ -437,15 +436,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t txeim: 1;
-        __IO uint32_t txoim: 1;
-        __IO uint32_t rxuim: 1;
-        __IO uint32_t rxoim: 1;
-        __IO uint32_t rxfim: 1;
-        __IO uint32_t faeim: 1;
-        __IO uint32_t txuim: 1;
-        __IO uint32_t ssrim: 1;
-        __I uint32_t reserved_0: 24;
+        uint32_t txeim: 1;
+        uint32_t txoim: 1;
+        uint32_t rxuim: 1;
+        uint32_t rxoim: 1;
+        uint32_t rxfim: 1;
+        uint32_t faeim: 1;
+        uint32_t txuim: 1;
+        uint32_t ssrim: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } SPI_S_IMR_TypeDef;
 
@@ -466,13 +465,13 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txeis: 1;
-        __I uint32_t txois: 1;
-        __I uint32_t rxuis: 1;
-        __I uint32_t rxois: 1;
-        __I uint32_t rxfis: 1;
-        __I uint32_t mstis: 1;
-        __I uint32_t reserved_0: 26;
+        const uint32_t txeis: 1;
+        const uint32_t txois: 1;
+        const uint32_t rxuis: 1;
+        const uint32_t rxois: 1;
+        const uint32_t rxfis: 1;
+        const uint32_t mstis: 1;
+        const uint32_t reserved_0: 26;
     } b;
 } SPI_M_ISR_TypeDef;
 
@@ -495,15 +494,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txeis: 1;
-        __I uint32_t txois: 1;
-        __I uint32_t rxuis: 1;
-        __I uint32_t rxois: 1;
-        __I uint32_t rxfis: 1;
-        __I uint32_t faeis: 1;
-        __I uint32_t txuis: 1;
-        __I uint32_t ssris: 1;
-        __I uint32_t reserved_0: 24;
+        const uint32_t txeis: 1;
+        const uint32_t txois: 1;
+        const uint32_t rxuis: 1;
+        const uint32_t rxois: 1;
+        const uint32_t rxfis: 1;
+        const uint32_t faeis: 1;
+        const uint32_t txuis: 1;
+        const uint32_t ssris: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } SPI_S_ISR_TypeDef;
 
@@ -524,13 +523,13 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txeir: 1;
-        __I uint32_t txoir: 1;
-        __I uint32_t rxuir: 1;
-        __I uint32_t rxoir: 1;
-        __I uint32_t rxfir: 1;
-        __I uint32_t mstir: 1;
-        __I uint32_t reserved_0: 26;
+        const uint32_t txeir: 1;
+        const uint32_t txoir: 1;
+        const uint32_t rxuir: 1;
+        const uint32_t rxoir: 1;
+        const uint32_t rxfir: 1;
+        const uint32_t mstir: 1;
+        const uint32_t reserved_0: 26;
     } b;
 } SPI_M_RISR_TypeDef;
 
@@ -553,15 +552,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txeir: 1;
-        __I uint32_t txoir: 1;
-        __I uint32_t rxuir: 1;
-        __I uint32_t rxoir: 1;
-        __I uint32_t rxfir: 1;
-        __I uint32_t faeir: 1;
-        __I uint32_t txuir: 1;
-        __I uint32_t ssrir: 1;
-        __I uint32_t reserved_0: 24;
+        const uint32_t txeir: 1;
+        const uint32_t txoir: 1;
+        const uint32_t rxuir: 1;
+        const uint32_t rxoir: 1;
+        const uint32_t rxfir: 1;
+        const uint32_t faeir: 1;
+        const uint32_t txuir: 1;
+        const uint32_t ssrir: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } SPI_S_RISR_TypeDef;
 
@@ -577,8 +576,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txoicr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t txoicr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_TXOICR_TypeDef;
 
@@ -594,8 +593,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rxoicr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t rxoicr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_RXOICR_TypeDef;
 
@@ -611,8 +610,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rxuicr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t rxuicr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_RXUICR_TypeDef;
 
@@ -628,8 +627,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t msticr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t msticr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_M_MSTICR_TypeDef;
 
@@ -645,8 +644,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t faeicr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t faeicr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_S_FAEICR_TypeDef;
 
@@ -662,8 +661,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t icr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t icr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_ICR_TypeDef;
 
@@ -680,9 +679,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rdmae: 1;
-        __IO uint32_t tdmae: 1;
-        __I uint32_t reserved_0: 30;
+        uint32_t rdmae: 1;
+        uint32_t tdmae: 1;
+        const uint32_t reserved_0: 30;
     } b;
 } SPI_DMACR_TypeDef;
 
@@ -698,8 +697,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dmatdl: 6;
-        __I uint32_t reserved_0: 26;
+        uint32_t dmatdl: 6;
+        const uint32_t reserved_0: 26;
     } b;
 } SPI_DMATDLR_TypeDef;
 
@@ -715,8 +714,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dmardl: 6;
-        __I uint32_t reserved_0: 26;
+        uint32_t dmardl: 6;
+        const uint32_t reserved_0: 26;
     } b;
 } SPI_DMARDLR_TypeDef;
 
@@ -731,7 +730,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t idcode: 32;
+        const uint32_t idcode: 32;
     } b;
 } SPI_M_IDR_TypeDef;
 
@@ -747,8 +746,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txuicr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t txuicr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_S_TXUICR_TypeDef;
 
@@ -763,7 +762,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t ssi_comp_version: 32;
+        const uint32_t ssi_comp_version: 32;
     } b;
 } SPI_M_VERSION_ID_TypeDef;
 
@@ -779,8 +778,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t ssricr: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t ssricr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } SPI_S_SSRICR_TypeDef;
 
@@ -795,7 +794,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dr: 32;
+        uint32_t dr: 32;
     } b;
 } SPI_DR_TypeDef;
 
@@ -811,8 +810,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rsd: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t rsd: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } SPI_M_RSDR_TypeDef;
 

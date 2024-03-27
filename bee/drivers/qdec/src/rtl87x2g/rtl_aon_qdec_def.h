@@ -13,9 +13,8 @@
 #ifndef RTL_AON_QDEC_DEF_H
 #define RTL_AON_QDEC_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -63,22 +62,22 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t x_initial_phase: 2;
-        __IO uint32_t x_set_initial_phase: 1;
-        __IO uint32_t x_cnt_pause: 1;
-        __IO uint32_t x_cnt_scale: 1;
-        __IO uint32_t x_illegal_int_en: 1;
-        __IO uint32_t x_cnt_int_en: 1;
-        __IO uint32_t illegal_int_mask: 1;
-        __IO uint32_t cnt_int_mask: 1;
-        __IO uint32_t x_debounce_cnt: 13;
-        __IO uint32_t x_debounce_en: 1;
-        __IO uint32_t x_wake_aon_mask: 1;
-        __IO uint32_t x_int_mask: 1;
-        __IO uint32_t reg_config_dummy1: 4;
-        __IO uint32_t x_rst: 1;
-        __IO uint32_t x_fsm_en: 1;
-        __IO uint32_t x_axis_en: 1;
+        uint32_t x_initial_phase: 2;
+        uint32_t x_set_initial_phase: 1;
+        uint32_t x_cnt_pause: 1;
+        uint32_t x_cnt_scale: 1;
+        uint32_t x_illegal_int_en: 1;
+        uint32_t x_cnt_int_en: 1;
+        uint32_t illegal_int_mask: 1;
+        uint32_t cnt_int_mask: 1;
+        uint32_t x_debounce_cnt: 13;
+        uint32_t x_debounce_en: 1;
+        uint32_t x_wake_aon_mask: 1;
+        uint32_t x_int_mask: 1;
+        uint32_t reg_config_dummy1: 4;
+        uint32_t x_rst: 1;
+        uint32_t x_fsm_en: 1;
+        uint32_t x_axis_en: 1;
     } b;
 } AON_QDEC_CONFIG_TypeDef;
 
@@ -101,15 +100,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I  uint32_t acc_cnt: 16;
-        __IO uint32_t cnt_of_flg: 1;
-        __IO uint32_t cnt_uf_flg: 1;
-        __IO uint32_t cnt_int_sta: 1;
-        __IO uint32_t illegal_int_sta: 1;
-        __I  uint32_t cnt_dir: 1;
-        __IO uint32_t reserved_0: 1;
-        __I  uint32_t debug_state_x: 2;
-        __I  uint32_t debug_illegal_counter_x: 8;
+        const  uint32_t acc_cnt: 16;
+        uint32_t cnt_of_flg: 1;
+        uint32_t cnt_uf_flg: 1;
+        uint32_t cnt_int_sta: 1;
+        uint32_t illegal_int_sta: 1;
+        const  uint32_t cnt_dir: 1;
+        uint32_t reserved_0: 1;
+        const  uint32_t debug_state_x: 2;
+        const  uint32_t debug_illegal_counter_x: 8;
     } b;
 } AON_QDEC_SR_X_TypeDef;
 
@@ -130,13 +129,13 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t acc_cnt_clr: 1;
-        __IO uint32_t cnt_int_clr: 1;
-        __IO uint32_t of_flg_clr: 1;
-        __IO uint32_t uf_flg_clr: 1;
-        __IO uint32_t illegal_int_clr: 1;
-        __IO uint32_t illegal_cnt_clr: 1;
-        __IO uint32_t reserved_0: 26;
+        uint32_t acc_cnt_clr: 1;
+        uint32_t cnt_int_clr: 1;
+        uint32_t of_flg_clr: 1;
+        uint32_t uf_flg_clr: 1;
+        uint32_t illegal_int_clr: 1;
+        uint32_t illegal_cnt_clr: 1;
+        uint32_t reserved_0: 26;
     } b;
 } AON_QDEC_INT_CLR_TypeDef;
 

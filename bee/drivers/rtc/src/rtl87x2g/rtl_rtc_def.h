@@ -14,9 +14,9 @@
 #ifndef RTL_RTC_DEF_H
 #define RTL_RTC_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
+#include "armv81mml_setting.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -112,30 +112,30 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cnt_start: 1;
-        __IO uint32_t rtc_cnt_rst: 1;
-        __IO uint32_t rtc_pre_cnt_rst: 1;
-        __IO uint32_t rtc_cr0_dummy0: 5;
-        __IO uint32_t rtc_tick_ie: 1;
-        __IO uint32_t rtc_cnt_ov_ie: 1;
-        __IO uint32_t rtc_precmp_ie: 1;
-        __IO uint32_t rtc_precmp_cmp3_ie: 1;
-        __IO uint32_t rtc_cmp0gt_ie: 1;
-        __IO uint32_t rtc_cmp1gt_ie: 1;
-        __IO uint32_t rtc_cmp2gt_ie: 1;
-        __IO uint32_t rtc_cmp3gt_ie: 1;
-        __IO uint32_t rtc_cmp0_nv_ie: 1;
-        __IO uint32_t rtc_cmp1_nv_ie: 1;
-        __IO uint32_t rtc_cmp2_nv_ie: 1;
-        __IO uint32_t rtc_cmp3_nv_ie: 1;
-        __IO uint32_t rtc_cmp0_wk_ie: 1;
-        __IO uint32_t rtc_cmp1_wk_ie: 1;
-        __IO uint32_t rtc_cmp2_wk_ie: 1;
-        __IO uint32_t rtc_cmp3_wk_ie: 1;
-        __IO uint32_t rtc_cr0_dummy1: 5;
-        __IO uint32_t rtc_wk_ie: 1;
-        __IO uint32_t rtc_nv_ie: 1;
-        __IO uint32_t rtc_rst: 1;
+        uint32_t rtc_cnt_start: 1;
+        uint32_t rtc_cnt_rst: 1;
+        uint32_t rtc_pre_cnt_rst: 1;
+        uint32_t rtc_cr0_dummy0: 5;
+        uint32_t rtc_tick_ie: 1;
+        uint32_t rtc_cnt_ov_ie: 1;
+        uint32_t rtc_precmp_ie: 1;
+        uint32_t rtc_precmp_cmp3_ie: 1;
+        uint32_t rtc_cmp0gt_ie: 1;
+        uint32_t rtc_cmp1gt_ie: 1;
+        uint32_t rtc_cmp2gt_ie: 1;
+        uint32_t rtc_cmp3gt_ie: 1;
+        uint32_t rtc_cmp0_nv_ie: 1;
+        uint32_t rtc_cmp1_nv_ie: 1;
+        uint32_t rtc_cmp2_nv_ie: 1;
+        uint32_t rtc_cmp3_nv_ie: 1;
+        uint32_t rtc_cmp0_wk_ie: 1;
+        uint32_t rtc_cmp1_wk_ie: 1;
+        uint32_t rtc_cmp2_wk_ie: 1;
+        uint32_t rtc_cmp3_wk_ie: 1;
+        uint32_t rtc_cr0_dummy1: 5;
+        uint32_t rtc_wk_ie: 1;
+        uint32_t rtc_nv_ie: 1;
+        uint32_t rtc_rst: 1;
     } b;
 } RTC_CR0_TypeDef;
 
@@ -166,23 +166,23 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_tick_clr: 1;
-        __IO uint32_t rtc_cnt_ov_clr: 1;
-        __IO uint32_t rtc_precmp_clr: 1;
-        __IO uint32_t rtc_precmp_cmp3_clr: 1;
-        __IO uint32_t rtc_cmp0gt_clr: 1;
-        __IO uint32_t rtc_cmp1gt_clr: 1;
-        __IO uint32_t rtc_cmp2gt_clr: 1;
-        __IO uint32_t rtc_cmp3gt_clr: 1;
-        __IO uint32_t rtc_cmp0_nv_clr: 1;
-        __IO uint32_t rtc_cmp1_nv_clr: 1;
-        __IO uint32_t rtc_cmp2_nv_clr: 1;
-        __IO uint32_t rtc_cmp3_nv_clr: 1;
-        __IO uint32_t rtc_cmp0_wk_clr: 1;
-        __IO uint32_t rtc_cmp1_wk_clr: 1;
-        __IO uint32_t rtc_cmp2_wk_clr: 1;
-        __IO uint32_t rtc_cmp3_wk_clr: 1;
-        __IO uint32_t rtc_int_clear_dummy: 16;
+        uint32_t rtc_tick_clr: 1;
+        uint32_t rtc_cnt_ov_clr: 1;
+        uint32_t rtc_precmp_clr: 1;
+        uint32_t rtc_precmp_cmp3_clr: 1;
+        uint32_t rtc_cmp0gt_clr: 1;
+        uint32_t rtc_cmp1gt_clr: 1;
+        uint32_t rtc_cmp2gt_clr: 1;
+        uint32_t rtc_cmp3gt_clr: 1;
+        uint32_t rtc_cmp0_nv_clr: 1;
+        uint32_t rtc_cmp1_nv_clr: 1;
+        uint32_t rtc_cmp2_nv_clr: 1;
+        uint32_t rtc_cmp3_nv_clr: 1;
+        uint32_t rtc_cmp0_wk_clr: 1;
+        uint32_t rtc_cmp1_wk_clr: 1;
+        uint32_t rtc_cmp2_wk_clr: 1;
+        uint32_t rtc_cmp3_wk_clr: 1;
+        uint32_t rtc_int_clear_dummy: 16;
     } b;
 } RTC_INT_CLEAR_TypeDef;
 
@@ -213,23 +213,23 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_tick_sr: 1;
-        __IO uint32_t rtc_cnt_ov_sr: 1;
-        __IO uint32_t rtc_precmp_sr: 1;
-        __IO uint32_t rtc_precmp_cmp3_sr: 1;
-        __IO uint32_t rtc_cmp0gt_sr: 1;
-        __IO uint32_t rtc_cmp1gt_sr: 1;
-        __IO uint32_t rtc_cmp2gt_sr: 1;
-        __IO uint32_t rtc_cmp3gt_sr: 1;
-        __IO uint32_t rtc_cmp0_nv_sr: 1;
-        __IO uint32_t rtc_cmp1_nv_sr: 1;
-        __IO uint32_t rtc_cmp2_nv_sr: 1;
-        __IO uint32_t rtc_cmp3_nv_sr: 1;
-        __IO uint32_t rtc_cmp0_wk_sr: 1;
-        __IO uint32_t rtc_cmp1_wk_sr: 1;
-        __IO uint32_t rtc_cmp2_wk_sr: 1;
-        __IO uint32_t rtc_cmp3_wk_sr: 1;
-        __IO uint32_t rtc_int_sr_dummy: 16;
+        uint32_t rtc_tick_sr: 1;
+        uint32_t rtc_cnt_ov_sr: 1;
+        uint32_t rtc_precmp_sr: 1;
+        uint32_t rtc_precmp_cmp3_sr: 1;
+        uint32_t rtc_cmp0gt_sr: 1;
+        uint32_t rtc_cmp1gt_sr: 1;
+        uint32_t rtc_cmp2gt_sr: 1;
+        uint32_t rtc_cmp3gt_sr: 1;
+        uint32_t rtc_cmp0_nv_sr: 1;
+        uint32_t rtc_cmp1_nv_sr: 1;
+        uint32_t rtc_cmp2_nv_sr: 1;
+        uint32_t rtc_cmp3_nv_sr: 1;
+        uint32_t rtc_cmp0_wk_sr: 1;
+        uint32_t rtc_cmp1_wk_sr: 1;
+        uint32_t rtc_cmp2_wk_sr: 1;
+        uint32_t rtc_cmp3_wk_sr: 1;
+        uint32_t rtc_int_sr_dummy: 16;
     } b;
 } RTC_INT_SR_TypeDef;
 
@@ -245,8 +245,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_prescaler: 12;
-        __IO uint32_t rtc_prescaler_dummy: 20;
+        uint32_t rtc_prescaler: 12;
+        uint32_t rtc_prescaler_dummy: 20;
     } b;
 } RTC_PRESCALER0_TypeDef;
 
@@ -261,7 +261,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp0: 32;
+        uint32_t rtc_cmp0: 32;
     } b;
 } RTC_COMP_0_TypeDef;
 
@@ -276,7 +276,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp1: 32;
+        uint32_t rtc_cmp1: 32;
     } b;
 } RTC_COMP_1_TypeDef;
 
@@ -291,7 +291,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp2: 32;
+        uint32_t rtc_cmp2: 32;
     } b;
 } RTC_COMP_2_TypeDef;
 
@@ -306,7 +306,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp3: 32;
+        uint32_t rtc_cmp3: 32;
     } b;
 } RTC_COMP_3_TypeDef;
 
@@ -321,7 +321,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp0gt: 32;
+        uint32_t rtc_cmp0gt: 32;
     } b;
 } RTC_COMP0_GT_TypeDef;
 
@@ -336,7 +336,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp1gt: 32;
+        uint32_t rtc_cmp1gt: 32;
     } b;
 } RTC_COMP1_GT_TypeDef;
 
@@ -351,7 +351,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp2gt: 32;
+        uint32_t rtc_cmp2gt: 32;
     } b;
 } RTC_COMP2_GT_TypeDef;
 
@@ -366,7 +366,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_cmp3gt: 32;
+        uint32_t rtc_cmp3gt: 32;
     } b;
 } RTC_COMP3_GT_TypeDef;
 
@@ -381,7 +381,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rtc_cnt: 32;
+        const uint32_t rtc_cnt: 32;
     } b;
 } RTC_CNT0_TypeDef;
 
@@ -397,8 +397,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rtc_prescale_cnt: 12;
-        __IO uint32_t rtc_prescale_cnt_dummy: 20;
+        const uint32_t rtc_prescale_cnt: 12;
+        uint32_t rtc_prescale_cnt_dummy: 20;
     } b;
 } RTC_PRESCALE_CNT0_TypeDef;
 
@@ -414,8 +414,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_prescale_cmp: 12;
-        __IO uint32_t rtc_prescale_cmp_dummy: 20;
+        uint32_t rtc_prescale_cmp: 12;
+        uint32_t rtc_prescale_cmp_dummy: 20;
     } b;
 } RTC_PRESCALE_CMP0_TypeDef;
 
@@ -430,7 +430,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rtc_backup: 32;
+        uint32_t rtc_backup: 32;
     } b;
 } RTC_BACKUP_REG_TypeDef;
 
@@ -445,7 +445,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rtc_rtl_version: 32;
+        const uint32_t rtc_rtl_version: 32;
     } b;
 } RTC_RTL_VERSION0_TypeDef;
 

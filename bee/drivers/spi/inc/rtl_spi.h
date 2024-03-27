@@ -24,7 +24,6 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "rtl876x.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "spi/src/rtl87x2g/rtl_spi_def.h"
 #include "rcc/inc/rtl_rcc.h"
