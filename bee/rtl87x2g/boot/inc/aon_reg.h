@@ -1,5 +1,5 @@
-#ifndef _RTL876X_AON_REG_H
-#define _RTL876X_AON_REG_H
+#ifndef _AON_REG_H
+#define _AON_REG_H
 #include <stdint.h>
 
 /* Auto gen based on RL6920_B_Cut_AON_Autogen_table_2023_0612_V1.xlsx */
@@ -8953,9 +8953,7 @@ typedef volatile union _AON_NS_REG_KM4_WDT_MODE_TYPE
     6       R/W is_btmac_clk_32000Hz            1'b0
     7       R/W is_aon_clk_32000Hz              1'b0
     8       R/W is_systick_clk_32000Hz          1'b0
-    9       R/W is_hci_mode                     1'b0
-    10      R/W is_single_tone_mode             1'b0
-    31:11   R/W km4_boot_rsvd1                  21'b0
+    31:9    R/W km4_boot_rsvd1                  23'b0
  */
 typedef volatile union _AON_NS_REG0X_FW_GENERAL_NS_TYPE
 {
@@ -8971,9 +8969,7 @@ typedef volatile union _AON_NS_REG0X_FW_GENERAL_NS_TYPE
         uint32_t is_btmac_clk_32000Hz: 1;
         uint32_t is_aon_clk_32000Hz: 1;
         uint32_t is_systick_clk_32000Hz: 1;
-        uint32_t is_hci_mode: 1;
-        uint32_t is_single_tone_mode: 1;
-        uint32_t km4_boot_rsvd1: 21;
+        uint32_t km4_boot_rsvd1: 23;
     };
 } AON_NS_REG0X_FW_GENERAL_NS_TYPE;
 
@@ -9022,7 +9018,9 @@ typedef volatile union _AON_NS_REG6X_FW_GENERAL_NS_TYPE
 /* 0x1D10   0x4000_1d10
     0       R/W ota_mode                        1'b0
     1       R/W is_ft_mode                      1'b0
-    15:2    R/W rsvd                            14'h0
+    2       R/W is_hci_mode                     1'b0
+    3       R/W is_single_tone_mode             1'b0
+    15:4    R/W rsvd                            12'h0
     31:16   R/W FW_GENERAL_NS_REG9X             16'h0
  */
 typedef volatile union _AON_NS_REG8X_FW_GENERAL_NS_TYPE
@@ -9032,7 +9030,9 @@ typedef volatile union _AON_NS_REG8X_FW_GENERAL_NS_TYPE
     {
         uint32_t ota_mode: 1;
         uint32_t is_ft_mode: 1;
-        uint32_t rsvd: 14;
+        uint32_t is_hci_mode: 1;
+        uint32_t is_single_tone_mode: 1;
+        uint32_t rsvd: 12;
         uint32_t FW_GENERAL_NS_REG9X: 16;
     };
 } AON_NS_REG8X_FW_GENERAL_NS_TYPE;
