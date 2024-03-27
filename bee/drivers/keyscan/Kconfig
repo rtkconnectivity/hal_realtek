@@ -1,0 +1,10 @@
+menuconfig REALTEK_KEYSCAN
+	bool "REALTEK MCU keyscan driver"
+	default n
+	select REALTEK_RCC
+	select REALTEK_PINMUX
+	select REALTEK_NVIC
+
+	help
+	  This option enables the keyscan driver for REALTEK family of
+	  processors.

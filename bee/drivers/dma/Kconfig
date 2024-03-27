@@ -1,0 +1,10 @@
+menuconfig REALTEK_DMA
+	bool "REALTEK MCU dma driver"
+	default n
+	select REALTEK_RCC
+	select REALTEK_PINMUX
+	select REALTEK_NVIC
+
+	help
+	  This option enables the dma driver for REALTEK family of
+	  processors.
