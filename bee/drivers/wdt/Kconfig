@@ -1,0 +1,15 @@
+menuconfig REALTEK_AON_WDT
+	bool "REALTEK MCU aon watchdog timer"
+	default n
+	
+	help
+	  This option enables the aon wdt driver for REALTEK family of
+	  processors.
+
+menuconfig REALTEK_CORE_WDT
+	bool "REALTEK MCU core watchdog timer"
+	default n
+	
+	help
+	  This option enables the core wdt driver for REALTEK family of
+	  processors.

@@ -14,9 +14,10 @@
 #ifndef RTL_RCC_DEF_H
 #define RTL_RCC_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
+#include "pcc_reg.h"
+#include "cmsis_compiler.h"
 
 #ifdef  __cplusplus
 extern "C" {

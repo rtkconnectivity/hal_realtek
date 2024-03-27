@@ -14,9 +14,8 @@
 #ifndef RTL_I2C_DEF_H
 #define RTL_I2C_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -150,16 +149,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t master_mode: 1;
-        __IO uint32_t speed: 2;
-        __IO uint32_t ic_10bitaddr_slave: 1;
-        __I uint32_t ic_10bitaddr_master: 1;
-        __IO uint32_t ic_restart_en: 1;
-        __IO uint32_t ic_slave_disable: 1;
-        __I uint32_t reserved_2: 1;
-        __IO uint32_t tx_empty_ctrl: 1;
-        __I uint32_t reserved_1: 1;
-        __I uint32_t reserved_0: 22;
+        uint32_t master_mode: 1;
+        uint32_t speed: 2;
+        uint32_t ic_10bitaddr_slave: 1;
+        const uint32_t ic_10bitaddr_master: 1;
+        uint32_t ic_restart_en: 1;
+        uint32_t ic_slave_disable: 1;
+        const uint32_t reserved_2: 1;
+        uint32_t tx_empty_ctrl: 1;
+        const uint32_t reserved_1: 1;
+        const uint32_t reserved_0: 22;
     } b;
 } IC_CON_TypeDef;
 
@@ -178,11 +177,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_tar: 10;
-        __IO uint32_t gc_or_start: 1;
-        __IO uint32_t special: 1;
-        __IO uint32_t ic_10bitaddr_master: 1;
-        __I uint32_t reserved_0: 19;
+        uint32_t ic_tar: 10;
+        uint32_t gc_or_start: 1;
+        uint32_t special: 1;
+        uint32_t ic_10bitaddr_master: 1;
+        const uint32_t reserved_0: 19;
     } b;
 } IC_TAR_TypeDef;
 
@@ -198,8 +197,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_sar: 10;
-        __I uint32_t reserved_0: 22;
+        uint32_t ic_sar: 10;
+        const uint32_t reserved_0: 22;
     } b;
 } IC_SAR_TypeDef;
 
@@ -218,11 +217,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dat: 8;
-        __O uint32_t cmd: 1;
-        __O uint32_t stop: 1;
-        __O uint32_t restart: 1;
-        __I uint32_t reserved_0: 21;
+        uint32_t dat: 8;
+        uint32_t cmd: 1;
+        uint32_t stop: 1;
+        uint32_t restart: 1;
+        const uint32_t reserved_0: 21;
     } b;
 } IC_DATA_CMD_TypeDef;
 
@@ -238,8 +237,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_ss_scl_hcnt: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t ic_ss_scl_hcnt: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } IC_SS_SCL_HCNT_TypeDef;
 
@@ -255,8 +254,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_ss_scl_lcnt: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t ic_ss_scl_lcnt: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } IC_SS_SCL_LCNT_TypeDef;
 
@@ -272,8 +271,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_fs_scl_hcnt: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t ic_fs_scl_hcnt: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } IC_FS_SCL_HCNT_TypeDef;
 
@@ -289,8 +288,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_fs_scl_lcnt: 16;
-        __I uint32_t reserved_0: 16;
+        uint32_t ic_fs_scl_lcnt: 16;
+        const uint32_t reserved_0: 16;
     } b;
 } IC_FS_SCL_LCNT_TypeDef;
 
@@ -320,21 +319,21 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t r_rx_under: 1;
-        __I uint32_t r_rx_over: 1;
-        __I uint32_t r_rx_full: 1;
-        __I uint32_t r_tx_over: 1;
-        __I uint32_t r_tx_empty: 1;
-        __I uint32_t r_rd_req: 1;
-        __I uint32_t r_tx_abrt: 1;
-        __I uint32_t r_rx_done: 1;
-        __I uint32_t r_activity: 1;
-        __I uint32_t r_stop_det: 1;
-        __I uint32_t r_start_det: 1;
-        __I uint32_t r_gen_call: 1;
-        __I uint32_t reserved_1: 1;
-        __I uint32_t r_mst_on_hold: 1;
-        __I uint32_t reserved_0: 18;
+        const uint32_t r_rx_under: 1;
+        const uint32_t r_rx_over: 1;
+        const uint32_t r_rx_full: 1;
+        const uint32_t r_tx_over: 1;
+        const uint32_t r_tx_empty: 1;
+        const uint32_t r_rd_req: 1;
+        const uint32_t r_tx_abrt: 1;
+        const uint32_t r_rx_done: 1;
+        const uint32_t r_activity: 1;
+        const uint32_t r_stop_det: 1;
+        const uint32_t r_start_det: 1;
+        const uint32_t r_gen_call: 1;
+        const uint32_t reserved_1: 1;
+        const uint32_t r_mst_on_hold: 1;
+        const uint32_t reserved_0: 18;
     } b;
 } IC_INTR_STAT_TypeDef;
 
@@ -363,21 +362,21 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t m_rx_under: 1;
-        __IO uint32_t m_rx_over: 1;
-        __IO uint32_t m_rx_full: 1;
-        __IO uint32_t m_tx_over: 1;
-        __IO uint32_t m_tx_empty: 1;
-        __IO uint32_t m_rd_req: 1;
-        __IO uint32_t m_tx_abrt: 1;
-        __IO uint32_t m_rx_done: 1;
-        __IO uint32_t m_activity: 1;
-        __IO uint32_t m_stop_det: 1;
-        __IO uint32_t m_start_det: 1;
-        __IO uint32_t m_gen_call: 1;
-        __I uint32_t reserved_1: 1;
-        __IO uint32_t m_mst_on_hold: 1;
-        __I uint32_t reserved_0: 18;
+        uint32_t m_rx_under: 1;
+        uint32_t m_rx_over: 1;
+        uint32_t m_rx_full: 1;
+        uint32_t m_tx_over: 1;
+        uint32_t m_tx_empty: 1;
+        uint32_t m_rd_req: 1;
+        uint32_t m_tx_abrt: 1;
+        uint32_t m_rx_done: 1;
+        uint32_t m_activity: 1;
+        uint32_t m_stop_det: 1;
+        uint32_t m_start_det: 1;
+        uint32_t m_gen_call: 1;
+        const uint32_t reserved_1: 1;
+        uint32_t m_mst_on_hold: 1;
+        const uint32_t reserved_0: 18;
     } b;
 } IC_INTR_MASK_TypeDef;
 
@@ -406,21 +405,21 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rx_under: 1;
-        __I uint32_t rx_over: 1;
-        __I uint32_t rx_full: 1;
-        __I uint32_t tx_over: 1;
-        __I uint32_t tx_empty: 1;
-        __I uint32_t rd_req: 1;
-        __I uint32_t tx_abrt: 1;
-        __I uint32_t rx_done: 1;
-        __I uint32_t activity: 1;
-        __I uint32_t stop_det: 1;
-        __I uint32_t start_det: 1;
-        __I uint32_t gen_call: 1;
-        __I uint32_t reserved_1: 1;
-        __I uint32_t mst_on_hold: 1;
-        __I uint32_t reserved_0: 18;
+        const uint32_t rx_under: 1;
+        const uint32_t rx_over: 1;
+        const uint32_t rx_full: 1;
+        const uint32_t tx_over: 1;
+        const uint32_t tx_empty: 1;
+        const uint32_t rd_req: 1;
+        const uint32_t tx_abrt: 1;
+        const uint32_t rx_done: 1;
+        const uint32_t activity: 1;
+        const uint32_t stop_det: 1;
+        const uint32_t start_det: 1;
+        const uint32_t gen_call: 1;
+        const uint32_t reserved_1: 1;
+        const uint32_t mst_on_hold: 1;
+        const uint32_t reserved_0: 18;
     } b;
 } IC_RAW_INTR_STAT_TypeDef;
 
@@ -436,8 +435,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rx_tl: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t rx_tl: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } IC_RX_TL_TypeDef;
 
@@ -453,8 +452,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t tx_tl: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t tx_tl: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } IC_TX_TL_TypeDef;
 
@@ -470,8 +469,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t clr_intr: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t clr_intr: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_INTR_TypeDef;
 
@@ -487,8 +486,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_rx_under: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_rx_under: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_RX_UNDER_TypeDef;
 
@@ -504,8 +503,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_rx_over: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_rx_over: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_RX_OVER_TypeDef;
 
@@ -521,8 +520,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_tx_over: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_tx_over: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_TX_OVER_TypeDef;
 
@@ -538,8 +537,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_rd_req: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_rd_req: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_RD_REQ_TypeDef;
 
@@ -555,8 +554,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_tx_abrt: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_tx_abrt: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_TX_ABRT_TypeDef;
 
@@ -572,8 +571,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_rx_done: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_rx_done: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_RX_DONE_TypeDef;
 
@@ -589,8 +588,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_activity: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_activity: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_ACTIVITY_TypeDef;
 
@@ -606,8 +605,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_stop_det: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_stop_det: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_STOP_DET_TypeDef;
 
@@ -623,8 +622,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_start_det: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_start_det: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_START_DET_TypeDef;
 
@@ -640,8 +639,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t clr_gen_call: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t clr_gen_call: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_CLR_GEN_CALL_TypeDef;
 
@@ -657,8 +656,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_enable: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t ic_enable: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_ENABLE_TypeDef;
 
@@ -684,18 +683,18 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t activity: 1;
-        __I uint32_t tfnf: 1;
-        __I uint32_t tfe: 1;
-        __I uint32_t rfne: 1;
-        __I uint32_t rff: 1;
-        __I uint32_t mst_activity: 1;
-        __I uint32_t slv_activity: 1;
-        __I uint32_t reserved_4: 1;
-        __I uint32_t reserved_3: 1;
-        __I uint32_t reserved_2: 1;
-        __I uint32_t reserved_1: 1;
-        __I uint32_t reserved_0: 21;
+        const uint32_t activity: 1;
+        const uint32_t tfnf: 1;
+        const uint32_t tfe: 1;
+        const uint32_t rfne: 1;
+        const uint32_t rff: 1;
+        const uint32_t mst_activity: 1;
+        const uint32_t slv_activity: 1;
+        const uint32_t reserved_4: 1;
+        const uint32_t reserved_3: 1;
+        const uint32_t reserved_2: 1;
+        const uint32_t reserved_1: 1;
+        const uint32_t reserved_0: 21;
     } b;
 } IC_STATUS_TypeDef;
 
@@ -711,8 +710,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t txflr: 7;
-        __I uint32_t reserved_0: 25;
+        const uint32_t txflr: 7;
+        const uint32_t reserved_0: 25;
     } b;
 } IC_TXFLR_TypeDef;
 
@@ -728,8 +727,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rxflr: 7;
-        __I uint32_t reserved_0: 25;
+        const uint32_t rxflr: 7;
+        const uint32_t reserved_0: 25;
     } b;
 } IC_RXFLR_TypeDef;
 
@@ -746,9 +745,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_sda_tx_hold: 16;
-        __IO uint32_t ic_sda_rx_hold: 8;
-        __I uint32_t reserved_0: 8;
+        uint32_t ic_sda_tx_hold: 16;
+        uint32_t ic_sda_rx_hold: 8;
+        const uint32_t reserved_0: 8;
     } b;
 } IC_SDA_HOLD_TypeDef;
 
@@ -780,24 +779,24 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t abrt_7b_addr_noack: 1;
-        __I uint32_t abrt_10addr1_noack: 1;
-        __I uint32_t abrt_10addr2_noack: 1;
-        __I uint32_t abrt_txdata_noack: 1;
-        __I uint32_t abrt_gcall_noack: 1;
-        __I uint32_t abrt_gcall_read: 1;
-        __I uint32_t reserved_2: 1;
-        __I uint32_t abrt_sbyte_ackdet: 1;
-        __I uint32_t reserved_1: 1;
-        __I uint32_t abrt_sbyte_norstrt: 1;
-        __I uint32_t abrt_10b_rd_norstrt: 1;
-        __I uint32_t abrt_master_dis: 1;
-        __I uint32_t arb_lost: 1;
-        __I uint32_t abrt_slvflush_txfifo: 1;
-        __I uint32_t abrt_slv_arblost: 1;
-        __I uint32_t abrt_slvrd_intx: 1;
-        __I uint32_t reserved_0: 7;
-        __I uint32_t tx_flush_cnt: 9;
+        const uint32_t abrt_7b_addr_noack: 1;
+        const uint32_t abrt_10addr1_noack: 1;
+        const uint32_t abrt_10addr2_noack: 1;
+        const uint32_t abrt_txdata_noack: 1;
+        const uint32_t abrt_gcall_noack: 1;
+        const uint32_t abrt_gcall_read: 1;
+        const uint32_t reserved_2: 1;
+        const uint32_t abrt_sbyte_ackdet: 1;
+        const uint32_t reserved_1: 1;
+        const uint32_t abrt_sbyte_norstrt: 1;
+        const uint32_t abrt_10b_rd_norstrt: 1;
+        const uint32_t abrt_master_dis: 1;
+        const uint32_t arb_lost: 1;
+        const uint32_t abrt_slvflush_txfifo: 1;
+        const uint32_t abrt_slv_arblost: 1;
+        const uint32_t abrt_slvrd_intx: 1;
+        const uint32_t reserved_0: 7;
+        const uint32_t tx_flush_cnt: 9;
     } b;
 } IC_TX_ABRT_SOURCE_TypeDef;
 
@@ -813,8 +812,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t nack: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t nack: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_SLV_DATA_NACK_ONLY_TypeDef;
 
@@ -831,9 +830,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rdmae: 1;
-        __IO uint32_t tdmae: 1;
-        __I uint32_t reserved_0: 30;
+        uint32_t rdmae: 1;
+        uint32_t tdmae: 1;
+        const uint32_t reserved_0: 30;
     } b;
 } IC_DMA_CR_TypeDef;
 
@@ -849,8 +848,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dmatdl: 6;
-        __I uint32_t reserved_0: 26;
+        uint32_t dmatdl: 6;
+        const uint32_t reserved_0: 26;
     } b;
 } IC_DMA_TDLR_TypeDef;
 
@@ -866,8 +865,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dmardl: 6;
-        __I uint32_t reserved_0: 26;
+        uint32_t dmardl: 6;
+        const uint32_t reserved_0: 26;
     } b;
 } IC_DMA_RDLR_TypeDef;
 
@@ -883,8 +882,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t sda_setup: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t sda_setup: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } IC_SDA_SETUP_TypeDef;
 
@@ -900,8 +899,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ack_gen_call: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t ack_gen_call: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } IC_ACK_GENERAL_CALL_TypeDef;
 
@@ -919,10 +918,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t ic_en: 1;
-        __I uint32_t slv_disabled_while_busy: 1;
-        __I uint32_t slv_rx_data_lost: 1;
-        __I uint32_t reserved_0: 29;
+        const uint32_t ic_en: 1;
+        const uint32_t slv_disabled_while_busy: 1;
+        const uint32_t slv_rx_data_lost: 1;
+        const uint32_t reserved_0: 29;
     } b;
 } IC_ENABLE_STATUS_TypeDef;
 
@@ -938,8 +937,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t ic_fs_spklen: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t ic_fs_spklen: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } IC_FS_SPKLEN_TypeDef;
 

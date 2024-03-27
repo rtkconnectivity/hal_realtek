@@ -13,9 +13,9 @@
 #ifndef RTL_ENHTIM_DEF_H
 #define RTL_ENHTIM_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
+#include "platform_reg.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -105,6 +105,16 @@ typedef struct
   * \brief
   * \{
   */
+#define ENHANCED_TIMER0_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x0000)
+#define ENHANCED_TIMER1_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x0024)
+#define ENHANCED_TIMER2_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x0048)
+#define ENHANCED_TIMER3_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x006c)
+#define ENHTIM_SHARE_REG_BASE              (ENHANCED_TIMER_REG_BASE + 0x0120)
+#define ENHANCED_PWM0_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x0300)
+#define ENHANCED_PWM1_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x0304)
+#define ENHANCED_PWM2_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x0308)
+#define ENHANCED_PWM3_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x030C)
+#define REG_ENHTIMER_ONESHOT_CFG           (ENHANCED_TIMER_REG_BASE + 0x0320)
 
 #define ENH_TIM0                        ((ENHTIM_TypeDef      *) ENHANCED_TIMER0_REG_BASE)
 #define ENH_TIM1                        ((ENHTIM_TypeDef      *) ENHANCED_TIMER1_REG_BASE)
@@ -158,7 +168,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimer_cur_cnt: 32;
+        const uint32_t Enhtimer_cur_cnt: 32;
     } b;
 } ENHTIM_CUR_CNT_TypeDef;
 
@@ -173,7 +183,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimer_latch_cnt_0: 32;
+        const uint32_t Enhtimer_latch_cnt_0: 32;
     } b;
 } ENHTIM_LATCH_CNT_0_TypeDef;
 
@@ -188,7 +198,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t reg_timer_0_latch_cnt_1: 32;
+        const uint32_t reg_timer_0_latch_cnt_1: 32;
     } b;
 } ENHTIM_LATCH_CNT_1_TypeDef;
 
@@ -203,7 +213,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t reg_timer_0_latch_cnt_2: 32;
+        const uint32_t reg_timer_0_latch_cnt_2: 32;
     } b;
 } ENHTIM_LATCH_CNT_2_TypeDef;
 
@@ -232,21 +242,21 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer_mode: 2;
-        __IO uint32_t Enhtimer_PWM_polarity: 1;
-        __IO uint32_t Enhtimer_PWM_output_en: 1;
-        __IO uint32_t Enhtimer_latch_cnt_0_trig_mode: 2;
-        __IO uint32_t Enhtimer_latch_cnt_1_trig_mode: 2;
-        __IO uint32_t Enhtimer_latch_cnt_2_trig_mode: 2;
-        __IO uint32_t Enhtimer_Latch_cnt_0_en: 1;
-        __IO uint32_t Enhtimer_Latch_cnt_1_en: 1;
-        __IO uint32_t Enhtimer_Latch_cnt_2_en: 1;
-        __IO uint32_t Enhtimer_latch_cnt_0_fifo_th: 5;
-        __IO uint32_t reserved_1: 5;
-        __IO uint32_t reserved_0: 5;
-        __IO uint32_t Enhtimer_dma_en: 1;
-        __IO uint32_t Enhtimer_dma_mode: 1;
-        __IO uint32_t Enhtimer_dma_target: 2;
+        uint32_t Enhtimer_mode: 2;
+        uint32_t Enhtimer_PWM_polarity: 1;
+        uint32_t Enhtimer_PWM_output_en: 1;
+        uint32_t Enhtimer_latch_cnt_0_trig_mode: 2;
+        uint32_t Enhtimer_latch_cnt_1_trig_mode: 2;
+        uint32_t Enhtimer_latch_cnt_2_trig_mode: 2;
+        uint32_t Enhtimer_Latch_cnt_0_en: 1;
+        uint32_t Enhtimer_Latch_cnt_1_en: 1;
+        uint32_t Enhtimer_Latch_cnt_2_en: 1;
+        uint32_t Enhtimer_latch_cnt_0_fifo_th: 5;
+        uint32_t reserved_1: 5;
+        uint32_t reserved_0: 5;
+        uint32_t Enhtimer_dma_en: 1;
+        uint32_t Enhtimer_dma_mode: 1;
+        uint32_t Enhtimer_dma_target: 2;
     } b;
 } ENHTIM_CONFIGURE_TypeDef;
 
@@ -261,7 +271,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer_max_cnt: 32;
+        uint32_t Enhtimer_max_cnt: 32;
     } b;
 } ENHTIM_MAX_CNT_TypeDef;
 
@@ -276,7 +286,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer_ccr: 32;
+        uint32_t Enhtimer_ccr: 32;
     } b;
 } ENHTIM_CCR_TypeDef;
 
@@ -291,7 +301,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer_ccr_fifo_entry: 32;
+        uint32_t Enhtimer_ccr_fifo_entry: 32;
     } b;
 } ENHTIM_CCR_FIFO_ENTRY_TypeDef;
 
@@ -307,7 +317,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer_pwm_phase_shift_cnt: 32;
+        uint32_t Enhtimer_pwm_phase_shift_cnt: 32;
     } b;
 } ENHTIMER_0_PWM_SHIFT_CNT_TypeDef;
 
@@ -326,11 +336,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer0_latch_cnt_0_fifo_met_th: 1;
-        __IO uint32_t Enhtimer1_latch_cnt_0_fifo_met_th: 1;
-        __IO uint32_t Enhtimer2_latch_cnt_0_fifo_met_th: 1;
-        __IO uint32_t Enhtimer3_latch_cnt_0_fifo_met_th: 1;
-        __I uint32_t reserved_0: 28;
+        uint32_t Enhtimer0_latch_cnt_0_fifo_met_th: 1;
+        uint32_t Enhtimer1_latch_cnt_0_fifo_met_th: 1;
+        uint32_t Enhtimer2_latch_cnt_0_fifo_met_th: 1;
+        uint32_t Enhtimer3_latch_cnt_0_fifo_met_th: 1;
+        const uint32_t reserved_0: 28;
     } b;
 } ENHTIM_LACTH_FIFO_TH_STATUS_TypeDef;
 
@@ -353,15 +363,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimerr0_latch_cnt_0_fifo_full: 1;
-        __I uint32_t Enhtimer0_latch_cnt_0_fifo_empty: 1;
-        __IO uint32_t Enhtimer1_latch_cnt_0_fifo_full: 1;
-        __I uint32_t Enhtimer1_latch_cnt_0_fifo_empty: 1;
-        __IO uint32_t Enhtimer2_latch_cnt_0_fifo_full: 1;
-        __I uint32_t Enhtimer2_latch_cnt_0_fifo_empty: 1;
-        __IO uint32_t Enhtimer3_latch_cnt_0_fifo_full: 1;
-        __I uint32_t Enhtimer3_latch_cnt_0_fifo_empty: 1;
-        __I uint32_t reserved_0: 24;
+        uint32_t Enhtimerr0_latch_cnt_0_fifo_full: 1;
+        const uint32_t Enhtimer0_latch_cnt_0_fifo_empty: 1;
+        uint32_t Enhtimer1_latch_cnt_0_fifo_full: 1;
+        const uint32_t Enhtimer1_latch_cnt_0_fifo_empty: 1;
+        uint32_t Enhtimer2_latch_cnt_0_fifo_full: 1;
+        const uint32_t Enhtimer2_latch_cnt_0_fifo_empty: 1;
+        uint32_t Enhtimer3_latch_cnt_0_fifo_full: 1;
+        const uint32_t Enhtimer3_latch_cnt_0_fifo_empty: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } ENHTIM_LATCH_CNT_FIFO_STATUS_TypeDef;
 
@@ -384,15 +394,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimerr0_ccr_fifo_full: 1;
-        __I uint32_t Enhtimer0_ccr_fifo_empty: 1;
-        __I uint32_t Enhtimer1_ccr_fifo_full: 1;
-        __I uint32_t Enhtimer1_ccr_fifo_empty: 1;
-        __I uint32_t Enhtimer2_ccr_fifo_full: 1;
-        __I uint32_t Enhtimer2_ccr_fifo_empty: 1;
-        __I uint32_t Enhtimer3_ccr_fifo_full: 1;
-        __I uint32_t Enhtimer3_ccr_fifo_empty: 1;
-        __I uint32_t reserved_0: 24;
+        const uint32_t Enhtimerr0_ccr_fifo_full: 1;
+        const uint32_t Enhtimer0_ccr_fifo_empty: 1;
+        const uint32_t Enhtimer1_ccr_fifo_full: 1;
+        const uint32_t Enhtimer1_ccr_fifo_empty: 1;
+        const uint32_t Enhtimer2_ccr_fifo_full: 1;
+        const uint32_t Enhtimer2_ccr_fifo_empty: 1;
+        const uint32_t Enhtimer3_ccr_fifo_full: 1;
+        const uint32_t Enhtimer3_ccr_fifo_empty: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } ENHTIM_CCR_FIFO_STATUS_TypeDef;
 
@@ -416,16 +426,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer0_ccr_fifo_clr: 1;
-        __IO uint32_t Enhtimer1_ccr_fifo_clr: 1;
-        __IO uint32_t Enhtimer2_ccr_fifo_clr: 1;
-        __IO uint32_t Enhtimer3_ccr_fifo_clr: 1;
-        __I  uint32_t reserved_0: 4;
-        __IO uint32_t Enhtimer0_latch_cnt_0_fifo_clr: 1;
-        __IO uint32_t Enhtimer1_latch_cnt_0_fifo_clr: 1;
-        __IO uint32_t Enhtimer2_latch_cnt_0_fifo_clr: 1;
-        __IO uint32_t Enhtimer3_latch_cnt_0_fifo_clr: 1;
-        __I  uint32_t reserved_1: 20;
+        uint32_t Enhtimer0_ccr_fifo_clr: 1;
+        uint32_t Enhtimer1_ccr_fifo_clr: 1;
+        uint32_t Enhtimer2_ccr_fifo_clr: 1;
+        uint32_t Enhtimer3_ccr_fifo_clr: 1;
+        const  uint32_t reserved_0: 4;
+        uint32_t Enhtimer0_latch_cnt_0_fifo_clr: 1;
+        uint32_t Enhtimer1_latch_cnt_0_fifo_clr: 1;
+        uint32_t Enhtimer2_latch_cnt_0_fifo_clr: 1;
+        uint32_t Enhtimer3_latch_cnt_0_fifo_clr: 1;
+        const  uint32_t reserved_1: 20;
     } b;
 } ENHTIM_FIFO_CLR_TypeDef;
 
@@ -444,11 +454,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer0_enable: 1;
-        __IO uint32_t Enhtimer1_enable: 1;
-        __IO uint32_t Enhtimer2_enable: 1;
-        __IO uint32_t Enhtimer3_enable: 1;
-        __I uint32_t reserved_0: 28;
+        uint32_t Enhtimer0_enable: 1;
+        uint32_t Enhtimer1_enable: 1;
+        uint32_t Enhtimer2_enable: 1;
+        uint32_t Enhtimer3_enable: 1;
+        const uint32_t reserved_0: 28;
     } b;
 } ENHTIM_CONTROL_TypeDef;
 
@@ -467,11 +477,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer0_Interrupt_enable: 1;
-        __IO uint32_t Enhtimer1_Interrupt_enable: 1;
-        __IO uint32_t Enhtimer2_Interrupt_enable: 1;
-        __IO uint32_t Enhtimer3_Interrupt_enable: 1;
-        __IO uint32_t reserved_0: 28;
+        uint32_t Enhtimer0_Interrupt_enable: 1;
+        uint32_t Enhtimer1_Interrupt_enable: 1;
+        uint32_t Enhtimer2_Interrupt_enable: 1;
+        uint32_t Enhtimer3_Interrupt_enable: 1;
+        uint32_t reserved_0: 28;
     } b;
 } ENHTIM_INT_CONTROL_TypeDef;
 
@@ -495,16 +505,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer0_Status: 1;
-        __IO uint32_t Enhtimer1_Status: 1;
-        __IO uint32_t Enhtimer2_Status: 1;
-        __IO uint32_t Enhtimer3_Status: 1;
-        __IO uint32_t reserved_0: 4;
-        __IO uint32_t Enhtimer0_latch_cnt_0_fifo_intr_status: 1;
-        __IO uint32_t Enhtimer1_latch_cnt_0_fifo_intr_status: 1;
-        __IO uint32_t Enhtimer2_latch_cnt_0_fifo_intr_status: 1;
-        __IO uint32_t Enhtimer3_latch_cnt_0_fifo_intr_status: 1;
-        __IO uint32_t reserved_1: 20;
+        uint32_t Enhtimer0_Status: 1;
+        uint32_t Enhtimer1_Status: 1;
+        uint32_t Enhtimer2_Status: 1;
+        uint32_t Enhtimer3_Status: 1;
+        uint32_t reserved_0: 4;
+        uint32_t Enhtimer0_latch_cnt_0_fifo_intr_status: 1;
+        uint32_t Enhtimer1_latch_cnt_0_fifo_intr_status: 1;
+        uint32_t Enhtimer2_latch_cnt_0_fifo_intr_status: 1;
+        uint32_t Enhtimer3_latch_cnt_0_fifo_intr_status: 1;
+        uint32_t reserved_1: 20;
     } b;
 } ENHTIM_STATUS_TypeDef;
 
@@ -523,11 +533,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t reg_timer_0_interrupt_masked: 1;
-        __I uint32_t reg_timer_1_interrupt_masked: 1;
-        __I uint32_t reg_timer_2_interrupt_masked: 1;
-        __I uint32_t reg_timer_3_interrupt_masked: 1;
-        __I uint32_t reserved_0: 28;
+        const uint32_t reg_timer_0_interrupt_masked: 1;
+        const uint32_t reg_timer_1_interrupt_masked: 1;
+        const uint32_t reg_timer_2_interrupt_masked: 1;
+        const uint32_t reg_timer_3_interrupt_masked: 1;
+        const uint32_t reserved_0: 28;
     } b;
 } ENHTIM_INT_STATUS_TypeDef;
 
@@ -547,12 +557,12 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t reserved_16: 8;
-        __IO uint32_t Enhtimer0_latch_cnt_0_fifo_full_intr_en: 1;
-        __IO uint32_t Enhtimer1_latch_cnt_0_fifo_full_intr_en: 1;
-        __IO uint32_t Enhtimer2_latch_cnt_0_fifo_full_intr_en: 1;
-        __IO uint32_t Enhtimer3_latch_cnt_0_fifo_full_intr_en: 1;
-        __I  uint32_t reserved_0: 20;
+        const uint32_t reserved_16: 8;
+        uint32_t Enhtimer0_latch_cnt_0_fifo_full_intr_en: 1;
+        uint32_t Enhtimer1_latch_cnt_0_fifo_full_intr_en: 1;
+        uint32_t Enhtimer2_latch_cnt_0_fifo_full_intr_en: 1;
+        uint32_t Enhtimer3_latch_cnt_0_fifo_full_intr_en: 1;
+        const  uint32_t reserved_0: 20;
     } b;
 } ENHTIM_LATCH_INT_CONTROL_0_TypeDef;
 
@@ -572,12 +582,12 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I  uint32_t reserved_1: 8;
-        __IO uint32_t Enhtimer0_latch_cnt_0_fifo_met_th_intr_en: 1;
-        __IO uint32_t Enhtimer1_latch_cnt_0_fifo_met_th_intr_en: 1;
-        __IO uint32_t Enhtimer2_latch_cnt_0_fifo_met_th_intr_en: 1;
-        __IO uint32_t Enhtimer3_latch_cnt_0_fifo_met_th_intr_en: 1;
-        __I  uint32_t reserved_0: 20;
+        const  uint32_t reserved_1: 8;
+        uint32_t Enhtimer0_latch_cnt_0_fifo_met_th_intr_en: 1;
+        uint32_t Enhtimer1_latch_cnt_0_fifo_met_th_intr_en: 1;
+        uint32_t Enhtimer2_latch_cnt_0_fifo_met_th_intr_en: 1;
+        uint32_t Enhtimer3_latch_cnt_0_fifo_met_th_intr_en: 1;
+        const  uint32_t reserved_0: 20;
     } b;
 } ENHTIM_LATCH_INT_CONTROL_2_TypeDef;
 
@@ -594,8 +604,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimer0_latch_cnt_0_fifo_depth: 8;
-        __I uint32_t reserved_0: 24;
+        const uint32_t Enhtimer0_latch_cnt_0_fifo_depth: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } ENHTIM0_LATCH_FIFO_DEPTH_TypeDef;
 
@@ -611,8 +621,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimer1_latch_cnt_0_fifo_depth: 8;
-        __I uint32_t reserved_0: 24;
+        const uint32_t Enhtimer1_latch_cnt_0_fifo_depth: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } ENHTIM1_LATCH_FIFO_DEPTH_TypeDef;
 
@@ -628,8 +638,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimer2_latch_cnt_0_fifo_depth: 8;
-        __I uint32_t reserved_0: 24;
+        const uint32_t Enhtimer2_latch_cnt_0_fifo_depth: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } ENHTIM2_LATCH_FIFO_DEPTH_TypeDef;
 
@@ -645,8 +655,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimer3_latch_cnt_0_fifo_depth: 8;
-        __I uint32_t reserved_0: 24;
+        const uint32_t Enhtimer3_latch_cnt_0_fifo_depth: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } ENHTIM3_LATCH_FIFO_DEPTH_TypeDef;
 
@@ -665,11 +675,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t Enhtimer0_toggle_state: 1;
-        __I uint32_t Enhtimer1_toggle_state: 1;
-        __I uint32_t Enhtimer2_toggle_state: 1;
-        __I uint32_t Enhtimer3_toggle_state: 1;
-        __I uint32_t reserved_0: 28;
+        const uint32_t Enhtimer0_toggle_state: 1;
+        const uint32_t Enhtimer1_toggle_state: 1;
+        const uint32_t Enhtimer2_toggle_state: 1;
+        const uint32_t Enhtimer3_toggle_state: 1;
+        const uint32_t reserved_0: 28;
     } b;
 } ENHTIM_TOGGLE_STATE_TypeDef;
 
@@ -693,16 +703,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t enhtimer_pwm_dz_size: 8;
-        __IO uint32_t enhtimer_pwm_dz_emg_stop: 1;
-        __IO uint32_t enhtimer_pwm_dz_stop_state_n: 1;
-        __IO uint32_t enhtimer_pwm_dz_stop_state_p: 1;
-        __IO uint32_t enhtimer_pwm_dz_en: 1;
-        __IO uint32_t enhtimer_pwm_dz_ref_sel: 2;
-        __IO uint32_t enhtimer_pwm_dz_ref_n_inv_en: 1;
-        __IO uint32_t enhtimer_pwm_dz_ref_p_inv_en: 1;
-        __IO uint32_t enhtimer_pwm_open_drain_en: 1;
-        __I uint32_t RSVD529: 15;
+        uint32_t enhtimer_pwm_dz_size: 8;
+        uint32_t enhtimer_pwm_dz_emg_stop: 1;
+        uint32_t enhtimer_pwm_dz_stop_state_n: 1;
+        uint32_t enhtimer_pwm_dz_stop_state_p: 1;
+        uint32_t enhtimer_pwm_dz_en: 1;
+        uint32_t enhtimer_pwm_dz_ref_sel: 2;
+        uint32_t enhtimer_pwm_dz_ref_n_inv_en: 1;
+        uint32_t enhtimer_pwm_dz_ref_p_inv_en: 1;
+        uint32_t enhtimer_pwm_open_drain_en: 1;
+        const uint32_t RSVD529: 15;
     } b;
 } ENHTIMER_PWM_CFG_TypeDef;
 
@@ -726,16 +736,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t Enhtimer_0_oneshot_mode_en: 1;
-        __IO uint32_t Enhtimer_1_oneshot_mode_en: 1;
-        __IO uint32_t Enhtimer_2_oneshot_mode_en: 1;
-        __IO uint32_t Enhtimer_3_oneshot_mode_en: 1;
-        __I  uint32_t RSVD0: 4;
-        __IO uint32_t Enhtimer_0_oneshot_go: 1;
-        __IO uint32_t Enhtimer_1_oneshot_go: 1;
-        __IO uint32_t Enhtimer_2_oneshot_go: 1;
-        __IO uint32_t Enhtimer_3_oneshot_go: 1;
-        __I  uint32_t RSVD1: 20;
+        uint32_t Enhtimer_0_oneshot_mode_en: 1;
+        uint32_t Enhtimer_1_oneshot_mode_en: 1;
+        uint32_t Enhtimer_2_oneshot_mode_en: 1;
+        uint32_t Enhtimer_3_oneshot_mode_en: 1;
+        const  uint32_t RSVD0: 4;
+        uint32_t Enhtimer_0_oneshot_go: 1;
+        uint32_t Enhtimer_1_oneshot_go: 1;
+        uint32_t Enhtimer_2_oneshot_go: 1;
+        uint32_t Enhtimer_3_oneshot_go: 1;
+        const  uint32_t RSVD1: 20;
     } b;
 } ENHTIMER_ONESHOT_CFG_TypeDef;
 

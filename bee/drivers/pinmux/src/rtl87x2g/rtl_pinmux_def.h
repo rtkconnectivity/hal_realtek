@@ -14,9 +14,9 @@
 #ifndef RTL_PINMUX_DEF_H
 #define RTL_PINMUX_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
+#include "rtl_aon_reg.h"
 
 #ifdef  __cplusplus
 extern "C" {

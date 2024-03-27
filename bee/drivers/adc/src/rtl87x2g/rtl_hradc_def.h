@@ -13,9 +13,8 @@
 #ifndef RTL_HRADC_DEF_H
 #define RTL_HRADC_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -89,24 +88,24 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t REG_PGA_VCMI_EN: 1;
-        __IO uint32_t REG_PGA_BYPASS_EN: 1;
-        __IO uint32_t REG_PGA_INSHORT_EN: 1;
-        __IO uint32_t REG_PGA_RSTB: 1;
-        __IO uint32_t REG_PGA_POW: 1;
-        __IO uint32_t REG_CHOP_DIV_1_0: 2;
-        __IO uint32_t REG_CHOP_EN: 1;
-        __IO uint32_t REG_DTSDM_RSTB: 1;
-        __IO uint32_t REG_DTSDM_POW: 1;
-        __IO uint32_t REG_AD_CK_POW: 1;
-        __IO uint32_t REG_VREFP_EXT_SEL: 1;
-        __IO uint32_t REG_PGA_IB_SEL_1_0: 2;
-        __IO uint32_t REG_DTSDM_IB_SEL_1_0: 2;
-        __IO uint32_t REG_PGA_DUMMY_9_0: 9;
-        __IO uint32_t REG_ISO_SDADC: 1;
-        __IO uint32_t REG_PGA_GSEL_2_0: 3;
-        __IO uint32_t REG_PGA_CH_NUM_1_0: 2;
-        __IO uint32_t REG_PGA_DIFF_MODE: 1;
+        uint32_t REG_PGA_VCMI_EN: 1;
+        uint32_t REG_PGA_BYPASS_EN: 1;
+        uint32_t REG_PGA_INSHORT_EN: 1;
+        uint32_t REG_PGA_RSTB: 1;
+        uint32_t REG_PGA_POW: 1;
+        uint32_t REG_CHOP_DIV_1_0: 2;
+        uint32_t REG_CHOP_EN: 1;
+        uint32_t REG_DTSDM_RSTB: 1;
+        uint32_t REG_DTSDM_POW: 1;
+        uint32_t REG_AD_CK_POW: 1;
+        uint32_t REG_VREFP_EXT_SEL: 1;
+        uint32_t REG_PGA_IB_SEL_1_0: 2;
+        uint32_t REG_DTSDM_IB_SEL_1_0: 2;
+        uint32_t REG_PGA_DUMMY_9_0: 9;
+        uint32_t REG_ISO_SDADC: 1;
+        uint32_t REG_PGA_GSEL_2_0: 3;
+        uint32_t REG_PGA_CH_NUM_1_0: 2;
+        uint32_t REG_PGA_DIFF_MODE: 1;
     } b;
 } HRADC_REG0X_SDADC_TypeDef;
 /* 0x0004
@@ -137,26 +136,26 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t sdadc_fifo_thr_int_en: 1;
-        __IO uint32_t sdadc_fifo_overflow_int_en: 1;
-        __IO uint32_t sdadc_scan_oneround_done_int_en: 1;
-        __IO uint32_t sdadc_data_ready_int_en: 1;
-        __IO uint32_t sdadc_boot_ready_int_en: 1;
-        __IO uint32_t sdadc_fifo_thr_int_mask: 1;
-        __IO uint32_t sdadc_fifo_overflow_int_mask: 1;
-        __IO uint32_t sdadc_scan_oneround_done_int_mask: 1;
-        __IO uint32_t sdadc_data_ready_int_mask: 1;
-        __IO uint32_t sdadc_boot_ready_int_mask: 1;
-        __IO uint32_t sdadc_fifo_thr_int: 1;
-        __IO uint32_t sdadc_fifo_overflow_int: 1;
-        __IO uint32_t sdadc_scan_oneround_done_int: 1;
-        __IO uint32_t sdadc_data_ready_int: 1;
-        __IO uint32_t sdadc_boot_ready_int: 1;
-        __IO uint32_t sdadc_fifo_clr: 1;
-        __IO uint32_t sdadc_fifo_en: 1;
-        __IO uint32_t sdadc_fifo_thr: 5;
-        __IO uint32_t sdadc_data_discard: 5;
-        __IO uint32_t sdadc_dma_req_burst_size: 5;
+        uint32_t sdadc_fifo_thr_int_en: 1;
+        uint32_t sdadc_fifo_overflow_int_en: 1;
+        uint32_t sdadc_scan_oneround_done_int_en: 1;
+        uint32_t sdadc_data_ready_int_en: 1;
+        uint32_t sdadc_boot_ready_int_en: 1;
+        uint32_t sdadc_fifo_thr_int_mask: 1;
+        uint32_t sdadc_fifo_overflow_int_mask: 1;
+        uint32_t sdadc_scan_oneround_done_int_mask: 1;
+        uint32_t sdadc_data_ready_int_mask: 1;
+        uint32_t sdadc_boot_ready_int_mask: 1;
+        uint32_t sdadc_fifo_thr_int: 1;
+        uint32_t sdadc_fifo_overflow_int: 1;
+        uint32_t sdadc_scan_oneround_done_int: 1;
+        uint32_t sdadc_data_ready_int: 1;
+        uint32_t sdadc_boot_ready_int: 1;
+        uint32_t sdadc_fifo_clr: 1;
+        uint32_t sdadc_fifo_en: 1;
+        uint32_t sdadc_fifo_thr: 5;
+        uint32_t sdadc_data_discard: 5;
+        uint32_t sdadc_dma_req_burst_size: 5;
     } b;
 } HRADC_REG0X_SDADC_DIG_CONFIG_TypeDef;
 /* 0x0008
@@ -181,20 +180,20 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t sdadc_ch_switch_intv: 4;
-        __IO uint32_t sdadc_dr_config: 4;
-        __IO uint32_t sdadc_channel_settling_time_config: 2;
-        __IO uint32_t sdadc_channel_reset_time_config: 2;
-        __IO uint32_t sdadc_filter_in_phase_swap: 1;
-        __IO uint32_t sdadc_clk_edge_swap: 1;
-        __IO uint32_t sdadc_test_mode_en: 1;
-        __IO uint32_t RESERVED_0: 4;
-        __IO uint32_t sdadc_ch_idx_en: 8;
-        __IO uint32_t sdadc_adc_clk_sel: 1;
-        __IO uint32_t sdadc_dig_clk_sel: 1;
-        __IO uint32_t sdadc_scan_en: 1;
-        __IO uint32_t sdadc_conv_mode: 1;
-        __IO uint32_t sdadc_sample_start_en: 1;
+        uint32_t sdadc_ch_switch_intv: 4;
+        uint32_t sdadc_dr_config: 4;
+        uint32_t sdadc_channel_settling_time_config: 2;
+        uint32_t sdadc_channel_reset_time_config: 2;
+        uint32_t sdadc_filter_in_phase_swap: 1;
+        uint32_t sdadc_clk_edge_swap: 1;
+        uint32_t sdadc_test_mode_en: 1;
+        uint32_t RESERVED_0: 4;
+        uint32_t sdadc_ch_idx_en: 8;
+        uint32_t sdadc_adc_clk_sel: 1;
+        uint32_t sdadc_dig_clk_sel: 1;
+        uint32_t sdadc_scan_en: 1;
+        uint32_t sdadc_conv_mode: 1;
+        uint32_t sdadc_sample_start_en: 1;
     } b;
 } HRADC_REG2X_SDADC_DIG_CONFIG_TypeDef;
 /* 0x000C
@@ -225,26 +224,26 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t sdadc_ch_num_idx0: 2;
-        __IO uint32_t sdadc_mode_idx0: 1;
-        __IO uint32_t sdadc_ch_num_idx1: 2;
-        __IO uint32_t sdadc_mode_idx1: 1;
-        __IO uint32_t sdadc_ch_num_idx2: 2;
-        __IO uint32_t sdadc_mode_idx2: 1;
-        __IO uint32_t sdadc_ch_num_idx3: 2;
-        __IO uint32_t sdadc_mode_idx3: 1;
-        __IO uint32_t sdadc_ch_num_idx4: 2;
-        __IO uint32_t sdadc_mode_idx4: 1;
-        __IO uint32_t sdadc_ch_num_idx5: 2;
-        __IO uint32_t sdadc_mode_idx5: 1;
-        __IO uint32_t sdadc_ch_num_idx6: 2;
-        __IO uint32_t sdadc_mode_idx6: 1;
-        __IO uint32_t sdadc_ch_num_idx7: 2;
-        __IO uint32_t sdadc_mode_idx7: 1;
-        __IO uint32_t sdadc_mux_sel_hw: 1;
-        __IO uint32_t RESERVED_0: 3;
-        __IO uint32_t sdadc_filter_stage2_sel_order: 2;
-        __IO uint32_t sdadc_full_scale_compensation_gain: 2;
+        uint32_t sdadc_ch_num_idx0: 2;
+        uint32_t sdadc_mode_idx0: 1;
+        uint32_t sdadc_ch_num_idx1: 2;
+        uint32_t sdadc_mode_idx1: 1;
+        uint32_t sdadc_ch_num_idx2: 2;
+        uint32_t sdadc_mode_idx2: 1;
+        uint32_t sdadc_ch_num_idx3: 2;
+        uint32_t sdadc_mode_idx3: 1;
+        uint32_t sdadc_ch_num_idx4: 2;
+        uint32_t sdadc_mode_idx4: 1;
+        uint32_t sdadc_ch_num_idx5: 2;
+        uint32_t sdadc_mode_idx5: 1;
+        uint32_t sdadc_ch_num_idx6: 2;
+        uint32_t sdadc_mode_idx6: 1;
+        uint32_t sdadc_ch_num_idx7: 2;
+        uint32_t sdadc_mode_idx7: 1;
+        uint32_t sdadc_mux_sel_hw: 1;
+        uint32_t RESERVED_0: 3;
+        uint32_t sdadc_filter_stage2_sel_order: 2;
+        uint32_t sdadc_full_scale_compensation_gain: 2;
     } b;
 } HRADC_REG4X_SDADC_DIG_CONFIG_TypeDef;
 /* 0x0010
@@ -256,7 +255,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_fifo_rdata: 32;
+        const uint32_t sdadc_fifo_rdata: 32;
     } b;
 } HRADC_REG_SDADC_OUTPUT_DATA_FIFO_TypeDef;
 /* 0x0014
@@ -268,7 +267,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx0_output_data: 32;
+        const uint32_t sdadc_ch_idx0_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX0_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x0018
@@ -280,7 +279,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx1_output_data: 32;
+        const uint32_t sdadc_ch_idx1_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX1_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x001C
@@ -292,7 +291,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx2_output_data: 32;
+        const uint32_t sdadc_ch_idx2_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX2_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x0020
@@ -304,7 +303,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx3_output_data: 32;
+        const uint32_t sdadc_ch_idx3_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX3_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x0024
@@ -316,7 +315,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx4_output_data: 32;
+        const uint32_t sdadc_ch_idx4_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX4_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x0028
@@ -328,7 +327,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx5_output_data: 32;
+        const uint32_t sdadc_ch_idx5_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX5_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x002C
@@ -340,7 +339,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx6_output_data: 32;
+        const uint32_t sdadc_ch_idx6_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX6_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x0030
@@ -352,7 +351,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_ch_idx7_output_data: 32;
+        const uint32_t sdadc_ch_idx7_output_data: 32;
     } b;
 } HRADC_REG_CH_IDX7_SDADC_OUTPUT_DATA_TypeDef;
 /* 0x0034
@@ -373,16 +372,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t sdadc_bg_ready_dly: 3;
-        __IO uint32_t sdadc_ss_done_dly: 4;
-        __IO uint32_t sdadc_ldo_ready_dly: 5;
-        __IO uint32_t sdadc_adc_clk_ready_dly: 2;
-        __IO uint32_t sdadc_dmy_load_extend_dly: 2;
-        __IO uint32_t sdadc_adc_ready_dly: 2;
-        __IO uint32_t sdadc_en: 1;
-        __IO uint32_t sdadc_auto_boot_en: 1;
-        __IO uint32_t sdadc_clk_en: 1;
-        __IO uint32_t RESERVED_0: 11;
+        uint32_t sdadc_bg_ready_dly: 3;
+        uint32_t sdadc_ss_done_dly: 4;
+        uint32_t sdadc_ldo_ready_dly: 5;
+        uint32_t sdadc_adc_clk_ready_dly: 2;
+        uint32_t sdadc_dmy_load_extend_dly: 2;
+        uint32_t sdadc_adc_ready_dly: 2;
+        uint32_t sdadc_en: 1;
+        uint32_t sdadc_auto_boot_en: 1;
+        uint32_t sdadc_clk_en: 1;
+        uint32_t RESERVED_0: 11;
     } b;
 } HRADC_REG_SDADC_POWERON_CONFIG_TypeDef;
 /* 0x0038
@@ -395,8 +394,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t sdadc_fifo_cnt: 6;
-        __I uint32_t RESERVED_0: 26;
+        const uint32_t sdadc_fifo_cnt: 6;
+        const uint32_t RESERVED_0: 26;
     } b;
 } HRADC_REG_SDADC_FIFO_INFO_TypeDef;
 

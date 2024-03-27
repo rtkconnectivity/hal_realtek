@@ -14,9 +14,8 @@
 #ifndef RTL_TIM_DEF_H
 #define RTL_TIM_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -77,6 +76,14 @@ typedef struct
   * \brief
   * \{
   */
+#define TIMER_0_REG_BASE                   (TIMER_REG_BASE + 0x0000)
+#define TIMER_1_REG_BASE                   (TIMER_REG_BASE + 0x0014)
+#define TIMER_2_REG_BASE                   (TIMER_REG_BASE + 0x0028)
+#define TIMER_3_REG_BASE                   (TIMER_REG_BASE + 0x003c)
+#define TIMER_4_REG_BASE                   (TIMER_REG_BASE + 0x0050)
+#define TIMER_5_REG_BASE                   (TIMER_REG_BASE + 0x0064)
+#define TIMER_6_REG_BASE                   (TIMER_REG_BASE + 0x0078)
+#define TIMER_7_REG_BASE                   (TIMER_REG_BASE + 0x008c)
 
 #define TIM0               ((TIM_TypeDef *) TIMER_0_REG_BASE)
 #define TIM1               ((TIM_TypeDef *) TIMER_1_REG_BASE)
@@ -86,6 +93,11 @@ typedef struct
 #define TIM5               ((TIM_TypeDef *) TIMER_5_REG_BASE)
 #define TIM6               ((TIM_TypeDef *) TIMER_6_REG_BASE)
 #define TIM7               ((TIM_TypeDef *) TIMER_7_REG_BASE)
+
+#define TIM0_REG_BASE                         TIMER_0_REG_BASE
+#define TIMER_A0_REG_BASE                     TIMER_0_REG_BASE
+#define TIMA_CH0                              TIM0
+#define TIMA_CH1                              TIM1
 
 /** End of TIM_Declaration
   * \}
@@ -153,7 +165,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t TimerNLoadCount: 32;
+        uint32_t TimerNLoadCount: 32;
     } b;
 } TIMER_LOADCOUNT_TypeDef;
 
@@ -168,7 +180,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t TimerNCurrentValue: 32;
+        const uint32_t TimerNCurrentValue: 32;
     } b;
 } TIMER_CURRENTVALUE_TypeDef;
 
@@ -187,11 +199,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t TimerEnable: 1;
-        __IO uint32_t TimerMode: 1;
-        __IO uint32_t TimerInterruptMask: 1;
-        __IO uint32_t TIMER_PWM: 1;
-        __I uint32_t reserved_0: 28;
+        uint32_t TimerEnable: 1;
+        uint32_t TimerMode: 1;
+        uint32_t TimerInterruptMask: 1;
+        uint32_t TIMER_PWM: 1;
+        const uint32_t reserved_0: 28;
     } b;
 } TIMER_CONTROLREG_TypeDef;
 
@@ -207,8 +219,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t TimerNEndofInterrupt: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t TimerNEndofInterrupt: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } TIMER_EOI_TypeDef;
 
@@ -224,8 +236,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t TimerNInterruptStatus: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t TimerNInterruptStatus: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } TIMER_INTSTATUS_TypeDef;
 
@@ -257,24 +269,24 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t timer_pwm_2_dead_zone_size: 8;
-        __IO uint32_t timer_pwm_2_emg_stop: 1;
-        __IO uint32_t timer_pwm_2_stop_state_0: 1;
-        __IO uint32_t timer_pwm_2_stop_state_1: 1;
-        __IO uint32_t timer_pwm_2_dummy_b11: 1;
-        __IO uint32_t timer_pwm_2_dead_zone_en: 1;
-        __IO uint32_t timer_pwm_2_pwm_pn_invserse_sel: 1;
-        __IO uint32_t timer_pwm_2_dummy_b14: 1;
-        __IO uint32_t timer_pwm_2_dummy_b15: 1;
-        __IO uint32_t timer_pwm_3_dead_zone_size: 8;
-        __IO uint32_t timer_pwm_3_emg_stop: 1;
-        __IO uint32_t timer_pwm_3_stop_state_0: 1;
-        __IO uint32_t timer_pwm_3_stop_state_1: 1;
-        __IO uint32_t timer_pwm_3_dummy_b11: 1;
-        __IO uint32_t timer_pwm_3_dead_zone_en: 1;
-        __IO uint32_t timer_pwm_3_pwm_pn_invserse_sel: 1;
-        __IO uint32_t timer_pwm_3_dummy_b14: 1;
-        __IO uint32_t timer_pwm_3_dummy_b15: 1;
+        uint32_t timer_pwm_2_dead_zone_size: 8;
+        uint32_t timer_pwm_2_emg_stop: 1;
+        uint32_t timer_pwm_2_stop_state_0: 1;
+        uint32_t timer_pwm_2_stop_state_1: 1;
+        uint32_t timer_pwm_2_dummy_b11: 1;
+        uint32_t timer_pwm_2_dead_zone_en: 1;
+        uint32_t timer_pwm_2_pwm_pn_invserse_sel: 1;
+        uint32_t timer_pwm_2_dummy_b14: 1;
+        uint32_t timer_pwm_2_dummy_b15: 1;
+        uint32_t timer_pwm_3_dead_zone_size: 8;
+        uint32_t timer_pwm_3_emg_stop: 1;
+        uint32_t timer_pwm_3_stop_state_0: 1;
+        uint32_t timer_pwm_3_stop_state_1: 1;
+        uint32_t timer_pwm_3_dummy_b11: 1;
+        uint32_t timer_pwm_3_dead_zone_en: 1;
+        uint32_t timer_pwm_3_pwm_pn_invserse_sel: 1;
+        uint32_t timer_pwm_3_dummy_b14: 1;
+        uint32_t timer_pwm_3_dummy_b15: 1;
     } b;
 } TIMER_PWM_WRAP_CFG_TypeDef;
 

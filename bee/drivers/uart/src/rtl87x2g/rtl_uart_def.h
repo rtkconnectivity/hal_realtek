@@ -14,9 +14,8 @@
 #ifndef RTL_UART_DEF_H
 #define RTL_UART_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -101,7 +100,7 @@ typedef struct
 #define UART3              ((UART_TypeDef *) UART3_REG_BASE)
 #define UART4              ((UART_TypeDef *) UART4_REG_BASE)
 #define UART5              ((UART_TypeDef *) UART5_REG_BASE)
-
+#define UART                            UART0
 /** End of UART_Declaration
   * \}
   */
@@ -131,8 +130,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dll: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t dll: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } UART_DLL_TypeDef;
 
@@ -148,8 +147,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dlm: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t dlm: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } UART_DLM_TypeDef;
 
@@ -170,13 +169,13 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t erbi: 1;
-        __IO uint32_t etbei: 1;
-        __IO uint32_t elsi: 1;
-        __IO uint32_t uart_DUMMY_000: 1;
-        __IO uint32_t tx_empty_stop_int_en: 1;
-        __IO uint32_t tx_fifo_th_int_en: 1;
-        __I uint32_t reserved_0: 26;
+        uint32_t erbi: 1;
+        uint32_t etbei: 1;
+        uint32_t elsi: 1;
+        uint32_t uart_DUMMY_000: 1;
+        uint32_t tx_empty_stop_int_en: 1;
+        uint32_t tx_fifo_th_int_en: 1;
+        const uint32_t reserved_0: 26;
     } b;
 } UART_IER_TypeDef;
 
@@ -193,9 +192,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t int_pend: 1;
-        __I uint32_t int_id: 3;
-        __I uint32_t reserved_0: 28;
+        const uint32_t int_pend: 1;
+        const uint32_t int_id: 3;
+        const uint32_t reserved_0: 28;
     } b;
 } UART_IIR_TypeDef;
 
@@ -218,15 +217,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t rxfifo_error_en: 1;
-        __IO uint32_t clear_rxfifo: 1;
-        __IO uint32_t clear_txfifo: 1;
-        __O uint32_t dma_mode: 1;
-        __I uint32_t reserved_2: 4;
-        __O uint32_t rxfifo_trigger_level: 5;
-        __I uint32_t reserved_1: 3;
-        __O uint32_t tx_fifo_th: 5;
-        __I uint32_t reserved_0: 11;
+        uint32_t rxfifo_error_en: 1;
+        uint32_t clear_rxfifo: 1;
+        uint32_t clear_txfifo: 1;
+        uint32_t dma_mode: 1;
+        const uint32_t reserved_2: 4;
+        uint32_t rxfifo_trigger_level: 5;
+        const uint32_t reserved_1: 3;
+        uint32_t tx_fifo_th: 5;
+        const uint32_t reserved_0: 11;
     } b;
 } UART_FCR_TypeDef;
 
@@ -249,14 +248,14 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t wls0: 1;
-        __I uint32_t reserved_1: 1;
-        __IO uint32_t stb: 1;
-        __IO uint32_t parity_sel: 2;
-        __IO uint32_t stick_parity: 1;
-        __IO uint32_t break_ctrl: 1;
-        __IO uint32_t dlab: 1;
-        __I uint32_t reserved_0: 24;
+        uint32_t wls0: 1;
+        const uint32_t reserved_1: 1;
+        uint32_t stb: 1;
+        uint32_t parity_sel: 2;
+        uint32_t stick_parity: 1;
+        uint32_t break_ctrl: 1;
+        uint32_t dlab: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } UART_LCR_TypeDef;
 
@@ -276,12 +275,12 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t uart_DUMMY_002: 1;
-        __IO uint32_t rts: 1;
-        __IO uint32_t uart_DUMMY_001: 2;
-        __IO uint32_t loopback_en: 1;
-        __IO uint32_t autoflow_en: 1;
-        __I uint32_t reserved_0: 26;
+        uint32_t uart_DUMMY_002: 1;
+        uint32_t rts: 1;
+        uint32_t uart_DUMMY_001: 2;
+        uint32_t loopback_en: 1;
+        uint32_t autoflow_en: 1;
+        const uint32_t reserved_0: 26;
     } b;
 } UART_CTRL0_TypeDef;
 
@@ -304,15 +303,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rxfifo_datardy: 1;
-        __I uint32_t overrun_err: 1;
-        __I uint32_t parity_err: 1;
-        __I uint32_t framing_err: 1;
-        __I uint32_t break_err_int: 1;
-        __I uint32_t tx_fifo_empty_indicator: 1;
-        __I uint32_t tx_empty: 1;
-        __I uint32_t rxfifo_err: 1;
-        __I uint32_t reserved_0: 24;
+        const uint32_t rxfifo_datardy: 1;
+        const uint32_t overrun_err: 1;
+        const uint32_t parity_err: 1;
+        const uint32_t framing_err: 1;
+        const uint32_t break_err_int: 1;
+        const uint32_t tx_fifo_empty_indicator: 1;
+        const uint32_t tx_empty: 1;
+        const uint32_t rxfifo_err: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } UART_LSR_TypeDef;
 
@@ -335,15 +334,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t reserved_2: 3;
-        __IO uint32_t Pin_lb_test: 1;
-        __IO uint32_t uart_DUMMY_003: 2;
-        __IO uint32_t rx_break_signal_interrupt_enable: 1;
-        __IO uint32_t rx_break_signal_interrupt_status: 1;
-        __IO uint32_t Dbg_sel: 4;
-        __I uint32_t reserved_1: 4;
-        __IO uint32_t xfactor_adj: 11;
-        __I uint32_t reserved_0: 5;
+        const uint32_t reserved_2: 3;
+        uint32_t Pin_lb_test: 1;
+        uint32_t uart_DUMMY_003: 2;
+        uint32_t rx_break_signal_interrupt_enable: 1;
+        uint32_t rx_break_signal_interrupt_status: 1;
+        uint32_t Dbg_sel: 4;
+        const uint32_t reserved_1: 4;
+        uint32_t xfactor_adj: 11;
+        const uint32_t reserved_0: 5;
     } b;
 } UART_SCR_TypeDef;
 
@@ -366,15 +365,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t reserved_2: 3;
-        __IO uint32_t reset_rcv: 1;
-        __IO uint32_t xfactor: 4;
-        __I uint32_t reserved_1: 11;
-        __I uint32_t tx_fifo_th: 5;
-        __I uint32_t dma_mode: 1;
-        __I uint32_t rxfifo_error_en: 1;
-        __I uint32_t rxfifo_trigger_level: 5;
-        __I uint32_t reserved_0: 1;
+        const uint32_t reserved_2: 3;
+        uint32_t reset_rcv: 1;
+        uint32_t xfactor: 4;
+        const uint32_t reserved_1: 11;
+        const uint32_t tx_fifo_th: 5;
+        const uint32_t dma_mode: 1;
+        const uint32_t rxfifo_error_en: 1;
+        const uint32_t rxfifo_trigger_level: 5;
+        const uint32_t reserved_0: 1;
     } b;
 } UART_STSR_TypeDef;
 
@@ -389,8 +388,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rx_data: 8;
-        __I uint32_t reserved_0: 24;
+        const uint32_t rx_data: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } UART_RBR_TypeDef;
 
@@ -406,8 +405,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t tx_data: 8;
-        __I uint32_t reserved_0: 24;
+        uint32_t tx_data: 8;
+        const uint32_t reserved_0: 24;
     } b;
 } UART_THR_TypeDef;
 
@@ -428,13 +427,13 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t uart_DUMMY_005: 1;
-        __IO uint32_t txdma_en: 1;
-        __IO uint32_t rxdma_en: 1;
-        __IO uint32_t txdma_burstsize: 5;
-        __IO uint32_t rxdma_burstsize: 6;
-        __IO uint32_t uart_DUMMY_004: 2;
-        __I uint32_t reserved_0: 16;
+        uint32_t uart_DUMMY_005: 1;
+        uint32_t txdma_en: 1;
+        uint32_t rxdma_en: 1;
+        uint32_t txdma_burstsize: 5;
+        uint32_t rxdma_burstsize: 6;
+        uint32_t uart_DUMMY_004: 2;
+        const uint32_t reserved_0: 16;
     } b;
 } UART_MISCR_TypeDef;
 
@@ -451,9 +450,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rxidle_timeout_value: 4;
-        __I uint32_t reserved_0: 27;
-        __IO uint32_t rxidle_timeourt_en: 1;
+        uint32_t rxidle_timeout_value: 4;
+        const uint32_t reserved_0: 27;
+        uint32_t rxidle_timeourt_en: 1;
     } b;
 } UART_RX_TIMEOUT_TypeDef;
 
@@ -469,8 +468,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rxidle_timeout_int_sts: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t rxidle_timeout_int_sts: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } UART_RX_TIMEOUT_STS_TypeDef;
 
@@ -486,8 +485,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rxidle_timeout_int_en: 1;
-        __I uint32_t reserved_0: 31;
+        uint32_t rxidle_timeout_int_en: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } UART_RX_TIMEOUT_EN_TypeDef;
 
@@ -505,10 +504,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t tx_fifo_level: 5;
-        __I uint32_t reserved_1: 3;
-        __I uint32_t rx_fifo_level: 6;
-        __I uint32_t reserved_0: 18;
+        const uint32_t tx_fifo_level: 5;
+        const uint32_t reserved_1: 3;
+        const uint32_t rx_fifo_level: 6;
+        const uint32_t reserved_0: 18;
     } b;
 } UART_RXTX_FIFO_WL_TypeDef;
 
@@ -531,15 +530,15 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t rd_ava_int_mask: 1;
-        __IO uint32_t txfifo_empty_int_mask: 1;
-        __IO uint32_t rx_line_sts_int_mask: 1;
-        __IO uint32_t modem_sts_int_mask: 1;
-        __IO uint32_t rx_break_int_mask: 1;
-        __IO uint32_t rxidle_timeout_int_mask: 1;
-        __IO uint32_t txdone_int_mask: 1;
-        __IO uint32_t tx_thd_int_mask: 1;
-        __I uint32_t reserved_0: 24;
+        uint32_t rd_ava_int_mask: 1;
+        uint32_t txfifo_empty_int_mask: 1;
+        uint32_t rx_line_sts_int_mask: 1;
+        uint32_t modem_sts_int_mask: 1;
+        uint32_t rx_break_int_mask: 1;
+        uint32_t rxidle_timeout_int_mask: 1;
+        uint32_t txdone_int_mask: 1;
+        uint32_t tx_thd_int_mask: 1;
+        const uint32_t reserved_0: 24;
     } b;
 } UART_INT_MASK_TypeDef;
 
@@ -555,8 +554,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t tx_empty_stop_rdy: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t tx_empty_stop_rdy: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } UART_TXDONE_INT_TypeDef;
 
@@ -572,8 +571,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t int_tx_fifo: 1;
-        __I uint32_t reserved_0: 31;
+        const uint32_t int_tx_fifo: 1;
+        const uint32_t reserved_0: 31;
     } b;
 } UART_TX_THD_INT_TypeDef;
 

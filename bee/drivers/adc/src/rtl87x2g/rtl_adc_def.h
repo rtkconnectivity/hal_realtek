@@ -14,9 +14,8 @@
 #ifndef RTL_ADC_DEF_H
 #define RTL_ADC_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -131,10 +130,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t adc_fifo_data_out: 12;
-        __I uint32_t reserved_1: 4;
-        __I uint32_t reserved_0: 12;
-        __I uint32_t adc_schedule_index: 4;
+        const uint32_t adc_fifo_data_out: 12;
+        const uint32_t reserved_1: 4;
+        const uint32_t reserved_0: 12;
+        const uint32_t adc_schedule_index: 4;
     } b;
 } ADC_FIFO_READ_TypeDef;
 
@@ -160,18 +159,18 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t en_adc_continous_mode: 1;
-        __IO uint32_t en_adc_one_shot_mode: 1;
-        __I uint32_t reserved_1: 1;
-        __I uint32_t adc_fifo_wpt: 5;
-        __I uint32_t adc_fifo_rpt: 5;
-        __IO uint32_t adc_fifo_overwrite: 1;
-        __IO uint32_t adc_burst_size: 6;
-        __IO uint32_t adc_fifo_thd: 6;
-        __IO uint32_t adc_fifo_clr: 1;
-        __IO uint32_t adc_one_shot_fifo: 1;
-        __I uint32_t reserved_0: 2;
-        __IO uint32_t adc_dbg_sel: 2;
+        uint32_t en_adc_continous_mode: 1;
+        uint32_t en_adc_one_shot_mode: 1;
+        const uint32_t reserved_1: 1;
+        const uint32_t adc_fifo_wpt: 5;
+        const uint32_t adc_fifo_rpt: 5;
+        uint32_t adc_fifo_overwrite: 1;
+        uint32_t adc_burst_size: 6;
+        uint32_t adc_fifo_thd: 6;
+        uint32_t adc_fifo_clr: 1;
+        uint32_t adc_one_shot_fifo: 1;
+        const uint32_t reserved_0: 2;
+        uint32_t adc_dbg_sel: 2;
     } b;
 } ADC_DIG_CTRL_TypeDef;
 
@@ -188,9 +187,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t adc_schedule_idx_sel: 16;
-        __I uint32_t adc_fifo_data_level: 6;
-        __I uint32_t reserved_0: 10;
+        uint32_t adc_schedule_idx_sel: 16;
+        const uint32_t adc_fifo_data_level: 6;
+        const uint32_t reserved_0: 10;
     } b;
 } ADC_SCHED_CTRL_TypeDef;
 
@@ -222,24 +221,24 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t en_adc_fifio_rd_req_interrupt: 1;
-        __IO uint32_t en_adc_fifo_rd_error_interrupt: 1;
-        __IO uint32_t en_adc_fifo_thd_interrupt: 1;
-        __IO uint32_t en_adc_fifo_overflow_interrupt: 1;
-        __IO uint32_t en_adc_one_shot_done_interrupt: 1;
-        __I uint32_t reserved_2: 3;
-        __IO uint32_t clr_adc_fifio_rd_req_interrupt: 1;
-        __IO uint32_t clr_adc_fifo_rd_error_interrupt: 1;
-        __IO uint32_t clr_adc_fifo_thd_interrupt: 1;
-        __IO uint32_t clr_adc_fifo_overflow_interrupt: 1;
-        __IO uint32_t clr_adc_one_shot_done_interrupt: 1;
-        __I uint32_t reserved_1: 3;
-        __I uint32_t st_adc_fifio_rd_req_interrupt: 1;
-        __I uint32_t st_adc_fifo_rd_error_interrupt: 1;
-        __I uint32_t st_adc_fifo_thd_interrupt: 1;
-        __I uint32_t st_adc_fifo_overflow_interrupt: 1;
-        __I uint32_t st_adc_one_shot_done_interrupt: 1;
-        __I uint32_t reserved_0: 11;
+        uint32_t en_adc_fifio_rd_req_interrupt: 1;
+        uint32_t en_adc_fifo_rd_error_interrupt: 1;
+        uint32_t en_adc_fifo_thd_interrupt: 1;
+        uint32_t en_adc_fifo_overflow_interrupt: 1;
+        uint32_t en_adc_one_shot_done_interrupt: 1;
+        const uint32_t reserved_2: 3;
+        uint32_t clr_adc_fifio_rd_req_interrupt: 1;
+        uint32_t clr_adc_fifo_rd_error_interrupt: 1;
+        uint32_t clr_adc_fifo_thd_interrupt: 1;
+        uint32_t clr_adc_fifo_overflow_interrupt: 1;
+        uint32_t clr_adc_one_shot_done_interrupt: 1;
+        const uint32_t reserved_1: 3;
+        const uint32_t st_adc_fifio_rd_req_interrupt: 1;
+        const uint32_t st_adc_fifo_rd_error_interrupt: 1;
+        const uint32_t st_adc_fifo_thd_interrupt: 1;
+        const uint32_t st_adc_fifo_overflow_interrupt: 1;
+        const uint32_t st_adc_one_shot_done_interrupt: 1;
+        const uint32_t reserved_0: 11;
     } b;
 } ADC_CTRL_INT_TypeDef;
 
@@ -256,9 +255,9 @@ typedef union
     uint8_t d8[2];
     struct
     {
-        __IO uint32_t ch_num_idx: 4;
-        __IO uint32_t adc_mode_idx: 2;
-        __I uint32_t reserved: 10;
+        uint32_t ch_num_idx: 4;
+        uint32_t adc_mode_idx: 2;
+        const uint32_t reserved: 10;
     } b;
 } ADC_SCHED_TAB_IDX_TypeDef;
 
@@ -273,8 +272,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t adc_idx_output_data: 12;
-        __I uint32_t reserved_1: 4;
+        const uint32_t adc_idx_output_data: 12;
+        const uint32_t reserved_1: 4;
     } b;
 } ADC_IDX_OUTPUT_DATA_TypeDef;
 
@@ -303,22 +302,22 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t adc_rg0x_auxadc_0_delay_sel: 2;
-        __IO uint32_t adc_rg0x_auxadc_1_delay_sel: 2;
-        __IO uint32_t adc_rg2x_auxadc_0_delay_sel: 2;
-        __IO uint32_t adc_data_delay: 3;
-        __I uint32_t reserved_5: 1;
-        __IO uint32_t adc_poweron_select: 5;
-        __IO uint32_t adc_poweron_only_en: 1;
-        __I uint32_t reserved_4: 3;
-        __IO uint32_t adc_manual_poweron: 1;
-        __I uint32_t reserved_3: 1;
-        __IO uint32_t adc_fifo_stop_wr: 1;
-        __I uint32_t reserved_2: 2;
-        __IO uint32_t adc_data_avg_en: 1;
-        __IO uint32_t adc_data_avg_sel: 3;
-        __I uint32_t reserved_1: 3;
-        __IO uint32_t reserved_0: 1;
+        uint32_t adc_rg0x_auxadc_0_delay_sel: 2;
+        uint32_t adc_rg0x_auxadc_1_delay_sel: 2;
+        uint32_t adc_rg2x_auxadc_0_delay_sel: 2;
+        uint32_t adc_data_delay: 3;
+        const uint32_t reserved_5: 1;
+        uint32_t adc_poweron_select: 5;
+        uint32_t adc_poweron_only_en: 1;
+        const uint32_t reserved_4: 3;
+        uint32_t adc_manual_poweron: 1;
+        const uint32_t reserved_3: 1;
+        uint32_t adc_fifo_stop_wr: 1;
+        const uint32_t reserved_2: 2;
+        uint32_t adc_data_avg_en: 1;
+        uint32_t adc_data_avg_sel: 3;
+        const uint32_t reserved_1: 3;
+        uint32_t reserved_0: 1;
     } b;
 } ADC_POW_DATA_DLY_CTRL_TypeDef;
 
@@ -342,16 +341,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t reserved_3: 8;
-        __IO uint32_t adc_keep_ck_ad_high: 1;
-        __I uint32_t reserved_2: 2;
-        __IO uint32_t adc_delay_tune_sel: 2;
-        __I uint32_t reserved_1: 3;
-        __IO uint32_t adc_data_offset: 12;
-        __I uint32_t reserved_0: 1;
-        __IO uint32_t adc_timer_trigger_en: 1;
-        __IO uint32_t adc_data_align_msb: 1;
-        __IO uint32_t adc_data_offset_en: 1;
+        const uint32_t reserved_3: 8;
+        uint32_t adc_keep_ck_ad_high: 1;
+        const uint32_t reserved_2: 2;
+        uint32_t adc_delay_tune_sel: 2;
+        const uint32_t reserved_1: 3;
+        uint32_t adc_data_offset: 12;
+        const uint32_t reserved_0: 1;
+        uint32_t adc_timer_trigger_en: 1;
+        uint32_t adc_data_align_msb: 1;
+        uint32_t adc_data_offset_en: 1;
     } b;
 } ADC_DATA_CLK_CTRL_TypeDef;
 
@@ -366,9 +365,9 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t adc_sample_time_period: 14;
-        __I uint32_t reserved_0: 16;
-        __IO uint32_t adc_convert_time_period_sel: 2;
+        uint32_t adc_sample_time_period: 14;
+        const uint32_t reserved_0: 16;
+        uint32_t adc_convert_time_period_sel: 2;
     } b;
 } ADC_TIME_PERIOD_TypeDef;
 
