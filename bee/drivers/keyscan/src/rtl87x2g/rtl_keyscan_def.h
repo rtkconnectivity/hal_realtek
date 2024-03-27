@@ -13,9 +13,8 @@
 #ifndef RTL_KEYSCAN_DEF_H
 #define RTL_KEYSCAN_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -71,13 +70,13 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t keyscan_delay_div: 6;
-        __IO uint32_t reserved_1: 2;
-        __IO uint32_t keyscan_clk_div: 11;
-        __I uint32_t reserved_0: 5;
-        __IO uint32_t keyscan_clk_sel: 2;
-        __IO uint32_t keyscan_gt_pre_sel: 3;
-        __IO uint32_t keyscan_gt_post_sel: 3;
+        uint32_t keyscan_delay_div: 6;
+        uint32_t reserved_1: 2;
+        uint32_t keyscan_clk_div: 11;
+        const uint32_t reserved_0: 5;
+        uint32_t keyscan_clk_sel: 2;
+        uint32_t keyscan_gt_pre_sel: 3;
+        uint32_t keyscan_gt_post_sel: 3;
     } b;
 } KEYSCAN_CLK_DIV_TypeDef;
 
@@ -99,14 +98,14 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t keyscan_release_timer_cnt: 9;
-        __IO uint32_t keyscan_interval_timer_cnt: 9;
-        __IO uint32_t keyscan_deb_timer_cnt: 9;
-        __I uint32_t reserved_0: 1;
-        __IO uint32_t keyscan_push_high_en: 1;
-        __IO uint32_t keyscan_release_timer_en: 1;
-        __IO uint32_t keyscan_interval_timer_en: 1;
-        __IO uint32_t keyscan_deb_timer_en: 1;
+        uint32_t keyscan_release_timer_cnt: 9;
+        uint32_t keyscan_interval_timer_cnt: 9;
+        uint32_t keyscan_deb_timer_cnt: 9;
+        const uint32_t reserved_0: 1;
+        uint32_t keyscan_push_high_en: 1;
+        uint32_t keyscan_release_timer_en: 1;
+        uint32_t keyscan_interval_timer_en: 1;
+        uint32_t keyscan_deb_timer_en: 1;
     } b;
 } KEYSCAN_CONFIG1_TypeDef;
 
@@ -136,22 +135,22 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t keyscan_all_release_int_en: 1;
-        __IO uint32_t keyscan_fifo_notempty_int_en: 1;
-        __IO uint32_t keyscan_scan_finish_int_en: 1;
-        __IO uint32_t keyscan_fifo_or_int_en: 1;
-        __IO uint32_t keyscan_fifo_th_int_en: 1;
-        __IO uint32_t keyscan_fifo_th_level: 5;
-        __I uint32_t reserved_0: 1;
-        __IO uint32_t keyscan_manual_sel: 1;
-        __IO uint32_t keyscan_fifo_filter_data: 9;
-        __IO uint32_t keyscan_fifo_data_filter_en: 1;
-        __IO uint32_t keyscan_manual_trigger: 1;
-        __IO uint32_t keyscan_fifo_limit: 5;
-        __IO uint32_t keyscan_fifo_ov_ctrl: 1;
-        __IO uint32_t keyscan_trig_sel: 1;
-        __IO uint32_t keyscan_work_mode: 1;
-        __IO uint32_t keyscan_run_enable: 1;
+        uint32_t keyscan_all_release_int_en: 1;
+        uint32_t keyscan_fifo_notempty_int_en: 1;
+        uint32_t keyscan_scan_finish_int_en: 1;
+        uint32_t keyscan_fifo_or_int_en: 1;
+        uint32_t keyscan_fifo_th_int_en: 1;
+        uint32_t keyscan_fifo_th_level: 5;
+        const uint32_t reserved_0: 1;
+        uint32_t keyscan_manual_sel: 1;
+        uint32_t keyscan_fifo_filter_data: 9;
+        uint32_t keyscan_fifo_data_filter_en: 1;
+        uint32_t keyscan_manual_trigger: 1;
+        uint32_t keyscan_fifo_limit: 5;
+        uint32_t keyscan_fifo_ov_ctrl: 1;
+        uint32_t keyscan_trig_sel: 1;
+        uint32_t keyscan_work_mode: 1;
+        uint32_t keyscan_run_enable: 1;
     } b;
 } KEYSCAN_CONFIG2_TypeDef;
 
@@ -169,10 +168,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t keyscan_col_num: 5;
-        __I uint32_t reserved_1: 3;
-        __IO uint32_t keyscan_col_sel: 20;
-        __I uint32_t reserved_0: 4;
+        uint32_t keyscan_col_num: 5;
+        const uint32_t reserved_1: 3;
+        uint32_t keyscan_col_sel: 20;
+        const uint32_t reserved_0: 4;
     } b;
 } KEYSCAN_COLUMN_CONFIG_TypeDef;
 
@@ -190,10 +189,10 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t keyscan_row_sel: 12;
-        __I uint32_t reserved_1: 4;
-        __IO uint32_t keyscan_row_num: 4;
-        __I uint32_t reserved_0: 12;
+        uint32_t keyscan_row_sel: 12;
+        const uint32_t reserved_1: 4;
+        uint32_t keyscan_row_num: 4;
+        const uint32_t reserved_0: 12;
     } b;
 } KEYSCAN_ROW_CONFIG_TypeDef;
 
@@ -209,8 +208,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t keyscan_fifo_entry: 9;
-        __I uint32_t reserved_0: 23;
+        const uint32_t keyscan_fifo_entry: 9;
+        const uint32_t reserved_0: 23;
     } b;
 } KEYSCAN_FIFO_ENTRY_TypeDef;
 
@@ -230,12 +229,12 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t keyscan_all_release_int_mask: 1;
-        __IO uint32_t keyscan_fifo_notempty_int_mask: 1;
-        __IO uint32_t keyscan_scan_finish_int_mask: 1;
-        __IO uint32_t keyscan_fifo_or_int_mask: 1;
-        __IO uint32_t keyscan_fifo_th_int_mask: 1;
-        __I uint32_t reserved_0: 27;
+        uint32_t keyscan_all_release_int_mask: 1;
+        uint32_t keyscan_fifo_notempty_int_mask: 1;
+        uint32_t keyscan_scan_finish_int_mask: 1;
+        uint32_t keyscan_fifo_or_int_mask: 1;
+        uint32_t keyscan_fifo_th_int_mask: 1;
+        const uint32_t reserved_0: 27;
     } b;
 } KEYSCAN_INT_MASK_TypeDef;
 
@@ -259,16 +258,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t keyscan_all_release_int_clr: 1;
-        __IO uint32_t keyscan_fifo_notempty_int_clr: 1;
-        __IO uint32_t keyscan_scan_finish_int_clr: 1;
-        __IO uint32_t keyscan_fifo_or_int_clr: 1;
-        __IO uint32_t keyscan_fifo_th_int_clr: 1;
-        __IO uint32_t keyscan_fifo_ov_st_clr: 1;
-        __IO uint32_t keyscan_fifo_clr: 1;
-        __IO uint32_t keyscan_fifo_datafilter_st_clr: 1;
-        __IO uint32_t keyscan_fifo_limit_st_clr: 1;
-        __I uint32_t reserved_0: 23;
+        uint32_t keyscan_all_release_int_clr: 1;
+        uint32_t keyscan_fifo_notempty_int_clr: 1;
+        uint32_t keyscan_scan_finish_int_clr: 1;
+        uint32_t keyscan_fifo_or_int_clr: 1;
+        uint32_t keyscan_fifo_th_int_clr: 1;
+        uint32_t keyscan_fifo_ov_st_clr: 1;
+        uint32_t keyscan_fifo_clr: 1;
+        uint32_t keyscan_fifo_datafilter_st_clr: 1;
+        uint32_t keyscan_fifo_limit_st_clr: 1;
+        const uint32_t reserved_0: 23;
     } b;
 } KEYSCAN_INT_CLR_TypeDef;
 
@@ -295,19 +294,19 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t keyscan_fifo_empty: 1;
-        __I uint32_t keyscan_fifo_full: 1;
-        __I uint32_t keyscan_fifo_ov_status: 1;
-        __I uint32_t keyscan_fifo_datafilter_status: 1;
-        __I uint32_t keyscan_fifo_data_level: 6;
-        __I uint32_t reserved_1: 5;
-        __I uint32_t keyscan_all_release_int_status: 1;
-        __I uint32_t keyscan_fifo_notempty_int_status: 1;
-        __I uint32_t keyscan_scan_finish_int_status: 1;
-        __I uint32_t keyscan_fifo_or_int_status: 1;
-        __I uint32_t keyscan_fifo_th_int_status: 1;
-        __I uint32_t keyscan_fifo_limit_status: 1;
-        __I uint32_t reserved_0: 11;
+        const uint32_t keyscan_fifo_empty: 1;
+        const uint32_t keyscan_fifo_full: 1;
+        const uint32_t keyscan_fifo_ov_status: 1;
+        const uint32_t keyscan_fifo_datafilter_status: 1;
+        const uint32_t keyscan_fifo_data_level: 6;
+        const uint32_t reserved_1: 5;
+        const uint32_t keyscan_all_release_int_status: 1;
+        const uint32_t keyscan_fifo_notempty_int_status: 1;
+        const uint32_t keyscan_scan_finish_int_status: 1;
+        const uint32_t keyscan_fifo_or_int_status: 1;
+        const uint32_t keyscan_fifo_th_int_status: 1;
+        const uint32_t keyscan_fifo_limit_status: 1;
+        const uint32_t reserved_0: 11;
     } b;
 } KEYSCAN_INT_STS_TypeDef;
 
@@ -322,7 +321,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t rtl_version: 32;
+        const uint32_t rtl_version: 32;
     } b;
 } KEYSCAN_DBG1_TypeDef;
 
@@ -341,11 +340,11 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t dbg_sel: 3;
-        __IO uint32_t reg_speedup_mode: 1;
-        __I uint32_t current_state: 3;
-        __I uint32_t reserved_0: 24;
-        __IO uint32_t force_512k: 1;
+        uint32_t dbg_sel: 3;
+        uint32_t reg_speedup_mode: 1;
+        const uint32_t current_state: 3;
+        const uint32_t reserved_0: 24;
+        uint32_t force_512k: 1;
     } b;
 } KEYSCAN_DBG2_TypeDef;
 

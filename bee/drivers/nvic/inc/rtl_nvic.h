@@ -24,7 +24,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "rtl876x.h"
+#if defined (CONFIG_SOC_SERIES_RTL87X2G)
+#include "nvic/src/rtl87x2g/rtl_nvic_def.h"
+#endif
 
 /** \defgroup 87X2G_NVIC        NVIC
   * \brief

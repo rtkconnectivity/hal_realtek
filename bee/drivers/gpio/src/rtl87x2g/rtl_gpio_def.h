@@ -14,9 +14,8 @@
 #ifndef RTL_GPIO_DEF_H
 #define RTL_GPIO_DEF_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
+#include "address_map.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -95,6 +94,8 @@ typedef struct
 #define GPIOB              ((GPIO_TypeDef          *) GPIOB_REG_BASE)
 #define GPIOA_DEB          ((GPIO_Debounce_TypeDef *) GPIOA_DEB_REG_BASE)
 #define GPIOB_DEB          ((GPIO_Debounce_TypeDef *) GPIOB_DEB_REG_BASE)
+#define GPIOA_REG2_BASE                    (GPIOA_REG_BASE + 0x0100)
+#define GPIOB_REG2_BASE                    (GPIOB_REG_BASE + 0x0100)
 
 /** End of GPIO_Declaration
   * \}
@@ -124,7 +125,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_swporta_dr: 32;
+        uint32_t gpio_swporta_dr: 32;
     } b;
 } GPIO_DR_TypeDef;
 
@@ -139,7 +140,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_swporta_ddr: 32;
+        uint32_t gpio_swporta_ddr: 32;
     } b;
 } GPIO_DDR_TypeDef;
 
@@ -153,7 +154,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_inten: 32;
+        uint32_t gpio_inten: 32;
     } b;
 } GPIO_INT_EN_TypeDef;
 
@@ -168,7 +169,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_intmask: 32;
+        uint32_t gpio_intmask: 32;
     } b;
 } GPIO_INT_MASK_TypeDef;
 
@@ -183,7 +184,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_inttype_level: 32;
+        uint32_t gpio_inttype_level: 32;
     } b;
 } GPIO_INT_LV_TypeDef;
 
@@ -198,7 +199,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t gpio_intstatus: 32;
+        const uint32_t gpio_intstatus: 32;
     } b;
 } GPIO_INT_STS_TypeDef;
 
@@ -212,7 +213,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t gpio_raw_intstatus: 32;
+        const uint32_t gpio_raw_intstatus: 32;
     } b;
 } GPIO_INT_RAW_STS_TypeDef;
 
@@ -226,7 +227,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __O uint32_t gpio_porta_eoi: 32;
+        uint32_t gpio_porta_eoi: 32;
     } b;
 } GPIO_INT_CLR_TypeDef;
 
@@ -242,8 +243,8 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_ls_sync: 1;
-        __IO uint32_t reserved: 31;
+        uint32_t gpio_ls_sync: 1;
+        uint32_t reserved: 31;
     } b;
 } GPIO_LS_SYNC_TypeDef;
 
@@ -258,7 +259,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_output_mode: 32;
+        uint32_t gpio_output_mode: 32;
     } b;
 } GPIO_OUT_MODE_TypeDef;
 
@@ -273,7 +274,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __I uint32_t gpio_pad_state: 32;
+        const uint32_t gpio_pad_state: 32;
     } b;
 } GPIO_PAD_STATE_TypeDef;
 
@@ -287,7 +288,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t gpio_polarity: 32;
+        uint32_t gpio_polarity: 32;
     } b;
 } GPIO_EXT_DEB_POL_CTL_TypeDef;
 
@@ -309,16 +310,16 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t GPIO_G_L_CNT_LIMIT: 8;
-        __IO uint32_t GPIO_G_L_DEB_CLK_SEL: 1;
-        __IO uint32_t GPIO_G_L_DEB_CLK_DIV: 3;
-        __IO uint32_t GPIO_G_L_DEB_CNT_EN: 1;
-        __IO uint32_t reserved_1: 3;
-        __IO uint32_t GPIO_G_H_CNT_LIMIT: 8;
-        __IO uint32_t GPIO_G_H_DEB_CLK_SEL: 1;
-        __IO uint32_t GPIO_G_H_DEB_CLK_DIV: 3;
-        __IO uint32_t GPIO_G_H_DEB_CNT_EN: 1;
-        __IO uint32_t reserved_0: 3;
+        uint32_t GPIO_G_L_CNT_LIMIT: 8;
+        uint32_t GPIO_G_L_DEB_CLK_SEL: 1;
+        uint32_t GPIO_G_L_DEB_CLK_DIV: 3;
+        uint32_t GPIO_G_L_DEB_CNT_EN: 1;
+        uint32_t reserved_1: 3;
+        uint32_t GPIO_G_H_CNT_LIMIT: 8;
+        uint32_t GPIO_G_H_DEB_CLK_SEL: 1;
+        uint32_t GPIO_G_H_DEB_CLK_DIV: 3;
+        uint32_t GPIO_G_H_DEB_CNT_EN: 1;
+        uint32_t reserved_0: 3;
     } b;
 } GPIO_DEB_CLK_CTL_TypeDef;
 
@@ -333,7 +334,7 @@ typedef union
     uint8_t d8[4];
     struct
     {
-        __IO uint32_t GPIO_x_DEB_FUNC_EN: 32;
+        uint32_t GPIO_x_DEB_FUNC_EN: 32;
     } b;
 } GPIO_DEB_FUN_CTL_TypeDef;
 

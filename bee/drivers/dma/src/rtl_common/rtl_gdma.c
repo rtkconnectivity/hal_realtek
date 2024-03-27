@@ -376,7 +376,7 @@ void GDMA_Cmd(uint8_t GDMA_ChannelNum, FunctionalState NewState)
 #endif
         {
             /*Gdma transfer not finished */
-            if (GDMAx->GDMA_ChEnReg & BIT(GDMA_ChannelNum))
+            if (GDMAx->GDMA_ChEnReg & BIT(channel_num))
             {
                 /* suspend gdma channel */
                 GDMA_Channelx->GDMA_CFG_LOWx |= GDMA_SUSPEND_TRANSMISSSION;
@@ -407,7 +407,7 @@ void GDMA_Cmd(uint8_t GDMA_ChannelNum, FunctionalState NewState)
         else
         {
             /*gdma transfor not finished */
-            if (GDMAx->GDMA_ChEnReg & BIT(GDMA_ChannelNum + 16 - 8))
+            if (GDMAx->GDMA_ChEnReg & BIT(channel_num + 16 - 8))
             {
                 /* suspend gdma channel */
                 GDMA_Channelx->GDMA_CFG_LOWx |= GDMA_SUSPEND_TRANSMISSSION;

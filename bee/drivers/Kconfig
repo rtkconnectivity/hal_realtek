@@ -13,4 +13,5 @@ rsource "keyscan/Kconfig"
 rsource "qdec/Kconfig"
 rsource "spi/Kconfig"
 rsource "usb/Kconfig"
+rsource "wdt/Kconfig"
 endmenu
