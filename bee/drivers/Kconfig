@@ -14,4 +14,5 @@ rsource "qdec/Kconfig"
 rsource "spi/Kconfig"
 rsource "usb/Kconfig"
 rsource "wdt/Kconfig"
+rsource "bluetooth/Kconfig"
 endmenu
