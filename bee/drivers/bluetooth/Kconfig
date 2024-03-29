@@ -1,0 +1,7 @@
+menuconfig REALTEK_BT
+	bool "REALTEK MCU bluetooth driver"
+	default y
+
+	help
+	  This option enables the bluetooth driver for REALTEK family of
+	  processors.
