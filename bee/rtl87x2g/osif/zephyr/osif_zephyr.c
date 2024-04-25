@@ -148,19 +148,36 @@ bool os_alloc_secure_ctx_zephyr(uint32_t stack_size)
     return true;
 }
 
+K_THREAD_STACK_DEFINE(lowstack_stack, 768*4);
+struct k_thread lowstack_thread_data;
 bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routine)(void *),
                            void *p_param, uint16_t stack_size, uint16_t priority)
 {
-
     k_tid_t ret_thread_handle;
-    k_tid_t thread_handle;
 
-    int switch_priority = CONFIG_ZEPHYR_PRI_MAX - priority;
+/* The lowstack thread must be able to preempt all native cooperative threads in Zephyr
+(such as bt tx thread, mesh adv thread, BT Mesh settings workq and so on..). 
+Otherwise, if lowstack thread is not processed in a timely manner within approximately 40ms, 
+it may result in lowstack crashing and subsequently causing no event reply after hci command is sent, leading to a hardfault. 
+
+Therefore, we need to make the lowstack thread a "Meta-IRQ thread", which can preempt coop threads and meta-irq threads.
+Specifically, the priority of lowstack thread is set to K_HIGHEST_THREAD_PRIO with CONFIG_NUM_METAIRQ_PRIORITIES=1.
+
+Reference: https://docs.zephyrproject.org/latest/kernel/services/threads/index.html#meta-irq-priorities  */
 
     if (strcmp(p_name, "low_stack_task") == 0)
     {
-        switch_priority = -8;
+        *pp_handle = &lowstack_thread_data;
+        ret_thread_handle = k_thread_create(&lowstack_thread_data, lowstack_stack, 768*4,
+                                (k_thread_entry_t) p_routine, p_param, NULL, NULL,
+                                K_HIGHEST_THREAD_PRIO, 0, K_MSEC(10));
+        k_thread_name_set(ret_thread_handle, p_name);
+        return true;
     }
+
+    k_tid_t thread_handle;
+
+    int switch_priority = CONFIG_ZEPHYR_PRI_MAX - priority;
 
     thread_handle = (struct k_thread *) shared_multi_heap_alloc(RAM_TYPE_DATA_ON,
                                                                 sizeof(struct k_thread));
