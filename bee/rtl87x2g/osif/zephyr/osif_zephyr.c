@@ -1147,8 +1147,6 @@ void os_pm_return_to_idle_task_zephyr(void)
     __set_CONTROL(__get_CONTROL() | BIT1);
     __ISB();
 
-    os_pm_restore_tickcount();//restore tickcount and process timeout callback
-
     extern void z_thread_entry(k_thread_entry_t, void *, void *, void *);
     extern void idle(void *, void *, void *);
     z_thread_entry(idle, 0, 0, 0);
@@ -1170,6 +1168,7 @@ void os_pm_store_zephyr(void)
 
 void os_pm_restore_zephyr(void)
 {
+    os_pm_restore_tickcount();//restore tickcount and process timeout callback
 
     os_sched_restore_zephyr();
 }
@@ -1202,86 +1201,86 @@ uint32_t os_sys_tick_clk_get_zephyr(void)
 uint32_t os_pm_next_timeout_value_get_zephyr(void)
 {
 /* Solution without the exclude timer mechanism. */
-    // uint32_t ticks = z_get_next_timeout_expiry();
-    // return ticks;
+    uint32_t ticks = z_get_next_timeout_expiry();
+    return ticks;
 
 /* Solution with the exclude timer mechanism. */
-    uint32_t timeout_tick_res = 0xFFFFFFFF;
-    uint32_t timeout_tick = 0;
-    struct k_timer *timer;
-    struct k_thread *thread;
+    // uint32_t timeout_tick_res = 0xFFFFFFFF;
+    // uint32_t timeout_tick = 0;
+    // struct k_timer *timer;
+    // struct k_thread *thread;
 
-    bool handle_checked;
+    // bool handle_checked;
 
-    for (struct _timeout *t = get_first_timeout(); t != NULL; t = get_next_timeout(t))
-    {
-        handle_checked = true;
-        timeout_tick += t->dticks;
+    // for (struct _timeout *t = get_first_timeout(); t != NULL; t = get_next_timeout(t))
+    // {
+    //     handle_checked = true;
+    //     timeout_tick += t->dticks;
 
-        if (t->fn == z_timer_expiration_handler) //z_timer_expiration_handler
-        {
-            timer = CONTAINER_OF(t, struct k_timer, timeout);
-            T_OS_QUEUE_ELEM *p_cur_queue_item =lpm_excluded_handle[0].p_first;
-            while (p_cur_queue_item != NULL)
-            {
-                void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
-                if (cur_excluded_handle != NULL)
-                {
-                    if (timer == cur_excluded_handle)
-                    {
-                        long is_auto_reload;
-                        os_timer_get_auto_reload_zephyr(&cur_excluded_handle, &is_auto_reload);
-                        if (is_auto_reload)
-                        {
-                            DBG_DIRECT("[PM]!!handle=0x%x, exclude timer cannot be auto_reload", cur_excluded_handle);
-                            __ASSERT(0, "[PM]!!handle=0x%x", cur_excluded_handle);
-                        }
-                        handle_checked = false;
-                        break;
-                    }
-                }
-                p_cur_queue_item = p_cur_queue_item->p_next;
-            }
+    //     if (t->fn == z_timer_expiration_handler) //z_timer_expiration_handler
+    //     {
+    //         timer = CONTAINER_OF(t, struct k_timer, timeout);
+    //         T_OS_QUEUE_ELEM *p_cur_queue_item =lpm_excluded_handle[0].p_first;
+    //         while (p_cur_queue_item != NULL)
+    //         {
+    //             void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
+    //             if (cur_excluded_handle != NULL)
+    //             {
+    //                 if (timer == cur_excluded_handle)
+    //                 {
+    //                     long is_auto_reload;
+    //                     os_timer_get_auto_reload_zephyr(&cur_excluded_handle, &is_auto_reload);
+    //                     if (is_auto_reload)
+    //                     {
+    //                         DBG_DIRECT("[PM]!!handle=0x%x, exclude timer cannot be auto_reload", cur_excluded_handle);
+    //                         __ASSERT(0, "[PM]!!handle=0x%x", cur_excluded_handle);
+    //                     }
+    //                     handle_checked = false;
+    //                     break;
+    //                 }
+    //             }
+    //             p_cur_queue_item = p_cur_queue_item->p_next;
+    //         }
 
-            if (handle_checked)
-            {
-                timeout_tick_res = timeout_tick;
-                break;
-            }
-        }
-        else if (t->fn == z_thread_timeout) //z_thread_timeout
-        {
-            thread = CONTAINER_OF(t, struct k_thread, base.timeout);
+    //         if (handle_checked)
+    //         {
+    //             timeout_tick_res = timeout_tick;
+    //             break;
+    //         }
+    //     }
+    //     else if (t->fn == z_thread_timeout) //z_thread_timeout
+    //     {
+    //         thread = CONTAINER_OF(t, struct k_thread, base.timeout);
 
-            T_OS_QUEUE_ELEM *p_cur_queue_item = lpm_excluded_handle[1].p_first;
-            while (p_cur_queue_item != NULL)
-            {
-                void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
-                if (cur_excluded_handle != NULL)
-                {
+    //         T_OS_QUEUE_ELEM *p_cur_queue_item = lpm_excluded_handle[1].p_first;
+    //         while (p_cur_queue_item != NULL)
+    //         {
+    //             void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
+    //             if (cur_excluded_handle != NULL)
+    //             {
 
-                    if (thread == cur_excluded_handle)
-                    {
-                        handle_checked = false;
-                        break;
-                    }
-                }
-                p_cur_queue_item = p_cur_queue_item->p_next;
-            }
-            if (handle_checked)
-            {
-                timeout_tick_res = timeout_tick;
-                break;
-            }
-        }
-        else//other timeout type(e.g. workqueue item)
-        {
-            timeout_tick_res = timeout_tick;
-            break;
-        }
-    }
+    //                 if (thread == cur_excluded_handle)
+    //                 {
+    //                     handle_checked = false;
+    //                     break;
+    //                 }
+    //             }
+    //             p_cur_queue_item = p_cur_queue_item->p_next;
+    //         }
+    //         if (handle_checked)
+    //         {
+    //             timeout_tick_res = timeout_tick;
+    //             break;
+    //         }
+    //     }
+    //     else//other timeout type(e.g. workqueue item)
+    //     {
+    //         timeout_tick_res = timeout_tick;
+    //         break;
+    //     }
+    // }
 
-    return timeout_tick_res;
+    // return timeout_tick_res;
 
 }
 
