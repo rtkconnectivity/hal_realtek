@@ -452,4 +452,5 @@ prvSetupFPU = 0x0002cc31 ;
 lpm_excluded_handle = 0x0013e1ec ;
 os_register_pm_excluded_handle_imp = 0x00028215 ;
 os_unregister_pm_excluded_handle_imp = 0x000287dd ;
-
+os_pm_restore_tickcount  = 0x00027c65 ;
+os_pm_store_tickcount = 0x00027e35 ;
