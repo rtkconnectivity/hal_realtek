@@ -29,6 +29,7 @@ add_subdirectory_ifdef(CONFIG_REALTEK_SPI spi)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_USB usb)
 add_subdirectory_ifdef(CONFIG_REALTEK_BT bluetooth)
+add_subdirectory_ifdef(CONFIG_REALTEK_PPT ppt)
 if (CONFIG_REALTEK_CORE_WDT OR CONFIG_REALTEK_AON_WDT)
 add_subdirectory(wdt)
 endif()
