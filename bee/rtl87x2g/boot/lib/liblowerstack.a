@@ -1,4 +1,7 @@
+BB_read_baseband_register = 0x00070a3d ;
 BB_write_baseband_register = 0x00070a75 ;
+BB_read_native_clock = 0x00070ae9 ;
+BB_read_native_counter = 0x00070b37 ;
 bzdma_ble_set_segment_valid_bitmap = 0x00071401 ;
 bzdma_send_burst_rxcmd_and_wait_complete = 0x000720fd ;
 vhci_has_sig_pended = 0x00073eb5 ;
