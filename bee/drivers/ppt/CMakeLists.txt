@@ -1,0 +1,1 @@
+add_subdirectory_ifdef(CONFIG_REALTEK_USING_PPT_SYNC_MASTER sync)
