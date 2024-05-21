@@ -1,10 +1,11 @@
-menuconfig REALTEK_AON_QDEC
+config REALTEK_AON_QDEC
 	bool "REALTEK MCU aon qdec driver"
-	default n
+	default y
+	depends on USE_HAL_REALTEK_AON_QDEC
 
-	select REALTEK_RCC
-	select REALTEK_PINMUX
-	select REALTEK_NVIC
+	select USE_HAL_REALTEK_RCC
+	select USE_HAL_REALTEK_PINMUX
+	select USE_HAL_REALTEK_NVIC
 
 	help
 	  This option enables the aon qdec driver for REALTEK MCU.

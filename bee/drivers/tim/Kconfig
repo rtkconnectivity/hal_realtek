@@ -1,21 +1,23 @@
-menuconfig REALTEK_TIM
+config REALTEK_TIM
 	bool "REALTEK MCU tim driver"
-	default n
+	default y
+	depends on USE_HAL_REALTEK_TIM
 
-	select REALTEK_RCC
-	select REALTEK_PINMUX
-	select REALTEK_NVIC
+	select USE_HAL_REALTEK_RCC
+	select USE_HAL_REALTEK_PINMUX
+	select USE_HAL_REALTEK_NVIC
 
 	help
 	  This option enables the tim driver for REALTEK MCU.
 
-menuconfig REALTEK_ENHTIM
+config REALTEK_ENHTIM
 	bool "REALTEK MCU enhtim driver"
-	default n
+	default y
+	depends on USE_HAL_REALTEK_ENHTIM
 
-	select REALTEK_RCC
-	select REALTEK_PINMUX
-	select REALTEK_NVIC
+	select USE_HAL_REALTEK_RCC
+	select USE_HAL_REALTEK_PINMUX
+	select USE_HAL_REALTEK_NVIC
 
 	help
 	  This option enables the enhtim driver for REALTEK MCU.
