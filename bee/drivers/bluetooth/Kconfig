@@ -1,4 +1,4 @@
-menuconfig REALTEK_BT
+config REALTEK_BT
 	bool "REALTEK MCU bluetooth driver"
 	default y
 

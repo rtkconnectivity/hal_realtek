@@ -1,9 +1,11 @@
-menuconfig REALTEK_UART
+config REALTEK_UART
 	bool "REALTEK MCU uart driver"
-	default n
-	select REALTEK_RCC
-	select REALTEK_PINMUX
-	select REALTEK_NVIC
+	default y
+	depends on USE_HAL_REALTEK_UART
+
+	select USE_HAL_REALTEK_RCC
+	select USE_HAL_REALTEK_PINMUX
+	select USE_HAL_REALTEK_NVIC
 
 	help
 	  This option enables the uart driver for REALTEK MCU.

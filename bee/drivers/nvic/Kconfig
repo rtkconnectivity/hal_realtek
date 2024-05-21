@@ -1,5 +1,7 @@
-menuconfig REALTEK_NVIC
+config REALTEK_NVIC
 	bool "REALTEK MCU nvic driver"
+	default y
+	depends on USE_HAL_REALTEK_NVIC
 	default n
 
 	help
