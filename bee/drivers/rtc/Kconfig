@@ -1,10 +1,11 @@
-menuconfig REALTEK_RTC
+config REALTEK_RTC
 	bool "REALTEK MCU rtc driver"
-	default n
+	default y
+	depends on USE_HAL_REALTEK_RTC
 
-	select REALTEK_RCC
-	select REALTEK_PINMUX
-	select REALTEK_NVIC
+	select USE_HAL_REALTEK_RCC
+	select USE_HAL_REALTEK_PINMUX
+	select USE_HAL_REALTEK_NVIC
 
 	help
 	  This option enables the rtc driver for REALTEK MCU.
