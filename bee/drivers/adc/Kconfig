@@ -1,11 +1,11 @@
-
-menuconfig REALTEK_ADC
+config REALTEK_ADC
 	bool "REALTEK MCU adc driver"
-	default n
+	default y
+	depends on USE_HAL_REALTEK_ADC
 
-	select REALTEK_RCC
-	select REALTEK_PINMUX
-	select REALTEK_NVIC
+	select USE_HAL_REALTEK_RCC
+	select USE_HAL_REALTEK_PINMUX
+	select USE_HAL_REALTEK_NVIC
 	select REALTEK_USING_SDK_LIB
 
 	help

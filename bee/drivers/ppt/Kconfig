@@ -1,0 +1,9 @@
+config REALTEK_PPT
+	bool "RealTek MCU ppt driver"
+	default n
+
+config REALTEK_USING_PPT_SYNC_MASTER
+	bool "RealTek ppt master library"
+	default y if REALTEK_PPT
+	help
+		This option enables the ppt master library for REALTEK MCU.
