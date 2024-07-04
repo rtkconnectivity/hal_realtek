@@ -1,0 +1,6 @@
+zephyr_include_directories(rom)
+zephyr_include_directories(rom/portable/bee4)
+zephyr_include_directories(inc)
+zephyr_library_sources(src/mac_802154_frame_parser.c)
+zephyr_library_sources(src/mac_802154_xip.c)
+zephyr_code_relocate(FILES src/mac_802154_xip.c LOCATION ITCM)

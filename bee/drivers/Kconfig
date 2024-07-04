@@ -16,4 +16,5 @@ rsource "usb/Kconfig"
 rsource "wdt/Kconfig"
 rsource "bluetooth/Kconfig"
 rsource "ppt/Kconfig"
+rsource "mac_802154/Kconfig"
 endmenu
