@@ -35,6 +35,9 @@ extern void mac_EDScanProcess_rom(void);
 typedef void (*bt_hci_reset_handler_t)(void);
 static bt_hci_reset_handler_t bt_rci_reset_handler = NULL;
 
+static uint16_t saved_shortaddr = 0;
+static uint8_t saved_extaddr[8];
+
 void mac_RegisterBtHciResetHandler(bt_hci_reset_handler_t handler)
 {
     bt_rci_reset_handler = handler;
@@ -404,10 +407,14 @@ bool patch_SystemCall_Zigbee_Stack_imp(uint32_t opcode)
     switch (opcode)
     {
         case SYSCALL_STACK_HCI_RESET_ENTER:
+        mac_memcpy(saved_extaddr, &MAC->eadr_l, 8);
+        saved_shortaddr = MAC->sadr;
         break;
 
         case SYSCALL_STACK_HCI_RESET_EXIT:
         bt_rci_reset_handler();
+        mac_SetLongAddress(saved_extaddr);
+        mac_SetShortAddress(saved_shortaddr);
         break;
 
         default:
