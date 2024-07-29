@@ -7,7 +7,6 @@ extern "C" {
 
 #include "stdint.h"
 #include "stdbool.h"
-#include "cmsis_compiler.h"
 #include "vector_table_auto_gen.h"
 
 /** @defgroup VECTOR_TABLE  Vector table
