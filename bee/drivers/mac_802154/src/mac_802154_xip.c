@@ -406,18 +406,18 @@ bool patch_SystemCall_Zigbee_Stack_imp(uint32_t opcode)
 {
     switch (opcode)
     {
-        case SYSCALL_STACK_HCI_RESET_ENTER:
+    case SYSCALL_STACK_HCI_RESET_ENTER:
         mac_memcpy(saved_extaddr, &MAC->eadr_l, 8);
         saved_shortaddr = MAC->sadr;
         break;
 
-        case SYSCALL_STACK_HCI_RESET_EXIT:
+    case SYSCALL_STACK_HCI_RESET_EXIT:
         bt_rci_reset_handler();
         mac_SetLongAddress(saved_extaddr);
         mac_SetShortAddress(saved_shortaddr);
         break;
 
-        default:
+    default:
         break;
     }
 }

@@ -382,72 +382,72 @@ typedef union
     struct
     {
         const uint32_t rtc_cnt: 32;
-    } b;
-} RTC_CNT0_TypeDef;
+        } b;
+    } RTC_CNT0_TypeDef;
 
 
 
-/* 0x34
-   11:0    R      rtc_prescale_cnt        12'b0
-   31:12   R/W    rtc_prescale_cnt_dummy  20'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t rtc_prescale_cnt: 12;
-        uint32_t rtc_prescale_cnt_dummy: 20;
-    } b;
-} RTC_PRESCALE_CNT0_TypeDef;
+    /* 0x34
+       11:0    R      rtc_prescale_cnt        12'b0
+       31:12   R/W    rtc_prescale_cnt_dummy  20'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t rtc_prescale_cnt: 12;
+                uint32_t rtc_prescale_cnt_dummy: 20;
+            } b;
+        } RTC_PRESCALE_CNT0_TypeDef;
 
 
 
-/* 0x38
-   11:0    R/W    rtc_prescale_cmp        12'b0
-   31:12   R/W    rtc_prescale_cmp_dummy  20'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t rtc_prescale_cmp: 12;
-        uint32_t rtc_prescale_cmp_dummy: 20;
-    } b;
-} RTC_PRESCALE_CMP0_TypeDef;
+    /* 0x38
+       11:0    R/W    rtc_prescale_cmp        12'b0
+       31:12   R/W    rtc_prescale_cmp_dummy  20'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t rtc_prescale_cmp: 12;
+                uint32_t rtc_prescale_cmp_dummy: 20;
+            } b;
+        } RTC_PRESCALE_CMP0_TypeDef;
 
 
 
-/* 0x3C
-   31:0    R/W    rtc_backup              32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t rtc_backup: 32;
-    } b;
-} RTC_BACKUP_REG_TypeDef;
+    /* 0x3C
+       31:0    R/W    rtc_backup              32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t rtc_backup: 32;
+            } b;
+        } RTC_BACKUP_REG_TypeDef;
 
 
 
-/* 0x40
-   31:0    R      rtc_rtl_version         32'h2112180A
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t rtc_rtl_version: 32;
-    } b;
-} RTC_RTL_VERSION0_TypeDef;
+    /* 0x40
+       31:0    R      rtc_rtl_version         32'h2112180A
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t rtc_rtl_version: 32;
+            } b;
+        } RTC_RTL_VERSION0_TypeDef;
 
 
 #ifdef  __cplusplus
