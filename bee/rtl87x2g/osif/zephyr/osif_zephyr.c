@@ -1310,9 +1310,17 @@ uint64_t os_sys_tick_increase_zephyr(uint32_t tick_increment)
     return old_tick;
 }
 
+extern bool tick_mode;
 uint32_t os_sys_tick_rate_get_zephyr(void)
 {
-    return (uint32_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC;
+    if (tick_mode)
+    {
+        return (uint32_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC;
+    }
+    else
+    {
+        return (uint32_t)100;
+    }
 }
 
 uint32_t os_sys_tick_clk_get_zephyr(void)
