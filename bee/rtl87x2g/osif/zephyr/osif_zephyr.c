@@ -1144,7 +1144,20 @@ bool os_timer_delete_zephyr(void **pp_handle)
 
 bool os_timer_is_timer_active_zephyr(void **pp_handle)
 {
-    return true;
+    if (pp_handle && *pp_handle)
+    {
+        struct k_timer *obj = (struct k_timer *)*pp_handle;
+
+        if (k_timer_remaining_get(obj) == 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool os_timer_state_get_zephyr(void **pp_handle, uint32_t *p_timer_state)
