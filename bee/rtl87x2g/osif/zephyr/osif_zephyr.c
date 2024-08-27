@@ -34,41 +34,28 @@ Timer_Info timer_number_array[TIMER_NUMBER_MAX];
 extern struct k_thread *z_swap_next_thread(void);
 extern void os_queue_func_init(void);
 /************************************************************ OS INIT & SCHEDULAR ************************************************************/
+static struct sys_heap data_on_heap;
+static struct sys_heap buffer_on_heap;
+static struct sys_heap ext_data_heap;
+
 void os_heap_init_zephyr(void)
 {
-    // Init the multi-heap, Init the shared multi-heap pool
-    shared_multi_heap_pool_init();
-    //  Add dataON region
-    struct shared_multi_heap_region heapDataON =
-    {
-        .addr = (uintptr_t)(DT_REG_ADDR(DT_NODELABEL(heap))),
-        .size = DT_REG_SIZE(DT_NODELABEL(heap)),
-        .attr = RAM_TYPE_DATA_ON,
-    };
-    shared_multi_heap_add(&heapDataON, NULL);// Add the region to the pool
+    // init heap in data on region
+    // RAM_TYPE: RAM_TYPE_DATA_ON
+    sys_heap_init(&data_on_heap, (void *)(DT_REG_ADDR(DT_NODELABEL(heap))),
+                  DT_REG_SIZE(DT_NODELABEL(heap)));
 
-    // Add bufferON region
-    struct shared_multi_heap_region heapBufferON =
-    {
-        .addr = (uintptr_t)(BUFFER_ON_HEAP_ADDR),
-        .size = BUFFER_ON_HEAP_SIZE,
-        .attr = RAM_TYPE_BUFFER_ON,
-    };
-    shared_multi_heap_add(&heapBufferON, NULL);
+    // init heap in bufferON region
+    // RAM_TYPE: RAM_TYPE_BUFFER_ON
+    sys_heap_init(&buffer_on_heap, (void *)BUFFER_ON_HEAP_ADDR, BUFFER_ON_HEAP_SIZE);
 
-    //Add ext_data_ram region
-    struct shared_multi_heap_region heapExtDataRam =
-    {
-        .addr = (uintptr_t)(EXT_DATA_SRAM_HEAP_ADDR),
-        .size = EXT_DATA_SRAM_HEAP_SIZE,
-        .attr = RAM_TYPE_EXT_DATA_SRAM,
-    };
-    shared_multi_heap_add(&heapExtDataRam, NULL);
+    //  init heap in ext_data_ram region
+    // RAM_TYPE: RAM_TYPE_EXT_DATA_SRAM
+    sys_heap_init(&ext_data_heap, (void *)EXT_DATA_SRAM_HEAP_ADDR, EXT_DATA_SRAM_HEAP_SIZE);
 }
 
 void os_init_zephyr(void)
 {
-    //shared multi-heap init
     os_heap_init_zephyr();
 
     return;
@@ -184,8 +171,8 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
 
     int switch_priority = CONFIG_ZEPHYR_PRI_MAX - priority;
 
-    thread_handle = (struct k_thread *) shared_multi_heap_alloc(RAM_TYPE_DATA_ON,
-                                                                sizeof(struct k_thread));
+    thread_handle = (struct k_thread *) sys_heap_alloc(&data_on_heap,
+                                                       sizeof(struct k_thread));
     if (thread_handle != NULL)
     {
         memset(thread_handle, 0, sizeof(struct k_thread));
@@ -198,11 +185,11 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
     }
     /****************************** dynamic stack ******************************/
     k_thread_stack_t *stack_buffer;
-    stack_buffer = (k_thread_stack_t *) shared_multi_heap_aligned_alloc(0, 8,
-                                                                        stack_size);
+    stack_buffer = (k_thread_stack_t *) sys_heap_aligned_alloc(&data_on_heap, 8,
+                                                               stack_size);
     if (stack_buffer == NULL)
     {
-        shared_multi_heap_free(thread_handle);
+        sys_heap_free(&data_on_heap, thread_handle);
         thread_handle = NULL;
         DBG_DIRECT("alloc thread stack failed because data ram heap is full");
         return false;
@@ -326,7 +313,7 @@ bool os_task_signal_create_zephyr(void *p_handle, uint32_t count)
     }
 
     struct k_sem *sem_obj;
-    sem_obj = (struct k_sem *) shared_multi_heap_alloc(RAM_TYPE_DATA_ON, sizeof(struct k_sem));
+    sem_obj = (struct k_sem *) sys_heap_alloc(&data_on_heap, sizeof(struct k_sem));
 
     if (sem_obj != NULL)
     {
@@ -458,7 +445,7 @@ bool os_sem_create_zephyr(void **pp_handle, const char *p_name, uint32_t init_co
                           uint32_t max_count)
 {
     struct k_sem *sem_obj;
-    sem_obj = (struct k_sem *) shared_multi_heap_alloc(RAM_TYPE_DATA_ON, sizeof(struct k_sem));
+    sem_obj = (struct k_sem *) sys_heap_alloc(&data_on_heap, sizeof(struct k_sem));
 
     if (sem_obj != NULL)
     {
@@ -488,7 +475,7 @@ bool os_sem_delete_zephyr(void *p_handle)
 
     obj = (struct k_sem *)p_handle;
 
-    shared_multi_heap_free(obj);
+    sys_heap_free(&data_on_heap, obj);
 
     return true;
 }
@@ -547,7 +534,7 @@ bool os_sem_give_zephyr(void *p_handle)
 bool os_mutex_create_zephyr(void **pp_handle)
 {
     struct k_mutex *mutex_obj;
-    mutex_obj = (struct k_mutex *) shared_multi_heap_alloc(RAM_TYPE_DATA_ON, sizeof(struct k_mutex));
+    mutex_obj = (struct k_mutex *) sys_heap_alloc(&data_on_heap, sizeof(struct k_mutex));
 
     if (mutex_obj != NULL)
     {
@@ -577,7 +564,7 @@ bool os_mutex_delete_zephyr(void *p_handle)
 
     obj = (struct k_mutex *)p_handle;
 
-    shared_multi_heap_free(obj);
+    sys_heap_free(&data_on_heap, obj);
 
     return true;
 }
@@ -653,7 +640,7 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, const char *p_name, uin
     size_t total_size = msg_size * msg_num;
     if (pp_handle)
     {
-        queue_obj = (struct k_msgq *) shared_multi_heap_alloc(RAM_TYPE_DATA_ON, sizeof(struct k_msgq));
+        queue_obj = (struct k_msgq *) sys_heap_alloc(&data_on_heap, sizeof(struct k_msgq));
         if (queue_obj != NULL)
         {
             memset(queue_obj, 0, sizeof(struct k_msgq));
@@ -665,7 +652,7 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, const char *p_name, uin
             return true;
         }
 
-        queue_buffer = shared_multi_heap_aligned_alloc(RAM_TYPE_DATA_ON, 4, total_size);
+        queue_buffer = sys_heap_aligned_alloc(&data_on_heap, 4, total_size);
         if (queue_buffer != NULL)
         {
             k_msgq_init(queue_obj, queue_buffer, msg_size, msg_num);
@@ -674,7 +661,7 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, const char *p_name, uin
         }
         else
         {
-            shared_multi_heap_free(queue_obj);
+            sys_heap_free(&data_on_heap, queue_obj);
             DBG_DIRECT("alloc queue buffer failed because data ram heap is full");
             ret = -ENOMEM;
         }
@@ -699,10 +686,10 @@ bool os_msg_queue_delete_intern_zephyr(void *p_handle, const char *p_func, uint3
 
     if ((obj->flags & K_MSGQ_FLAG_ALLOC) != 0U)
     {
-        shared_multi_heap_free(obj->buffer_start);
+        sys_heap_free(&data_on_heap, obj->buffer_start);
         obj->buffer_start = NULL;
         obj->flags &= ~K_MSGQ_FLAG_ALLOC;
-        shared_multi_heap_free(obj);
+        sys_heap_free(&data_on_heap, obj);
         return true;
     }
 
@@ -794,10 +781,27 @@ void *os_mem_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
                                  const char *p_func, uint32_t file_line)
 {
     void *p = NULL;
-    p = shared_multi_heap_alloc(ram_type, size);
+
+    switch (ram_type)
+    {
+    case RAM_TYPE_DATA_ON:
+        p = sys_heap_alloc(&data_on_heap, size);
+        break;
+    case RAM_TYPE_BUFFER_ON:
+        p = sys_heap_alloc(&buffer_on_heap, size);
+        break;
+    case RAM_TYPE_EXT_DATA_SRAM:
+        p = sys_heap_alloc(&ext_data_heap, size);
+        break;
+    default:
+        break;
+    }
+
     if (p == NULL)
     {
+        DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed!");
     }
+
     return p;
 }
 
@@ -805,10 +809,23 @@ void *os_mem_zalloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
                                   const char *p_func, uint32_t file_line)
 {
     void *p = NULL;
-    p = shared_multi_heap_alloc(ram_type, size);
+    switch (ram_type)
+    {
+    case RAM_TYPE_DATA_ON:
+        p = sys_heap_alloc(&data_on_heap, size);
+        break;
+    case RAM_TYPE_BUFFER_ON:
+        p = sys_heap_alloc(&buffer_on_heap, size);
+        break;
+    case RAM_TYPE_EXT_DATA_SRAM:
+        p = sys_heap_alloc(&ext_data_heap, size);
+        break;
+    default:
+        break;
+    }
     if (p == NULL)
     {
-        return 0;
+        DBG_DIRECT("os_mem_zalloc_intern_zephyr alloc failed!");
     }
     else
     {
@@ -824,10 +841,23 @@ void *os_mem_aligned_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size, uint8_t
                                          const char *p_func, uint32_t file_line)
 {
     void *p = NULL;
-    p = shared_multi_heap_aligned_alloc(ram_type, alignment, size);
+    switch (ram_type)
+    {
+    case RAM_TYPE_DATA_ON:
+        p = sys_heap_aligned_alloc(&data_on_heap, alignment, size);
+        break;
+    case RAM_TYPE_BUFFER_ON:
+        p = sys_heap_aligned_alloc(&buffer_on_heap, alignment, size);
+        break;
+    case RAM_TYPE_EXT_DATA_SRAM:
+        p = sys_heap_aligned_alloc(&ext_data_heap, alignment, size);
+        break;
+    default:
+        break;
+    }
     if (p == NULL)
     {
-        return 0;
+        DBG_DIRECT("os_mem_aligned_alloc_intern_zephyr alloc failed!");
     }
     return p;
 }
@@ -837,7 +867,22 @@ void *os_mem_aligned_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size, uint8_t
 /****************************************************************************/
 void os_mem_free_zephyr(void *p_block)
 {
-    shared_multi_heap_free(p_block);
+    if (p_block >= (void *)BUFFER_ON_HEAP_ADDR)
+    {
+        sys_heap_free(&buffer_on_heap, p_block);
+    }
+    else if (p_block >= (void *)EXT_DATA_SRAM_HEAP_ADDR)
+    {
+        sys_heap_free(&ext_data_heap, p_block);
+    }
+    else if (p_block >= (void *)DT_REG_ADDR(DT_NODELABEL(heap)))
+    {
+        sys_heap_free(&data_on_heap, p_block);
+    }
+    else
+    {
+        DBG_DIRECT("Memory free failed, because it is not in the legitable heap region.");
+    }
     return;
 }
 
@@ -850,7 +895,22 @@ void os_mem_aligned_free_zephyr(void *p_block)
 
     memcpy(&p, (uint8_t *)p_block - sizeof(void *), sizeof(void *));
 
-    shared_multi_heap_free(p);
+    if (p >= (void *)BUFFER_ON_HEAP_ADDR)
+    {
+        sys_heap_free(&buffer_on_heap, p);
+    }
+    else if (p >= (void *)EXT_DATA_SRAM_HEAP_ADDR)
+    {
+        sys_heap_free(&ext_data_heap, p);
+    }
+    else if (p >= (void *)DT_REG_ADDR(DT_NODELABEL(heap)))
+    {
+        sys_heap_free(&data_on_heap, p);
+    }
+    else
+    {
+        DBG_DIRECT("Memory aligned free failed, because it is not in the legitable heap region.");
+    }
 
     return;
 }
@@ -861,6 +921,38 @@ void os_mem_aligned_free_zephyr(void *p_block)
 //todo
 size_t os_mem_peek_zephyr(RAM_TYPE ram_type)
 {
+#ifdef CONFIG_SYS_HEAP_RUNTIME_STATS
+    struct sys_memory_stats stats;
+    uint32_t heap_size;
+    switch (ram_type)
+    {
+    case RAM_TYPE_DATA_ON:
+        sys_heap_runtime_stats_get(&data_on_heap, &stats);
+        heap_size =  DT_REG_SIZE(DT_NODELABEL(heap));
+        break;
+    case RAM_TYPE_BUFFER_ON:
+        sys_heap_runtime_stats_get(&buffer_on_heap, &stats);
+        heap_size = BUFFER_ON_HEAP_SIZE;
+        break;
+    case RAM_TYPE_EXT_DATA_SRAM:
+        sys_heap_runtime_stats_get(&ext_data_heap, &stats);
+        heap_size = EXT_DATA_SRAM_HEAP_SIZE;
+        break;
+    default:
+        printk("Invalid ram_type for os_mem_peek_zephyr!");
+        return true;
+        break;
+    }
+    printk("RAM type of heap: %d, heap size: %zu, allocated %zu, free %zu, max allocated %zu\n",
+           ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
+           stats.max_allocated_bytes);
+
+    /* use DBG_DIRECT when zephyr log system is not initialized*/
+    // DBG_DIRECT("RAM type of heap: %d, heap size: %d, allocated %d, free %d, max allocated %d\n",
+    //  ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
+    //  stats.max_allocated_bytes);
+#endif
+
     return true;
 }
 void os_mem_peek_printf_zephyr(void)
@@ -917,7 +1009,7 @@ bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t
     }
 
     struct k_timer *timer_obj;
-    timer_obj = (struct k_timer *) shared_multi_heap_alloc(RAM_TYPE_DATA_ON, sizeof(struct k_timer));
+    timer_obj = (struct k_timer *) sys_heap_alloc(&data_on_heap, sizeof(struct k_timer));
     if (timer_obj != NULL)
     {
         memset(timer_obj, 0, sizeof(struct k_timer));
@@ -939,7 +1031,7 @@ bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t
         k_timer_init(timer_obj, (k_timer_expiry_t) p_timer_callback, NULL);
         timer_obj->period = K_NO_WAIT;
     }
-    k_timeout_t *duration = shared_multi_heap_alloc(RAM_TYPE_DATA_ON, sizeof(k_timeout_t));
+    k_timeout_t *duration = sys_heap_alloc(&data_on_heap, sizeof(k_timeout_t));
     if (duration != NULL)
     {
         *duration = timer_ticks;
@@ -1037,9 +1129,9 @@ bool os_timer_delete_zephyr(void **pp_handle)
         k_timer_stop(timer);
 
         tmp = k_timer_user_data_get(timer);
-        shared_multi_heap_free(tmp);
+        sys_heap_free(&data_on_heap, tmp);
         tmp = NULL;
-        shared_multi_heap_free(timer);
+        sys_heap_free(&data_on_heap, timer);
         timer = NULL;
 
         *pp_handle = NULL;
