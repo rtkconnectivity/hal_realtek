@@ -10,6 +10,8 @@
   * @version  v0.1
   * *************************************************************************************
   */
+#ifndef PPT_SYNC_H
+#define PPT_SYNC_H
 
 /* Add Includes here */
 #include <stdbool.h>
@@ -573,3 +575,5 @@ void sync_rte_req_reg_cb(sync_rte_req_cb_t cb);
 /** @} End of PPT_SYNC_Driver_Exported_Functions */
 
 /** @} End of PPT_SYNC_Driver */
+
+#endif /*P PT_SYNC_H */

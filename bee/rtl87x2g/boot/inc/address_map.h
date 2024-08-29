@@ -35,7 +35,7 @@
 #define PPE_CFG_REG_BASE                   0x40025000UL
 #define ISO7816_REG_BASE                   0x40026000UL
 #define SEGCOM_CTL_REG_BASE                0x40027000UL
-#define CAN_REG_BASE                       0x40028000UL
+#define A2C_REG_BASE                       0x40028000UL
 #define SPIC_PHY_REG_BASE                  0x40029000UL
 
 #define PUBLIC_KEY_ENGINE_REG_BASE         0x40080000UL
