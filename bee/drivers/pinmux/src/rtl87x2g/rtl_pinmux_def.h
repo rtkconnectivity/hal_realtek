@@ -194,8 +194,8 @@ extern "C" {
 #define back_end_power_0            149
 #define card_int_n_sdhc_0           150
 
-#define CAN_TX                      155
-#define CAN_RX                      156
+#define A2C_TX                      155
+#define A2C_RX                      156
 
 #define LRC_SPORT1                  157
 #define BCLK_SPORT1                 158
