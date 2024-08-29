@@ -100,7 +100,7 @@ extern "C" {
 #define APBPeriph_HRADC_CLOCK               ((uint32_t)(1 << 3))
 #define APBPeriph_ADC_CLOCK                 ((uint32_t)(1 << 1))
 
-#define APBPeriph_CAN_CLOCK                 ((uint32_t)(1 << 24))
+#define APBPeriph_A2C_CLOCK                 ((uint32_t)(1 << 24))
 #define APBPeriph_IR_CLOCK                  ((uint32_t)(1 << 19))
 #define APBPeriph_ISO7816_CLOCK             ((uint32_t)(1 << 9))
 #define APBPeriph_GPIOB_CLOCK               ((uint32_t)(1 << 5))
@@ -212,7 +212,7 @@ extern "C" {
 #define APBPeriph_HRADC                 ((uint32_t)(0x7))
 #define APBPeriph_ADC                   ((uint32_t)(0x7))
 
-#define APBPeriph_CAN                   ((uint32_t)(0x808))
+#define APBPeriph_A2C                   ((uint32_t)(0x808))
 #define APBPeriph_IR                    ((uint32_t)(0x808))
 #define APBPeriph_ISO7816               ((uint32_t)(0x808))
 #define APBPeriph_GPIOB                 ((uint32_t)(0x8))
