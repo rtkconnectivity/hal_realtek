@@ -1,14 +1,8 @@
-/**
-************************************************************************************************************
-*               Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
-************************************************************************************************************
-* @file     utils.h
-* @brief    utility helper function for user application
-* @author   lory_xu
-* @date     2017-02
-* @version  v1.0
-*************************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef _UTILS_NS_H_
 #define _UTILS_NS_H_

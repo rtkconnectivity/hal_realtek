@@ -1,14 +1,8 @@
-/**
-  *****************************************************************************************
-  *     Copyright(c) 2022, Realtek Semiconductor Corporation. All rights reserved.
-  *****************************************************************************************
-  * @file    power_manager_unit_platform.h
-  * @brief   Platform Power Manager implementation head file.
-  * @author  Po Yu Chen, js.lin
-  * @date    2022-08-29
-  * @version v1.0
-  * *************************************************************************************
-  */
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion

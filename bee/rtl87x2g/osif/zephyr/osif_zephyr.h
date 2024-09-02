@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef _OSIF_ZEPHYR_H_
 #define _OSIF_ZEPHYR_H_
 #include <zephyr/kernel.h>
