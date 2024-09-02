@@ -1,15 +1,8 @@
-/**
-*********************************************************************************************************
-*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*********************************************************************************************************
-* \file     adc_lib.h
-* \brief    The header file of the adc_lib.
-* \details  This file provides adc_lib firmware functions.
-* \author   echo
-* \date     2023-11-01
-* \version  v1.0
-* *********************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef __ADC_K_LIB_H
 #define __ADC_K_LIB_H

@@ -1,14 +1,8 @@
-/**
-************************************************************************************************************
-*               Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
-************************************************************************************************************
-* @file     bitops.h
-* @brief    bit operation
-* @author   Grace
-* @date     2024-03
-* @version  v1.0
-*************************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef _BITOPS_H_
 #define _BITOPS_H_

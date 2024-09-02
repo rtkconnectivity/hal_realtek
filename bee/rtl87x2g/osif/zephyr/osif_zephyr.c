@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -24,9 +30,8 @@
 #include "mem_types.h"
 #include "mem_config.h"
 #include "system_rtl876x.h"
-#include "pmu_manager.h"
-#include "power_manager_slave.h"//for power_manager_slave_register_function_to_return
-#include "power_manager_unit_platform.h"
+#include "rom_api_for_zephyr.h"//for power_manager_slave_register_function_to_return
+#include "power_manager_unit_platform.h"//for platform_pm_register_callback_func_with_priority
 
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 Timer_Info timer_number_array[TIMER_NUMBER_MAX];

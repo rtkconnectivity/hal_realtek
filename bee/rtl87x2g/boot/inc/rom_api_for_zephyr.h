@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include <stdint.h>
 #include <patch_header_check.h>
 extern const T_ROM_HEADER_FORMAT nonsecure_rom_header;
@@ -40,3 +46,5 @@ extern void hw_aes_mutex_init(void);
 extern void HardFault_Handler_Rom(void);
 extern void GDMA0_Channel9_Handler(void);
 extern void PF_RTC_Handler(void);
+typedef void (*PMFuncToReturn)(void);
+void power_manager_slave_register_function_to_return(PMFuncToReturn func);

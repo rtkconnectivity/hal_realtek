@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef VECTOR_TABLE_AUTO_GEN_H
 #define VECTOR_TABLE_AUTO_GEN_H
 

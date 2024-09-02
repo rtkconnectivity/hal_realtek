@@ -1,17 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file    pm.h
-  * @brief   This file provides apis for power manager.
-  * @author  Grace
-  * @date    2022-04-27
-  * @version v1.0
-  * *************************************************************************************
-   * @attention
-   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
-   * *************************************************************************************
-  */
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
