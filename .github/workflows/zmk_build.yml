@@ -20,12 +20,10 @@ jobs:
             echo "This is pull request"
             echo "EVENT_TRIGER_REF=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
           fi
-
           if [ "${{ github.event_name }}" = "push" ];then
             echo "This is push"
             echo "EVENT_TRIGER_REF=${{ github.ref }}" >> $GITHUB_ENV
           fi
-
       - name: print_env
         run: |
           echo "sdk-version -> ${ZSDK_VERSION}"
@@ -54,14 +52,46 @@ jobs:
             cd zmk
             west init -l app
             west update
-      
+
+      - name: Install curl and jq
+        run: sudo apt-get update && sudo apt-get install -y curl jq
+
+      - name: Get PR Description
+        id: get_pr_description
+        run: |
+          PR_DESCRIPTION=$(jq --raw-output .pull_request.body "$GITHUB_EVENT_PATH")
+
+          if echo "$PR_DESCRIPTION" | grep -q '\[Related PR\]'; then
+            RELATED_PRS=$(echo "$PR_DESCRIPTION" | grep '\[Related PR\]' | sed 's/.*\[Related PR\] //')
+            echo "Found Related PRs: $RELATED_PRS"
+            echo "RELATED_PRS=$RELATED_PRS" >> $GITHUB_ENV
+          else
+            echo "No Related PRs found in the PR description."
+          fi
+
+      - name: Checkout related PRs
+        if: env.RELATED_PRS
+        run: |
+          echo ">>>>>>>>>>>> ${{ env.RELATED_PRS }}"
+          DEPEND_REPO=$(echo ${{ env.RELATED_PRS }} | cut -d':' -f1)
+          DEPEND_BRANCH=$(echo ${{ env.RELATED_PRS }} | cut -d':' -f2)
+          DEPEND_PR_NUMBER=$(echo ${{ env.RELATED_PRS }} | cut -d':' -f3)
+          # 获取PR的head
+          HEAD_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/$DEPEND_REPO/pulls/$DEPEND_PR_NUMBER" | jq -r '.head.sha')
+          
+          echo "Related PR: $DEPEND_REPO $DEPEND_BRANCH $DEPEND_PR_NUMBER $HEAD_SHA"
+          echo "DEPEND_REPO=$DEPEND_REPO" >> $GITHUB_ENV
+          echo "DEPEND_PR_NUMBER=$DEPEND_PR_NUMBER" >> $GITHUB_ENV
+          echo "HEAD_SHA=$HEAD_SHA" >> $GITHUB_ENV
+
       - name: check hal_realtek path and manifest_rev
         shell: bash
         run: |
             echo "GITHUB_REPOSITORY -> $GITHUB_REPOSITORY"
+            echo ">>>>>>>>>>> ${{ github.repository }}"
             cd zmk
             readarray -t project_list <<< "$(west list)"
-
             EVENT_PROJECT_PATH=""
             for i in "${project_list[@]}"
               do
@@ -74,22 +104,39 @@ jobs:
                       echo "EVENT_PROJECT_PATH=$EVENT_PROJECT_PATH" >> $GITHUB_ENV
                       echo "EVENT_PROJECT_PATH -> $EVENT_PROJECT_PATH"
                       echo "GITHUB_ENV -> $GITHUB_ENV"
-                      break
+                  fi
+                  depend_repository_name=`echo "${{ env.DEPEND_REPO }}" | awk -F/ '{print $NF}'`
+                  if [[ $project_url == *"${depend_repository_name}" ]]
+                  then
+                      DENPEND_PROJECT_PATH=`echo ${project_detail[1]}`
+                      echo "DENPEND_PROJECT_PATH=$DENPEND_PROJECT_PATH" >> $GITHUB_ENV
+                      echo "DENPEND_PROJECT_PATH -> $DENPEND_PROJECT_PATH"
+                      echo "GITHUB_ENV -> $GITHUB_ENV"
                   fi
               done
-
               if [ -z "$EVENT_PROJECT_PATH" ]
               then 
                   echo "logic error, can not find local path for ${GITHB_REPOSITY}"
                   exit 1
               fi
-
+              if [ -z "$DENPEND_PROJECT_PATH" ]
+              then 
+                  echo "logic error, can not find local path for ${{ env.DEPEND_REPO }}"
+                  exit 1
+              fi
               cd $EVENT_PROJECT_PATH
               git remote add origin ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}
               echo "need to checkout ${GITHUB_REPOSITORY} in zmk/$EVENT_PROJECT_PATH"
               echo "${manifest-rev}"
               echo "manifest_rev=$( git rev-parse manifest-rev )" >> $GITHUB_ENV
-      
+              cd ../../../$DENPEND_PROJECT_PATH
+              echo "$DENPEND_PROJECT_PATH"
+              pwd
+              git remote add origin ${GITHUB_SERVER_URL}/${DENPEND_PROJECT_PATH}
+              echo "need to checkout ${{ env.DEPEND_REPO }} in zmk/$DENPEND_PROJECT_PATH"
+              echo "${depend_manifest-rev}"
+              echo "depend_manifest-rev=$( git rev-parse depend_manifest-rev )" >> $GITHUB_ENV
+
       - name: checkout event triggered ref
         uses: actions/checkout@v4
         with:
@@ -100,17 +147,30 @@ jobs:
             persist-credentials: false
             clean: false
 
-
       - name: after check temp module
         shell: bash
         run: |
           cd zmk/$EVENT_PROJECT_PATH
-          git log
           echo "manifest_rev -> ${manifest_rev}"
           git branch manifest-rev $manifest_rev
-          git log
 
+      - name: checkout depend ref
+        if: env.RELATED_PRS
+        uses: actions/checkout@v4
+        with:
+            repository: ${{ env.DEPEND_REPO }}
+            path: ${{ format('{0}/{1}','zmk',env.DENPEND_PROJECT_PATH) }}
+            ref: ${{ env.HEAD_SHA }}
+            fetch-depth: 0
+            persist-credentials: false
+            clean: false
 
+      - name: after check temp module
+        shell: bash
+        run: |
+          cd zmk/$DENPEND_PROJECT_PATH
+          echo "depend_manifest-rev -> ${depend_manifest-rev}"
+          git branch manifest-rev $depend_manifest
       - name: do build
         shell: bash
         run: |
