@@ -94,7 +94,7 @@
         Public_Key_Engine_IRQn =                69, \
         Flash_SEC_IRQn =                        70, \
         SegCom_CTL_IRQn =                       71, \
-        CAN_IRQn =                              72, \
+        A2C_IRQn =                              72, \
         ETH_IRQn =                              73, \
         IMDC_IRQn =                             74, \
         Slave_Port_Monitor_IRQn =               75, \
@@ -307,7 +307,7 @@
         Public_Key_Engine_VECTORn =                85, \
         Flash_SEC_VECTORn =                        86, \
         SegCom_CTL_VECTORn =                       87, \
-        CAN_VECTORn =                              88, \
+        A2C_VECTORn =                              88, \
         ETH_VECTORn =                              89, \
         IMDC_VECTORn =                             90, \
         Slave_Port_Monitor_VECTORn =               91, \
