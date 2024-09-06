@@ -67,6 +67,7 @@ typedef enum
     RESET_REASON_BRANCH_TO_NS_FAIL          = 0x18,
     RESET_REASON_BRANCH_TO_S_FAIL           = 0x19,
     RESET_REASON_SYSTICK_TOGGLE_10_MS_NO_TICKLESS = 0x88,
+    SWITCH_TO_TEST_MODE                     = 0xDB,
 
     SW_RESET_APP_END                = 0xFF,
 } T_SW_RESET_REASON;
