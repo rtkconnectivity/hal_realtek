@@ -1,0 +1,23 @@
+share_cache_ram = 0x00001025;
+si_flow_data_init = 0x002008f0;
+si_flow_after_power_on_sequence_restart = 0x002008f8;
+si_flow_after_exit_low_power_mode = 0x00200900;
+hal_setup_hardware = 0x00000da7;
+hal_setup_cpu = 0x00000ec7;
+enable_wdg_in_rom = 0x000010c7;
+PPB_Init = 0x00003569;
+LogUartDMAInit = 0x00004349;
+ft_paras_apply = 0x002008e8;
+pMCU_PPB = 0x00200298;
+log_buffer_optimise_enable = 0x00004211;
+pmu_apply_voltage_tune = 0x00200980;
+pmu_power_on_sequence_restart = 0x00200990;
+pmu_pm_exit = 0x0020098c;
+power_manager_master_init = 0x00200a48;
+power_manager_slave_init = 0x00200aa0;
+phy_hw_control_init = 0x00200b54;
+phy_init = 0x00200b90;
+hw_aes_create_mutex = 0x00004561;
+if_os_init_done = 0x00200e78;
+platform_pm_init = 0x00200b14;
+
