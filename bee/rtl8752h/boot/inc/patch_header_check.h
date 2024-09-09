@@ -20,7 +20,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "rtl876x.h"
-#include "flash_nor_device.h"
 
 /** @addtogroup  FLASH_DEVICE    Flash Device
     * @{
@@ -61,6 +60,8 @@
   * @}
   */
 
+
+
 /*============================================================================*
   *                                   Types
   *============================================================================*/
@@ -89,7 +90,6 @@ typedef enum
     IMG_BT_STACKPATCH = 0x279b,
     IMAGE_MAX,
 
-    IMAGE_USER_DATA2 = 0xFFFD,  /**<the image only support unsafe single bank ota*/
     IMAGE_USER_DATA = 0xFFFE,  /**<the image only support unsafe single bank ota*/
 } T_IMG_ID;
 
@@ -286,11 +286,18 @@ typedef union _IMG_HEADER_FORMAT
                 T_FLASH_SEC_FORMAT flash_sec_cfg;
                 uint16_t fsbl_ext_img_id;
                 uint16_t fsbl_ext_load_pattern;
+#if (FT_PATCH == 1)
+                uint8_t reserved1[58];
+                uint32_t ft_ecn_version;
+#else
                 uint8_t reserved1[62];
+#endif
             };
         };
     };
 } T_IMG_HEADER_FORMAT;
+
+
 
 typedef struct _ROM_HEADER_FORMAT
 {
@@ -320,14 +327,9 @@ typedef enum
   * @}
   */
 
-/*============================================================================*
-  *                                   Functions
- *============================================================================*/
-/** @defgroup FLASH_DEVICE_Exported_Functions Flash Device Exported Functions
-    * @brief
-    * @{
-    */
-
+/*************************************************************************************************
+*                          functions
+*************************************************************************************************/
 /**
  * @brief  get image address in ota header
  * @param  ota_addr: valid ota header addr
@@ -344,6 +346,10 @@ extern uint32_t *get_image_addr_in_bank(uint32_t ota_addr, T_IMG_ID image_id);
 */
 extern uint32_t *get_image_size_in_bank(uint32_t ota_addr, T_IMG_ID image_id);
 
+/** @defgroup FLASH_DEVICE_Exported_Functions Flash Device Exported Functions
+    * @brief
+    * @{
+    */
 /**
  * @brief  get start address of active ota bank
  * @param  none
@@ -393,7 +399,7 @@ extern uint32_t get_active_bank_image_size_by_img_id(T_IMG_ID image_id);
  * @param  image_id specify the image
  * @return start address of specified image which located in ota temp bank
 */
-static uint32_t get_temp_ota_bank_addr_by_img_id(T_IMG_ID image_id);
+extern uint32_t get_temp_ota_bank_addr_by_img_id(T_IMG_ID image_id);
 
 /**
  * @brief  get size of specified image which located in ota temp bank
@@ -411,53 +417,6 @@ extern bool get_active_bank_image_version(T_IMG_ID image_id, T_IMAGE_VERSION *p_
 
 extern IMG_CHECK_ERR_TYPE image_entry_check(T_ROM_HEADER_FORMAT *rom_header,
                                             T_ROM_HEADER_FORMAT *patch_header);
-
-static inline uint32_t get_temp_ota_bank_addr_by_img_id(T_IMG_ID image_id)
-{
-    uint32_t image_addr = 0;
-    if (image_id < OTA || ((image_id >= IMAGE_MAX)))
-    {
-        return image_addr;
-    }
-    if (!is_ota_support_bank_switch())
-    {
-        if (image_id == OTA)
-        {
-            return 0;
-        }
-        image_addr = flash_nor_get_bank_addr(FLASH_OTA_TMP);
-    }
-    else
-    {
-        uint32_t ota_bank0_addr = flash_nor_get_bank_addr(FLASH_OTA_BANK_0);
-        uint32_t temp_bank_addr;
-        if (ota_bank0_addr == get_active_ota_bank_addr())
-        {
-            temp_bank_addr = flash_nor_get_bank_addr(FLASH_OTA_BANK_1);
-        }
-        else
-        {
-            temp_bank_addr = ota_bank0_addr;
-        }
-        if (image_id == OTA)
-        {
-            image_addr = temp_bank_addr;
-        }
-        else if (image_id >= SecureBoot && image_id < IMAGE_MAX)
-        {
-            if (IMG_CHECK_PASS != check_header_valid(temp_bank_addr, OTA))
-            {
-                return 0;
-            }
-            image_addr = *get_image_addr_in_bank(temp_bank_addr, image_id);
-        }
-    }
-    if (image_addr == 0xffffffff)
-    {
-        return 0;
-    }
-    return image_addr;
-}
 
 /** @} */ /* End of group FLASH_DEVICE_Exported_Functions */
 /** @} */ /* End of group FLASH_DEVICE */

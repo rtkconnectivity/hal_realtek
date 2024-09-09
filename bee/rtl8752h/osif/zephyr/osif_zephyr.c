@@ -33,7 +33,6 @@ task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 K_THREAD_STACK_DEFINE(lowstack_stack, LOWSTACK_STACKSIZE);
 struct k_thread lowstack_thread_handle;
 
-
 typedef struct timer_info
 {
     void *timer_handle;
@@ -50,7 +49,7 @@ extern void sys_clock_announce_only_add_ticks(int32_t ticks);
 // static struct sys_heap buffer_on_heap;
 
 static struct k_heap k_heap_array[RAM_TYPE_NUM];
-static struct sys_multi_heap multi_heap;
+struct sys_multi_heap multi_heap;
 
 #define MULTI_HEAP_ADD(ram_type, node_label) \
     k_heap_init(&k_heap_array[ram_type],    \
@@ -1164,7 +1163,7 @@ bool os_timer_number_get_zephyr(void **pp_handle, uint32_t *p_timer_num, bool *p
     *p_result = false;
     return true;
 }
-
+typedef void (*PendedFunctionOS_t)(void *para1, uint32_t para2);
 typedef struct pend_call
 {
     struct k_work work;
@@ -1173,12 +1172,14 @@ typedef struct pend_call
     uint32_t para2;
 } Pend_Call;
 
+
+
 void pendcall_handler(struct k_work *item)
 {
-    struct Pend_Call *cb =
+    Pend_Call *cb =
         CONTAINER_OF(item, Pend_Call, work);
     DBG_DIRECT("pendcall para1: %x para2: %x\n", (uint32_t)cb->para1, cb->para2);
-    cb->Pend_func(cb.para1, cb.para2);
+    cb->Pend_func(cb->para1, cb->para2);
     sys_multi_heap_free(&multi_heap, cb);
 }
 
@@ -1186,7 +1187,7 @@ uint32_t xPendFunctionCall_zephyr(PendedFunctionOS_t xFunctionToPend, void *para
 {
     int err;
     Pend_Call *cb = sys_multi_heap_alloc(&multi_heap, (void *)RAM_TYPE_DATA_ON,
-                                         sizeof(struct Pend_Call));
+                                         sizeof(Pend_Call));
     if (cb != NULL)
     {
         cb->Pend_func = xFunctionToPend;
@@ -1225,7 +1226,7 @@ bool os_task_name_get_zephyr(void *p_handle, char **p_task_name, bool *p_result)
 
     if (p_handle != NULL)
     {
-        thread_obj = (rt_thread_t)p_handle;
+        thread_obj = (struct k_thread *)p_handle;
     }
     else
     {

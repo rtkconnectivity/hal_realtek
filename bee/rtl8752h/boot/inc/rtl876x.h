@@ -5432,9 +5432,17 @@ typedef struct
 #define BIT30       0x40000000
 #define BIT31       0x80000000
 
+#ifndef BIT
 #define BIT(_n)                  (uint32_t)(1U << (_n))
+#endif
+
+#ifndef BIT64
 #define BIT64(n)                 (1ULL << (n))
+#endif
+
+#ifndef BIT_BAND
 #define BIT_BAND(reg, bit_pos)   (*((volatile uint32_t*)(0x42000000 + ((uint32_t)&reg - 0x40000000) * 32 + bit_pos * 4)))
+#endif
 
 
 /* Uncomment the line below to expanse the "assert_param" macro in the
