@@ -1,6 +1,6 @@
 /**
 *********************************************************************************************************
-*               Copyright(c) 2019, Realtek Semiconductor Corporation. All rights reserved.
+*               Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
 * @file     rtl876x_uart.c
 * @brief    This file provides all the UART firmware functions.

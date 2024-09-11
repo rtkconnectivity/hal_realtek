@@ -1,6 +1,6 @@
 /**
 *********************************************************************************************************
-*               Copyright(c) 2020, Realtek Semiconductor Corporation. All rights reserved.
+*               Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
 * @file     rtl876x_gdma.c
 * @brief    This file provides all the DMA firmware functions.

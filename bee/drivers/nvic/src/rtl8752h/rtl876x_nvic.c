@@ -1,6 +1,6 @@
 /**
 **********************************************************************************************************
-*               Copyright(c) 2015, Realtek Semiconductor Corporation. All rights reserved.
+*               Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
 **********************************************************************************************************
 * @file     rtl876x_nvic.c
 * @brief    This file provides all the NVIC firmware functions.

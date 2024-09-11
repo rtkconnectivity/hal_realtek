@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 Realtek Semiconductor. All Rights Reserved.
+/* Copyright (c) 2024 Realtek Semiconductor. All Rights Reserved.
  *
  *  The information contained herein is property of Realtek Semiconductor.
  *  Terms and conditions of usage are described in detail in Realtek
