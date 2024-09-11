@@ -4,7 +4,6 @@ config REALTEK_RCC
 	bool "REALTEK MCU rcc driver"
 	default y
 	depends on USE_HAL_REALTEK_RCC
-	default n
 
 	help
 	  This option enables the rcc driver for REALTEK MCU.

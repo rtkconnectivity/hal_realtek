@@ -4,7 +4,6 @@ config REALTEK_PINMUX
 	bool "REALTEK MCU pinmux driver"
 	default y
 	depends on USE_HAL_REALTEK_PINMUX
-	default n
 
 	help
 	  This option enables the pinmux driver for REALTEK MCU.
