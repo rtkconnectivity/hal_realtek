@@ -4,7 +4,6 @@ config REALTEK_NVIC
 	bool "REALTEK MCU nvic driver"
 	default y
 	depends on USE_HAL_REALTEK_NVIC
-	default n
 
 	help
 	  This option enables the nvic driver for REALTEK MCU.
