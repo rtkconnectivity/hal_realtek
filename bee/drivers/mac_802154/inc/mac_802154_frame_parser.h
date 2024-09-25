@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #ifndef MAC_802154_FRAME_PARSER_H
 #define MAC_802154_FRAME_PARSER_H
 

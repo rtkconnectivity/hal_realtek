@@ -1,14 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * \file    rtl_hradc_def.h
-  * \brief   HRADC related definitions for RTL87x2G.
-  * \author
-  * \date    2023-11-16
-  * \version v1.0
-  * *************************************************************************************
-  */
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef RTL_HRADC_DEF_H
 #define RTL_HRADC_DEF_H
