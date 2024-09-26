@@ -28,6 +28,10 @@
 #include "power_manager_slave.h"//for power_manager_slave_register_function_to_return
 #include "power_manager_unit_platform.h"
 
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_REGISTER(osif);
+
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 Timer_Info timer_number_array[TIMER_NUMBER_MAX];
 
@@ -180,7 +184,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
     }
     else
     {
-        DBG_DIRECT("alloc thread object failed because data ram heap is full");
+        printk("alloc thread object failed because data ram heap is full\n");
         return false;
     }
     /****************************** dynamic stack ******************************/
@@ -191,7 +195,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
     {
         k_heap_free(&data_on_heap, thread_handle);
         thread_handle = NULL;
-        DBG_DIRECT("alloc thread stack failed because data ram heap is full");
+        printk("alloc thread stack failed because data ram heap is full\n");
         return false;
     }
     memset(stack_buffer, 0, stack_size);
@@ -321,7 +325,7 @@ bool os_task_signal_create_zephyr(void *p_handle, uint32_t count)
     }
     else
     {
-        DBG_DIRECT("alloc sem object failed because data ram heap is full");
+        printk("alloc sem object failed because data ram heap is full\n");
         return false;
     }
 
@@ -454,7 +458,7 @@ bool os_sem_create_zephyr(void **pp_handle, const char *p_name, uint32_t init_co
     }
     else
     {
-        DBG_DIRECT("alloc sem object failed because data ram heap is full");
+        printk("alloc sem object failed because data ram heap is full\n");
         return false;
     }
 
@@ -539,16 +543,16 @@ bool os_mutex_create_zephyr(void **pp_handle)
     if (mutex_obj != NULL)
     {
         memset(mutex_obj, 0, sizeof(struct k_mutex));
-        *pp_handle = mutex_obj;
     }
     else
     {
-        DBG_DIRECT("alloc mutex object failed because data ram heap is full");
+        printk("alloc mutex object failed because data ram heap is full\n");
         return false;
     }
 
     k_mutex_init(mutex_obj);
 
+    *pp_handle = mutex_obj;
 
     return true;
 }
@@ -644,12 +648,11 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, const char *p_name, uin
         if (queue_obj != NULL)
         {
             memset(queue_obj, 0, sizeof(struct k_msgq));
-            *pp_handle = queue_obj;
         }
         else
         {
-            DBG_DIRECT("alloc queue object failed because data ram heap is full");
-            return true;
+            printk("alloc queue object failed because data ram heap is full\n");
+            return false;
         }
 
         queue_buffer = k_heap_aligned_alloc(&data_on_heap, 4, total_size, K_NO_WAIT);
@@ -662,12 +665,13 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, const char *p_name, uin
         else
         {
             k_heap_free(&data_on_heap, queue_obj);
-            DBG_DIRECT("alloc queue buffer failed because data ram heap is full");
+            printk("alloc queue buffer failed because data ram heap is full\n");
             ret = -ENOMEM;
         }
 
         if (ret == 0)
         {
+            *pp_handle = queue_obj;
             return true;
         }
         else
@@ -799,7 +803,7 @@ void *os_mem_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
 
     if (p == NULL)
     {
-        DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed!");
+        printk("os_mem_alloc_intern_zephyr alloc failed!\n");
     }
 
     return p;
@@ -825,7 +829,7 @@ void *os_mem_zalloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
     }
     if (p == NULL)
     {
-        DBG_DIRECT("os_mem_zalloc_intern_zephyr alloc failed!");
+        printk("os_mem_zalloc_intern_zephyr alloc failed!\n");
     }
     else
     {
@@ -857,7 +861,7 @@ void *os_mem_aligned_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size, uint8_t
     }
     if (p == NULL)
     {
-        DBG_DIRECT("os_mem_aligned_alloc_intern_zephyr alloc failed!");
+        printk("os_mem_aligned_alloc_intern_zephyr alloc failed!\n");
     }
     return p;
 }
@@ -881,7 +885,7 @@ void os_mem_free_zephyr(void *p_block)
     }
     else
     {
-        DBG_DIRECT("Memory free failed, because it is not in the legitable heap region.");
+        printk("Memory free failed, because it is not in the legitable heap region.\n");
     }
     return;
 }
@@ -909,7 +913,7 @@ void os_mem_aligned_free_zephyr(void *p_block)
     }
     else
     {
-        DBG_DIRECT("Memory aligned free failed, because it is not in the legitable heap region.");
+        printk("Memory aligned free failed, because it is not in the legitable heap region.\n");
     }
 
     return;
@@ -939,7 +943,7 @@ size_t os_mem_peek_zephyr(RAM_TYPE ram_type)
         heap_size = EXT_DATA_SRAM_HEAP_SIZE;
         break;
     default:
-        printk("Invalid ram_type for os_mem_peek_zephyr!");
+        printk("Invalid ram_type for os_mem_peek_zephyr!\n");
         return true;
         break;
     }
@@ -1013,11 +1017,10 @@ bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t
     if (timer_obj != NULL)
     {
         memset(timer_obj, 0, sizeof(struct k_timer));
-        *pp_handle = timer_obj;
     }
     else
     {
-        DBG_DIRECT("alloc timer object failed because data ram heap is full, timer name:%s", p_timer_name);
+        LOG_ERR("Alloc timer object failed because data ram heap is full, timer name:%s", p_timer_name);
         return false;
     }
 
@@ -1031,7 +1034,10 @@ bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t
         k_timer_init(timer_obj, (k_timer_expiry_t) p_timer_callback, NULL);
         timer_obj->period = K_NO_WAIT;
     }
+
     k_timeout_t *duration = k_heap_alloc(&data_on_heap, sizeof(k_timeout_t), K_NO_WAIT);
+
+    uint32_t key = arch_irq_lock();
     if (duration != NULL)
     {
         *duration = timer_ticks;
@@ -1039,15 +1045,20 @@ bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t
     }
     else
     {
-        DBG_DIRECT("alloc timer userdata failed because data ram heap is full, timer name:%s",
-                   p_timer_name);
+        LOG_ERR("Alloc timer userdata failed because data ram heap is full, timer name:%s\n",
+                p_timer_name);
         return false;
     }
 
-    uint32_t key = arch_irq_lock();
+    *pp_handle = timer_obj;
+
     timer_number_array[i].timer_handle = (void *)(*pp_handle);
     timer_number_array[i].timer_id = timer_id;
+
     arch_irq_unlock(key);
+
+    LOG_DBG("Create timer: %x, timer name:%s\n",
+            (unsigned int)*pp_handle, p_timer_name);
 
     return true;
 }
@@ -1065,10 +1076,18 @@ bool os_timer_start_zephyr(void **pp_handle)
         else
         {
             tmp = k_timer_user_data_get(timer);
+            if (tmp == NULL)
+            {
+                printk("User data in timer %x is NULL! Timer start failed!\n", (unsigned int)timer);
+                return false;
+            }
             k_timer_start(timer, *tmp, K_NO_WAIT);
         }
         return true;
     }
+    LOG_ERR("Timer pointer is NULL! Timer start fail! Second Pointer Addr: %x\n",
+            (unsigned int)pp_handle);
+
     return false;
 }
 
@@ -1089,11 +1108,19 @@ bool os_timer_restart_zephyr(void **pp_handle, uint32_t interval_ms)
         else
         {
             tmp = k_timer_user_data_get(timer);
+            if (tmp == NULL)
+            {
+                printk("User data in timer %x is NULL! Timer restart failed!\n", (unsigned int)timer);
+                return false;
+            }
             tmp->ticks = timer_ticks.ticks;
             k_timer_start(timer, timer_ticks, K_NO_WAIT);
         }
         return true;
     }
+
+    LOG_ERR("Timer pointer is NULL! Timer restart fail! Second Pointer Addr: %x\n",
+            (unsigned int)pp_handle);
     return false;
 }
 
@@ -1118,64 +1145,76 @@ bool os_timer_delete_zephyr(void **pp_handle)
         uint32_t key = arch_irq_lock();
         for (uint8_t i = 0; i < TIMER_NUMBER_MAX; i++)
         {
-            if (timer_number_array[i].timer_handle == *pp_handle)
+            if (timer_number_array[i].timer_handle == timer)
             {
                 timer_number_array[i].timer_handle = 0;
                 break;
             }
         }
-        arch_irq_unlock(key);
 
         k_timer_stop(timer);
 
         tmp = k_timer_user_data_get(timer);
+        if (tmp == NULL)
+        {
+            printk("User data in timer %x is NULL! Timer delete fail!\n", (unsigned int)timer);
+            return false;
+        }
         k_heap_free(&data_on_heap, tmp);
-        tmp = NULL;
-        k_heap_free(&data_on_heap, timer);
-        timer = NULL;
+        timer->user_data = NULL;
 
+        k_heap_free(&data_on_heap, timer);
         *pp_handle = NULL;
+
+        arch_irq_unlock(key);
 
         return true;
     }
 
+    LOG_ERR("Timer pointer is NULL! Timer delete fail! Second Pointer Addr: %x\n",
+            (unsigned int)pp_handle);
     return false;
 }
 
 bool os_timer_is_timer_active_zephyr(void **pp_handle)
 {
+    bool res = false;
     if (pp_handle && *pp_handle)
     {
         struct k_timer *obj = (struct k_timer *)*pp_handle;
 
+        uint32_t key = arch_irq_lock();
+
         if (k_timer_remaining_get(obj) == 0)
         {
-            return false;
+            res = false;
         }
         else
         {
-            return true;
+            res = true;
         }
+        arch_irq_unlock(key);
     }
-    return false;
+    return res;
 }
 
 bool os_timer_state_get_zephyr(void **pp_handle, uint32_t *p_timer_state)
 {
     if (pp_handle && *pp_handle)
     {
-        struct k_timer *obj;
+        struct k_timer *obj = (struct k_timer *)*pp_handle;
 
-        obj = (struct k_timer *)*pp_handle;
+        uint32_t key = arch_irq_lock();
 
-        if (sys_dnode_is_linked(&obj->timeout.node))
-        {
-            *p_timer_state = 1;
-        }
-        else
+        if (k_timer_remaining_get(obj) == 0)
         {
             *p_timer_state = 0;
         }
+        else
+        {
+            *p_timer_state = 1;
+        }
+        arch_irq_unlock(key);
 
         return true;
     }
@@ -1186,9 +1225,7 @@ bool os_timer_get_auto_reload_zephyr(void **pp_handle, long *p_autoreload)
 {
     if (pp_handle && *pp_handle)
     {
-        struct k_timer *obj;
-
-        obj = (struct k_timer *)*pp_handle;
+        struct k_timer *obj = (struct k_timer *)*pp_handle;
 
         if (K_TIMEOUT_EQ(obj->period, K_NO_WAIT))
         {
@@ -1354,7 +1391,8 @@ uint32_t os_pm_next_timeout_value_get_zephyr(void)
                         os_timer_get_auto_reload_zephyr(&cur_excluded_handle, &is_auto_reload);
                         if (is_auto_reload)
                         {
-                            DBG_DIRECT("[PM]!!handle=0x%x, exclude timer cannot be auto_reload", cur_excluded_handle);
+                            printk("[PM]!!handle=0x%x, exclude timer cannot be auto_reload\n",
+                                   (unsigned int)cur_excluded_handle);
                             __ASSERT(0, "[PM]!!handle=0x%x", (unsigned int) cur_excluded_handle);
                         }
                         handle_checked = false;
