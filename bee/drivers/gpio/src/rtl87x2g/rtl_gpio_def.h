@@ -1,15 +1,8 @@
-/**
-*********************************************************************************************************
-*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*********************************************************************************************************
-* \file     rtl_gpio_def.h
-* \brief    GPIO related definitions for RTL8762G
-* \details
-* \author   renee
-* \date     2023-11-15
-* \version  v1.1
-* *********************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef RTL_GPIO_DEF_H
 #define RTL_GPIO_DEF_H
@@ -200,158 +193,158 @@ typedef union
     struct
     {
         const uint32_t gpio_intstatus: 32;
-    } b;
-} GPIO_INT_STS_TypeDef;
+        } b;
+    } GPIO_INT_STS_TypeDef;
 
 
-/* 0x44
-   31:0    R      gpio_raw_intstatus      32'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t gpio_raw_intstatus: 32;
-    } b;
-} GPIO_INT_RAW_STS_TypeDef;
+    /* 0x44
+       31:0    R      gpio_raw_intstatus      32'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t gpio_raw_intstatus: 32;
+            } b;
+        } GPIO_INT_RAW_STS_TypeDef;
 
 
-/* 0x4C
-   31:0    W      gpio_porta_eoi          32'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t gpio_porta_eoi: 32;
-    } b;
-} GPIO_INT_CLR_TypeDef;
-
-
-
-/* 0x60
-   0       R/W    gpio_ls_sync            1'h0
-   31:1    R/W    reserved                31'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t gpio_ls_sync: 1;
-        uint32_t reserved: 31;
-    } b;
-} GPIO_LS_SYNC_TypeDef;
+    /* 0x4C
+       31:0    W      gpio_porta_eoi          32'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t gpio_porta_eoi: 32;
+            } b;
+        } GPIO_INT_CLR_TypeDef;
 
 
 
-/* 0x100
-   31:0    R/W    gpio_output_mode        32'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t gpio_output_mode: 32;
-    } b;
-} GPIO_OUT_MODE_TypeDef;
-
-
-/* 0x104
-   31:0    R      gpio_pad_state          32'h0
-   31:0    R/W    gpio_external_porta     32'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t gpio_pad_state: 32;
-    } b;
-} GPIO_PAD_STATE_TypeDef;
-
-
-/* 0x108
-   31:0    R/W    gpio_polarity           32'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t gpio_polarity: 32;
-    } b;
-} GPIO_EXT_DEB_POL_CTL_TypeDef;
-
-/* 0x00 ~ 0x0C
-   7:0     R/W    GPIO_G_L_CNT_LIMIT      8'h1
-   8       R/W    GPIO_G_L_DEB_CLK_SEL    1'h0
-   11:9    R/W    GPIO_G_L_DEB_CLK_DIV    3'h0
-   12      R/W    GPIO_G_L_DEB_CNT_EN     1'b0
-   15:13   R/W    DUMMY                  3'h0
-   23:16   R/W    GPIO_G_H_CNT_LIMIT      8'h1
-   24      R/W    GPIO_G_H_DEB_CLK_SEL    1'h0
-   27:25   R/W    GPIO_G_H_DEB_CLK_DIV    3'h0
-   28      R/W    GPIO_G_H_DEB_CNT_EN     1'b0
-   31:29   R/W    DUMMY                  2'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t GPIO_G_L_CNT_LIMIT: 8;
-        uint32_t GPIO_G_L_DEB_CLK_SEL: 1;
-        uint32_t GPIO_G_L_DEB_CLK_DIV: 3;
-        uint32_t GPIO_G_L_DEB_CNT_EN: 1;
-        uint32_t reserved_1: 3;
-        uint32_t GPIO_G_H_CNT_LIMIT: 8;
-        uint32_t GPIO_G_H_DEB_CLK_SEL: 1;
-        uint32_t GPIO_G_H_DEB_CLK_DIV: 3;
-        uint32_t GPIO_G_H_DEB_CNT_EN: 1;
-        uint32_t reserved_0: 3;
-    } b;
-} GPIO_DEB_CLK_CTL_TypeDef;
+    /* 0x60
+       0       R/W    gpio_ls_sync            1'h0
+       31:1    R/W    reserved                31'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t gpio_ls_sync: 1;
+                uint32_t reserved: 31;
+            } b;
+        } GPIO_LS_SYNC_TypeDef;
 
 
 
-/* 0x10
-   31:0    R/W    GPIO_x_DEB_FUNC_EN     32'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t GPIO_x_DEB_FUNC_EN: 32;
-    } b;
-} GPIO_DEB_FUN_CTL_TypeDef;
+    /* 0x100
+       31:0    R/W    gpio_output_mode        32'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t gpio_output_mode: 32;
+            } b;
+        } GPIO_OUT_MODE_TypeDef;
 
 
-/*============================================================================*
- *                          GPIO TYPE/API Wrappers
- *============================================================================*/
-/** \defgroup GPIO_Exported_Constants GPIO Exported Constants
-  * \brief
-  * \{
-  */
+    /* 0x104
+       31:0    R      gpio_pad_state          32'h0
+       31:0    R/W    gpio_external_porta     32'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t gpio_pad_state: 32;
+            } b;
+        } GPIO_PAD_STATE_TypeDef;
 
-/**
- * \defgroup GPIO_Constant_Wrapper GPIO Constant Wrapper
- * \{
- * \ingroup  GPIO_Exported_Constants
- */
+
+    /* 0x108
+       31:0    R/W    gpio_polarity           32'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t gpio_polarity: 32;
+            } b;
+        } GPIO_EXT_DEB_POL_CTL_TypeDef;
+
+    /* 0x00 ~ 0x0C
+       7:0     R/W    GPIO_G_L_CNT_LIMIT      8'h1
+       8       R/W    GPIO_G_L_DEB_CLK_SEL    1'h0
+       11:9    R/W    GPIO_G_L_DEB_CLK_DIV    3'h0
+       12      R/W    GPIO_G_L_DEB_CNT_EN     1'b0
+       15:13   R/W    DUMMY                  3'h0
+       23:16   R/W    GPIO_G_H_CNT_LIMIT      8'h1
+       24      R/W    GPIO_G_H_DEB_CLK_SEL    1'h0
+       27:25   R/W    GPIO_G_H_DEB_CLK_DIV    3'h0
+       28      R/W    GPIO_G_H_DEB_CNT_EN     1'b0
+       31:29   R/W    DUMMY                  2'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t GPIO_G_L_CNT_LIMIT: 8;
+                uint32_t GPIO_G_L_DEB_CLK_SEL: 1;
+                uint32_t GPIO_G_L_DEB_CLK_DIV: 3;
+                uint32_t GPIO_G_L_DEB_CNT_EN: 1;
+                uint32_t reserved_1: 3;
+                uint32_t GPIO_G_H_CNT_LIMIT: 8;
+                uint32_t GPIO_G_H_DEB_CLK_SEL: 1;
+                uint32_t GPIO_G_H_DEB_CLK_DIV: 3;
+                uint32_t GPIO_G_H_DEB_CNT_EN: 1;
+                uint32_t reserved_0: 3;
+            } b;
+        } GPIO_DEB_CLK_CTL_TypeDef;
+
+
+
+    /* 0x10
+       31:0    R/W    GPIO_x_DEB_FUNC_EN     32'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t GPIO_x_DEB_FUNC_EN: 32;
+            } b;
+        } GPIO_DEB_FUN_CTL_TypeDef;
+
+
+    /*============================================================================*
+     *                          GPIO TYPE/API Wrappers
+     *============================================================================*/
+    /** \defgroup GPIO_Exported_Constants GPIO Exported Constants
+      * \brief
+      * \{
+      */
+
+    /**
+     * \defgroup GPIO_Constant_Wrapper GPIO Constant Wrapper
+     * \{
+     * \ingroup  GPIO_Exported_Constants
+     */
 #define GPIO_Mode               GPIO_Dir
 #define GPIO_Mode_IN            GPIO_DIR_IN
 #define GPIO_Mode_OUT           GPIO_DIR_OUT
@@ -360,27 +353,27 @@ typedef union
 #define GPIO_INT_Trigger_LEVEL  GPIO_INT_TRIGGER_LEVEL
 #define GPIO_INT_Trigger_EDGE   GPIO_INT_TRIGGER_EDGE
 
-/** End of GPIO_Constant_Wrapper
-  * \}
-  */
+    /** End of GPIO_Constant_Wrapper
+      * \}
+      */
 
-/**
- * \defgroup GPIO_API_Wrapper GPIO API Wrapper
- * \{
- * \ingroup  GPIO_Exported_Constants
- */
+    /**
+     * \defgroup GPIO_API_Wrapper GPIO API Wrapper
+     * \{
+     * \ingroup  GPIO_Exported_Constants
+     */
 #define GPIO_GetPin             GPIO_GetPinBit
 #define GPIO_DBClkCmd           GPIO_ExtDebCmd
 #define GPIO_SetDebounceTime    GPIO_ExtDebUpdate
 #define GPIO_SetITPolarity      GPIO_SetPolarity
 
-/** End of GPIO_API_Wrapper
-  * \}
-  */
+    /** End of GPIO_API_Wrapper
+      * \}
+      */
 
-/** End of GPIO_Exported_Constants
-  * \}
-  */
+    /** End of GPIO_Exported_Constants
+      * \}
+      */
 
 #ifdef  __cplusplus
 }

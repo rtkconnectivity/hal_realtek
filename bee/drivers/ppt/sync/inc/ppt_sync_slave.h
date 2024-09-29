@@ -1,15 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2020, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * @file     ppt_sync.h
-  * @brief    Head file for sync protocol.
-  * @details  data structs and external functions declaration.
-  * @author   bill
-  * @date     2022-03-15
-  * @version  v0.1
-  * *************************************************************************************
-  */
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 /* Add Includes here */
 #include <ppt_sync.h>

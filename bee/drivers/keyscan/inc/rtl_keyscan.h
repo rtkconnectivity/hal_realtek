@@ -1,16 +1,8 @@
-/**
-*********************************************************************************************************
-*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*********************************************************************************************************
-* \file     rtl_keyscan.h
-* \brief    The header file of the peripheral KEYSCAN driver.
-* \details  This file provides all KEYSCAN firmware functions.
-* \author   yuzhuo_liu
-* \date     2023-10-17
-* \version  v1.0
-* *********************************************************************************************************
-*/
-
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/

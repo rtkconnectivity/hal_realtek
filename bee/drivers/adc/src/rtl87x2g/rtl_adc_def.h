@@ -1,15 +1,8 @@
-/**
-*********************************************************************************************************
-*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*********************************************************************************************************
-* \file     rtl_adc_def.h
-* \brief    ADC related definitions for RTL87x2G
-* \details
-* \author
-* \date     2023-11-15
-* \version  v1.1
-* *********************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef RTL_ADC_DEF_H
 #define RTL_ADC_DEF_H
@@ -131,245 +124,245 @@ typedef union
     struct
     {
         const uint32_t adc_fifo_data_out: 12;
-        const uint32_t reserved_1: 4;
-        const uint32_t reserved_0: 12;
-        const uint32_t adc_schedule_index: 4;
-    } b;
-} ADC_FIFO_READ_TypeDef;
+            const uint32_t reserved_1: 4;
+            const uint32_t reserved_0: 12;
+            const uint32_t adc_schedule_index: 4;
+        } b;
+    } ADC_FIFO_READ_TypeDef;
 
 
 
-/* 0x04
-    0       R/W    en_adc_continous_mode           1'h0
-    1       W1C    en_adc_one_shot_mode            1'h0
-    2       R/W    reserved_dummy04_02             1'h0
-    7:3     R      adc_fifo_wpt                    5'h0
-    12:8    R      adc_fifo_rpt                    5'h0
-    13      R/W    adc_fifo_overwrite              1'h0
-    19:14   R/W    adc_burst_size                  6'h0
-    25:20   R/W    adc_fifo_thd                    6'h0
-    26      W1C    adc_fifo_clr                    1'h0
-    27      R/W    adc_one_shot_fifo               1'h0
-    29:28   R      reserved_dummy04_29_28          2'h0
-    31:30   R/W    adc_dbg_sel                     2'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t en_adc_continous_mode: 1;
-        uint32_t en_adc_one_shot_mode: 1;
-        const uint32_t reserved_1: 1;
-        const uint32_t adc_fifo_wpt: 5;
-        const uint32_t adc_fifo_rpt: 5;
-        uint32_t adc_fifo_overwrite: 1;
-        uint32_t adc_burst_size: 6;
-        uint32_t adc_fifo_thd: 6;
-        uint32_t adc_fifo_clr: 1;
-        uint32_t adc_one_shot_fifo: 1;
-        const uint32_t reserved_0: 2;
-        uint32_t adc_dbg_sel: 2;
-    } b;
-} ADC_DIG_CTRL_TypeDef;
+    /* 0x04
+        0       R/W    en_adc_continous_mode           1'h0
+        1       W1C    en_adc_one_shot_mode            1'h0
+        2       R/W    reserved_dummy04_02             1'h0
+        7:3     R      adc_fifo_wpt                    5'h0
+        12:8    R      adc_fifo_rpt                    5'h0
+        13      R/W    adc_fifo_overwrite              1'h0
+        19:14   R/W    adc_burst_size                  6'h0
+        25:20   R/W    adc_fifo_thd                    6'h0
+        26      W1C    adc_fifo_clr                    1'h0
+        27      R/W    adc_one_shot_fifo               1'h0
+        29:28   R      reserved_dummy04_29_28          2'h0
+        31:30   R/W    adc_dbg_sel                     2'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t en_adc_continous_mode: 1;
+                uint32_t en_adc_one_shot_mode: 1;
+                const uint32_t reserved_1: 1;
+                const uint32_t adc_fifo_wpt: 5;
+                const uint32_t adc_fifo_rpt: 5;
+                uint32_t adc_fifo_overwrite: 1;
+                uint32_t adc_burst_size: 6;
+                uint32_t adc_fifo_thd: 6;
+                uint32_t adc_fifo_clr: 1;
+                uint32_t adc_one_shot_fifo: 1;
+                const uint32_t reserved_0: 2;
+                uint32_t adc_dbg_sel: 2;
+            } b;
+        } ADC_DIG_CTRL_TypeDef;
 
 
 
-/* 0x08
-    16:0    R/W    adc_schedule_idx_sel            16'h0
-    16:20   R      adc_fifo_data_level             6'h0
-    31:22   R      reserved_dummy08_31_22          19'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t adc_schedule_idx_sel: 16;
-        const uint32_t adc_fifo_data_level: 6;
-        const uint32_t reserved_0: 10;
-    } b;
-} ADC_SCHED_CTRL_TypeDef;
+    /* 0x08
+        16:0    R/W    adc_schedule_idx_sel            16'h0
+        16:20   R      adc_fifo_data_level             6'h0
+        31:22   R      reserved_dummy08_31_22          19'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t adc_schedule_idx_sel: 16;
+                const uint32_t adc_fifo_data_level: 6;
+                const uint32_t reserved_0: 10;
+            } b;
+        } ADC_SCHED_CTRL_TypeDef;
 
 
 
-/* 0x0C
-    0       R/W    en_adc_fifio_rd_req_interrupt   1'h0
-    1       R/W    en_adc_fifo_rd_error_interrupt  1'h0
-    2       R/W    en_adc_fifo_thd_interrupt       1'h0
-    3       R/W    en_adc_fifo_overflow_interrupt  1'h0
-    4       R/W    en_adc_one_shot_done_interrupt  1'h0
-    7:5     R      reserved_dummy0c_7_5            3'h0
-    8       W1C    clr_adc_fifio_rd_req_interrupt  1'h0
-    9       W1C    clr_adc_fifo_rd_error_interrupt 1'h0
-    10      W1C    clr_adc_fifo_thd_interrupt      1'h0
-    11      W1C    clr_adc_fifo_overflow_interrupt 1'h0
-    12      W1C    clr_adc_one_shot_done_interrupt 1'h0
-    15:13   R      reserved_dummy0c_15_13          3'h0
-    16      R      st_adc_fifio_rd_req_interrupt   1'h0
-    17      R      st_adc_fifo_rd_error_interrupt  1'h0
-    18      R      st_adc_fifo_thd_interrupt       1'h0
-    19      R      st_adc_fifo_overflow_interrupt  1'h0
-    20      R      st_adc_one_shot_done_interrupt  1'h0
-    31:21   R      reserved_dummy0c_31_21          11'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t en_adc_fifio_rd_req_interrupt: 1;
-        uint32_t en_adc_fifo_rd_error_interrupt: 1;
-        uint32_t en_adc_fifo_thd_interrupt: 1;
-        uint32_t en_adc_fifo_overflow_interrupt: 1;
-        uint32_t en_adc_one_shot_done_interrupt: 1;
-        const uint32_t reserved_2: 3;
-        uint32_t clr_adc_fifio_rd_req_interrupt: 1;
-        uint32_t clr_adc_fifo_rd_error_interrupt: 1;
-        uint32_t clr_adc_fifo_thd_interrupt: 1;
-        uint32_t clr_adc_fifo_overflow_interrupt: 1;
-        uint32_t clr_adc_one_shot_done_interrupt: 1;
-        const uint32_t reserved_1: 3;
-        const uint32_t st_adc_fifio_rd_req_interrupt: 1;
-        const uint32_t st_adc_fifo_rd_error_interrupt: 1;
-        const uint32_t st_adc_fifo_thd_interrupt: 1;
-        const uint32_t st_adc_fifo_overflow_interrupt: 1;
-        const uint32_t st_adc_one_shot_done_interrupt: 1;
-        const uint32_t reserved_0: 11;
-    } b;
-} ADC_CTRL_INT_TypeDef;
+    /* 0x0C
+        0       R/W    en_adc_fifio_rd_req_interrupt   1'h0
+        1       R/W    en_adc_fifo_rd_error_interrupt  1'h0
+        2       R/W    en_adc_fifo_thd_interrupt       1'h0
+        3       R/W    en_adc_fifo_overflow_interrupt  1'h0
+        4       R/W    en_adc_one_shot_done_interrupt  1'h0
+        7:5     R      reserved_dummy0c_7_5            3'h0
+        8       W1C    clr_adc_fifio_rd_req_interrupt  1'h0
+        9       W1C    clr_adc_fifo_rd_error_interrupt 1'h0
+        10      W1C    clr_adc_fifo_thd_interrupt      1'h0
+        11      W1C    clr_adc_fifo_overflow_interrupt 1'h0
+        12      W1C    clr_adc_one_shot_done_interrupt 1'h0
+        15:13   R      reserved_dummy0c_15_13          3'h0
+        16      R      st_adc_fifio_rd_req_interrupt   1'h0
+        17      R      st_adc_fifo_rd_error_interrupt  1'h0
+        18      R      st_adc_fifo_thd_interrupt       1'h0
+        19      R      st_adc_fifo_overflow_interrupt  1'h0
+        20      R      st_adc_one_shot_done_interrupt  1'h0
+        31:21   R      reserved_dummy0c_31_21          11'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t en_adc_fifio_rd_req_interrupt: 1;
+                uint32_t en_adc_fifo_rd_error_interrupt: 1;
+                uint32_t en_adc_fifo_thd_interrupt: 1;
+                uint32_t en_adc_fifo_overflow_interrupt: 1;
+                uint32_t en_adc_one_shot_done_interrupt: 1;
+                const uint32_t reserved_2: 3;
+                uint32_t clr_adc_fifio_rd_req_interrupt: 1;
+                uint32_t clr_adc_fifo_rd_error_interrupt: 1;
+                uint32_t clr_adc_fifo_thd_interrupt: 1;
+                uint32_t clr_adc_fifo_overflow_interrupt: 1;
+                uint32_t clr_adc_one_shot_done_interrupt: 1;
+                const uint32_t reserved_1: 3;
+                const uint32_t st_adc_fifio_rd_req_interrupt: 1;
+                const uint32_t st_adc_fifo_rd_error_interrupt: 1;
+                const uint32_t st_adc_fifo_thd_interrupt: 1;
+                const uint32_t st_adc_fifo_overflow_interrupt: 1;
+                const uint32_t st_adc_one_shot_done_interrupt: 1;
+                const uint32_t reserved_0: 11;
+            } b;
+        } ADC_CTRL_INT_TypeDef;
 
 
 
-/* 0x10-0x2C
-    3:0     R/W    ch_num_idx0                     4'h0
-    5:4     R/W    adc_mode_idx0                   2'h0
-    15:6    R      reserved_dummy10_15_5           10'h0
-*/
-typedef union
-{
-    uint32_t d16;
-    uint8_t d8[2];
-    struct
-    {
-        uint32_t ch_num_idx: 4;
-        uint32_t adc_mode_idx: 2;
-        const uint32_t reserved: 10;
-    } b;
-} ADC_SCHED_TAB_IDX_TypeDef;
+    /* 0x10-0x2C
+        3:0     R/W    ch_num_idx0                     4'h0
+        5:4     R/W    adc_mode_idx0                   2'h0
+        15:6    R      reserved_dummy10_15_5           10'h0
+    */
+    typedef union
+        {
+            uint32_t d16;
+            uint8_t d8[2];
+            struct
+            {
+                uint32_t ch_num_idx: 4;
+                uint32_t adc_mode_idx: 2;
+                const uint32_t reserved: 10;
+            } b;
+        } ADC_SCHED_TAB_IDX_TypeDef;
 
 
-/* 0x30-0x4c
-    11:0    R      adc_idx_output_data            12'h0
-    15:12   R      reserved_dummy30_15_12          4'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t adc_idx_output_data: 12;
-        const uint32_t reserved_1: 4;
-    } b;
-} ADC_IDX_OUTPUT_DATA_TypeDef;
+    /* 0x30-0x4c
+        11:0    R      adc_idx_output_data            12'h0
+        15:12   R      reserved_dummy30_15_12          4'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t adc_idx_output_data: 12;
+                const uint32_t reserved_1: 4;
+            } b;
+        } ADC_IDX_OUTPUT_DATA_TypeDef;
 
 
-/* 0x50
-    1:0     R/W    adc_rg0x_auxadc_0_delay_sel     2'h0
-    3:2     R/W    adc_rg0x_auxadc_1_delay_sel     2'h0
-    5:4     R/W    adc_rg2x_auxadc_0_delay_sel     2'h0
-    8:6     R/W    adc_data_delay                  3'h1
-    9       R      reserved_dummy50_9              1'h0
-    14:10   R/W    adc_poweron_select              5'h0
-    15      R/W    adc_poweron_only_en             1'h0
-    18:16   R      reserved_dummy50_18_16          3'h0
-    19      R/W    adc_manual_poweron              1'h0
-    20      R      reserved_dummy50_20             1'h0
-    21      R/W    adc_fifo_stop_wr                1'h0
-    23:22   R      reserved_dummy50_23_22          2'h0
-    24      R/W    adc_data_avg_en                 1'h0
-    27:25   R/W    adc_data_avg_sel                3'h0
-    30:28   R      reserved_dummy50_30_28          3'h0
-    31      R/W    reserved_dummy50_31             1'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t adc_rg0x_auxadc_0_delay_sel: 2;
-        uint32_t adc_rg0x_auxadc_1_delay_sel: 2;
-        uint32_t adc_rg2x_auxadc_0_delay_sel: 2;
-        uint32_t adc_data_delay: 3;
-        const uint32_t reserved_5: 1;
-        uint32_t adc_poweron_select: 5;
-        uint32_t adc_poweron_only_en: 1;
-        const uint32_t reserved_4: 3;
-        uint32_t adc_manual_poweron: 1;
-        const uint32_t reserved_3: 1;
-        uint32_t adc_fifo_stop_wr: 1;
-        const uint32_t reserved_2: 2;
-        uint32_t adc_data_avg_en: 1;
-        uint32_t adc_data_avg_sel: 3;
-        const uint32_t reserved_1: 3;
-        uint32_t reserved_0: 1;
-    } b;
-} ADC_POW_DATA_DLY_CTRL_TypeDef;
+    /* 0x50
+        1:0     R/W    adc_rg0x_auxadc_0_delay_sel     2'h0
+        3:2     R/W    adc_rg0x_auxadc_1_delay_sel     2'h0
+        5:4     R/W    adc_rg2x_auxadc_0_delay_sel     2'h0
+        8:6     R/W    adc_data_delay                  3'h1
+        9       R      reserved_dummy50_9              1'h0
+        14:10   R/W    adc_poweron_select              5'h0
+        15      R/W    adc_poweron_only_en             1'h0
+        18:16   R      reserved_dummy50_18_16          3'h0
+        19      R/W    adc_manual_poweron              1'h0
+        20      R      reserved_dummy50_20             1'h0
+        21      R/W    adc_fifo_stop_wr                1'h0
+        23:22   R      reserved_dummy50_23_22          2'h0
+        24      R/W    adc_data_avg_en                 1'h0
+        27:25   R/W    adc_data_avg_sel                3'h0
+        30:28   R      reserved_dummy50_30_28          3'h0
+        31      R/W    reserved_dummy50_31             1'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t adc_rg0x_auxadc_0_delay_sel: 2;
+                uint32_t adc_rg0x_auxadc_1_delay_sel: 2;
+                uint32_t adc_rg2x_auxadc_0_delay_sel: 2;
+                uint32_t adc_data_delay: 3;
+                const uint32_t reserved_5: 1;
+                uint32_t adc_poweron_select: 5;
+                uint32_t adc_poweron_only_en: 1;
+                const uint32_t reserved_4: 3;
+                uint32_t adc_manual_poweron: 1;
+                const uint32_t reserved_3: 1;
+                uint32_t adc_fifo_stop_wr: 1;
+                const uint32_t reserved_2: 2;
+                uint32_t adc_data_avg_en: 1;
+                uint32_t adc_data_avg_sel: 3;
+                const uint32_t reserved_1: 3;
+                uint32_t reserved_0: 1;
+            } b;
+        } ADC_POW_DATA_DLY_CTRL_TypeDef;
 
 
 
-/* 0x54
-    7:0     R      reserved_dummy54_7_0            8'h0
-    8       R/W    adc_keep_ck_ad_high             1'h0
-    10:9    R      reserved_dummy54_10_9           2'h0
-    12:11   R/W    adc_delay_tune_sel              2'h0
-    15:13   R      reserved_dummy54_15_13          3'h0
-    27:16   R/W    adc_data_offset                 12'h0
-    28      R      reserved_dummy54_28             1'h0
-    29      R/W    adc_timer_trigger_en            1'h0
-    30      R/W    adc_data_align_msb              1'h0
-    31      R/W    adc_data_offset_en              1'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t reserved_3: 8;
-        uint32_t adc_keep_ck_ad_high: 1;
-        const uint32_t reserved_2: 2;
-        uint32_t adc_delay_tune_sel: 2;
-        const uint32_t reserved_1: 3;
-        uint32_t adc_data_offset: 12;
-        const uint32_t reserved_0: 1;
-        uint32_t adc_timer_trigger_en: 1;
-        uint32_t adc_data_align_msb: 1;
-        uint32_t adc_data_offset_en: 1;
-    } b;
-} ADC_DATA_CLK_CTRL_TypeDef;
+    /* 0x54
+        7:0     R      reserved_dummy54_7_0            8'h0
+        8       R/W    adc_keep_ck_ad_high             1'h0
+        10:9    R      reserved_dummy54_10_9           2'h0
+        12:11   R/W    adc_delay_tune_sel              2'h0
+        15:13   R      reserved_dummy54_15_13          3'h0
+        27:16   R/W    adc_data_offset                 12'h0
+        28      R      reserved_dummy54_28             1'h0
+        29      R/W    adc_timer_trigger_en            1'h0
+        30      R/W    adc_data_align_msb              1'h0
+        31      R/W    adc_data_offset_en              1'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t reserved_3: 8;
+                uint32_t adc_keep_ck_ad_high: 1;
+                const uint32_t reserved_2: 2;
+                uint32_t adc_delay_tune_sel: 2;
+                const uint32_t reserved_1: 3;
+                uint32_t adc_data_offset: 12;
+                const uint32_t reserved_0: 1;
+                uint32_t adc_timer_trigger_en: 1;
+                uint32_t adc_data_align_msb: 1;
+                uint32_t adc_data_offset_en: 1;
+            } b;
+        } ADC_DATA_CLK_CTRL_TypeDef;
 
-/* 0x5C
-    13:0    R/W    adc_sample_time_period          14'h3E7
-    29:14   R      reserved_dummy5c_29_14          16'h0
-    31:30   R/W    adc_convert_time_period_sel     2'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t adc_sample_time_period: 14;
-        const uint32_t reserved_0: 16;
-        uint32_t adc_convert_time_period_sel: 2;
-    } b;
-} ADC_TIME_PERIOD_TypeDef;
+    /* 0x5C
+        13:0    R/W    adc_sample_time_period          14'h3E7
+        29:14   R      reserved_dummy5c_29_14          16'h0
+        31:30   R/W    adc_convert_time_period_sel     2'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t adc_sample_time_period: 14;
+                const uint32_t reserved_0: 16;
+                uint32_t adc_convert_time_period_sel: 2;
+            } b;
+        } ADC_TIME_PERIOD_TypeDef;
 
 #ifdef  __cplusplus
 }
