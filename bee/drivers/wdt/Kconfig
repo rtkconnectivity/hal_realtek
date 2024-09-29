@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
 config REALTEK_AON_WDT
 	bool "REALTEK MCU aon watchdog timer"
 	default y

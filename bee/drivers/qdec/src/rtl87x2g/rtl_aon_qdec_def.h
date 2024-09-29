@@ -1,15 +1,8 @@
-/**
-*********************************************************************************************************
-*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*********************************************************************************************************
-* \file     rtl_aon_qdec_def.h
-* \brief    AON QDEC Registers Structures Section
-* \details
-* \author   grace yan
-* \date     2023-02-20
-* \version  v1.1
-* *********************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #ifndef RTL_AON_QDEC_DEF_H
 #define RTL_AON_QDEC_DEF_H
 
@@ -101,43 +94,43 @@ typedef union
     struct
     {
         const  uint32_t acc_cnt: 16;
-        uint32_t cnt_of_flg: 1;
-        uint32_t cnt_uf_flg: 1;
-        uint32_t cnt_int_sta: 1;
-        uint32_t illegal_int_sta: 1;
-        const  uint32_t cnt_dir: 1;
-        uint32_t reserved_0: 1;
-        const  uint32_t debug_state_x: 2;
-        const  uint32_t debug_illegal_counter_x: 8;
-    } b;
-} AON_QDEC_SR_X_TypeDef;
+            uint32_t cnt_of_flg: 1;
+            uint32_t cnt_uf_flg: 1;
+            uint32_t cnt_int_sta: 1;
+            uint32_t illegal_int_sta: 1;
+            const  uint32_t cnt_dir: 1;
+            uint32_t reserved_0: 1;
+            const  uint32_t debug_state_x: 2;
+            const  uint32_t debug_illegal_counter_x: 8;
+        } b;
+    } AON_QDEC_SR_X_TypeDef;
 
 
 
-/* 0x08
-   0       W1C    acc_cnt_clr                 1'h0
-   1       W1C    cnt_int_clr                 1'h0
-   2       W1C    of_flg_clr                  1'h0
-   3       W1C    uf_flg_clr                  1'h0
-   4       W1C    illegal_int_clr             1'h0
-   5       W1C    illegal_cnt_clr             1'h0
-   31:6    R/W    reserved31_6                26'h0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t acc_cnt_clr: 1;
-        uint32_t cnt_int_clr: 1;
-        uint32_t of_flg_clr: 1;
-        uint32_t uf_flg_clr: 1;
-        uint32_t illegal_int_clr: 1;
-        uint32_t illegal_cnt_clr: 1;
-        uint32_t reserved_0: 26;
-    } b;
-} AON_QDEC_INT_CLR_TypeDef;
+    /* 0x08
+       0       W1C    acc_cnt_clr                 1'h0
+       1       W1C    cnt_int_clr                 1'h0
+       2       W1C    of_flg_clr                  1'h0
+       3       W1C    uf_flg_clr                  1'h0
+       4       W1C    illegal_int_clr             1'h0
+       5       W1C    illegal_cnt_clr             1'h0
+       31:6    R/W    reserved31_6                26'h0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t acc_cnt_clr: 1;
+                uint32_t cnt_int_clr: 1;
+                uint32_t of_flg_clr: 1;
+                uint32_t uf_flg_clr: 1;
+                uint32_t illegal_int_clr: 1;
+                uint32_t illegal_cnt_clr: 1;
+                uint32_t reserved_0: 26;
+            } b;
+        } AON_QDEC_INT_CLR_TypeDef;
 
 
 #ifdef  __cplusplus
