@@ -1,15 +1,8 @@
-/**
-*********************************************************************************************************
-*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*********************************************************************************************************
-* @file      hal_i2c.h
-* @brief     This file provides HW Timer HAL layer api
-* @details
-* @author    renee
-* @date
-* @version   v1.0
-* *********************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef _HAL_I2C_
 #define _HAL_I2C_

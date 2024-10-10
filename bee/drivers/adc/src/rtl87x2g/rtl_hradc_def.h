@@ -1,14 +1,8 @@
-/**
-*****************************************************************************************
-*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
-*****************************************************************************************
-  * \file    rtl_hradc_def.h
-  * \brief   HRADC related definitions for RTL87x2G.
-  * \author
-  * \date    2023-11-16
-  * \version v1.0
-  * *************************************************************************************
-  */
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef RTL_HRADC_DEF_H
 #define RTL_HRADC_DEF_H
@@ -256,148 +250,148 @@ typedef union
     struct
     {
         const uint32_t sdadc_fifo_rdata: 32;
-    } b;
-} HRADC_REG_SDADC_OUTPUT_DATA_FIFO_TypeDef;
-/* 0x0014
-    31:0    R      sdadc_ch_idx0_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx0_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX0_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x0018
-    31:0    R      sdadc_ch_idx1_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx1_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX1_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x001C
-    31:0    R      sdadc_ch_idx2_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx2_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX2_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x0020
-    31:0    R      sdadc_ch_idx3_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx3_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX3_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x0024
-    31:0    R      sdadc_ch_idx4_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx4_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX4_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x0028
-    31:0    R      sdadc_ch_idx5_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx5_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX5_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x002C
-    31:0    R      sdadc_ch_idx6_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx6_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX6_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x0030
-    31:0    R      sdadc_ch_idx7_output_data           32'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_ch_idx7_output_data: 32;
-    } b;
-} HRADC_REG_CH_IDX7_SDADC_OUTPUT_DATA_TypeDef;
-/* 0x0034
-    2:0     R/W    sdadc_bg_ready_dly                  3'b100
-    6:3     R/W    sdadc_ss_done_dly                   4'b1000
-    11:7    R/W    sdadc_ldo_ready_dly                 5'b10000
-    13:12   R/W    sdadc_adc_clk_ready_dly             2'b00
-    15:14   R/W    sdadc_dmy_load_extend_dly           2'b01
-    17:16   R/W    sdadc_adc_ready_dly                 2'b01
-    18      R/W    sdadc_en                            1'b0
-    19      R/W    sdadc_auto_boot_en                  1'b1
-    20      R/W    sdadc_clk_en                        1'b0
-    31:21   R/W    RSVD                                11'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        uint32_t sdadc_bg_ready_dly: 3;
-        uint32_t sdadc_ss_done_dly: 4;
-        uint32_t sdadc_ldo_ready_dly: 5;
-        uint32_t sdadc_adc_clk_ready_dly: 2;
-        uint32_t sdadc_dmy_load_extend_dly: 2;
-        uint32_t sdadc_adc_ready_dly: 2;
-        uint32_t sdadc_en: 1;
-        uint32_t sdadc_auto_boot_en: 1;
-        uint32_t sdadc_clk_en: 1;
-        uint32_t RESERVED_0: 11;
-    } b;
-} HRADC_REG_SDADC_POWERON_CONFIG_TypeDef;
-/* 0x0038
-    5:0     R      sdadc_fifo_cnt                      6'b0
-    31:6    R      RSVD                                26'b0
-*/
-typedef union
-{
-    uint32_t d32;
-    uint8_t d8[4];
-    struct
-    {
-        const uint32_t sdadc_fifo_cnt: 6;
-        const uint32_t RESERVED_0: 26;
-    } b;
-} HRADC_REG_SDADC_FIFO_INFO_TypeDef;
+        } b;
+    } HRADC_REG_SDADC_OUTPUT_DATA_FIFO_TypeDef;
+    /* 0x0014
+        31:0    R      sdadc_ch_idx0_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx0_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX0_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x0018
+        31:0    R      sdadc_ch_idx1_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx1_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX1_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x001C
+        31:0    R      sdadc_ch_idx2_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx2_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX2_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x0020
+        31:0    R      sdadc_ch_idx3_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx3_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX3_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x0024
+        31:0    R      sdadc_ch_idx4_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx4_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX4_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x0028
+        31:0    R      sdadc_ch_idx5_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx5_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX5_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x002C
+        31:0    R      sdadc_ch_idx6_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx6_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX6_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x0030
+        31:0    R      sdadc_ch_idx7_output_data           32'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_ch_idx7_output_data: 32;
+            } b;
+        } HRADC_REG_CH_IDX7_SDADC_OUTPUT_DATA_TypeDef;
+    /* 0x0034
+        2:0     R/W    sdadc_bg_ready_dly                  3'b100
+        6:3     R/W    sdadc_ss_done_dly                   4'b1000
+        11:7    R/W    sdadc_ldo_ready_dly                 5'b10000
+        13:12   R/W    sdadc_adc_clk_ready_dly             2'b00
+        15:14   R/W    sdadc_dmy_load_extend_dly           2'b01
+        17:16   R/W    sdadc_adc_ready_dly                 2'b01
+        18      R/W    sdadc_en                            1'b0
+        19      R/W    sdadc_auto_boot_en                  1'b1
+        20      R/W    sdadc_clk_en                        1'b0
+        31:21   R/W    RSVD                                11'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                uint32_t sdadc_bg_ready_dly: 3;
+                uint32_t sdadc_ss_done_dly: 4;
+                uint32_t sdadc_ldo_ready_dly: 5;
+                uint32_t sdadc_adc_clk_ready_dly: 2;
+                uint32_t sdadc_dmy_load_extend_dly: 2;
+                uint32_t sdadc_adc_ready_dly: 2;
+                uint32_t sdadc_en: 1;
+                uint32_t sdadc_auto_boot_en: 1;
+                uint32_t sdadc_clk_en: 1;
+                uint32_t RESERVED_0: 11;
+            } b;
+        } HRADC_REG_SDADC_POWERON_CONFIG_TypeDef;
+    /* 0x0038
+        5:0     R      sdadc_fifo_cnt                      6'b0
+        31:6    R      RSVD                                26'b0
+    */
+    typedef union
+        {
+            uint32_t d32;
+            uint8_t d8[4];
+            struct
+            {
+                const uint32_t sdadc_fifo_cnt: 6;
+                const uint32_t RESERVED_0: 26;
+            } b;
+        } HRADC_REG_SDADC_FIFO_INFO_TypeDef;
 
 
 #ifdef  __cplusplus

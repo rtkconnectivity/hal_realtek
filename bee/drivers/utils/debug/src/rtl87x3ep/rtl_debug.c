@@ -1,15 +1,8 @@
-/**
-*********************************************************************************************************
-*               Copyright(c) 2021, Realtek Semiconductor Corporation. All rights reserved.
-**********************************************************************************************************
-* @file     rtl_debug.c
-* @brief    This file provides all the io debug related firmware functions.
-* @details
-* @author
-* @date     2020-09-02
-* @version  v0.1
-*********************************************************************************************************
-*/
+/*
+ * Copyright (c) 2024 Realtek Semiconductor Corp.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <stdint.h>
 
 #include "rtl_pinmux.h"
