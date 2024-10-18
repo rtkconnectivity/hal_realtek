@@ -1297,81 +1297,6 @@ void os_timer_init_zephyr(void)
 }
 
 /************************************************************ PM ************************************************************/
-/****************************************************************************/
-/*dlps restore os kernel scheduler processing                               */
-/****************************************************************************/
-/* from realtek */
-extern void os_pm_restore_tickcount(void);
-extern void os_pm_store_tickcount(void);
-extern PMCheckResult os_pm_check(uint32_t *wakeup_time_diff);
-extern T_OS_QUEUE lpm_excluded_handle[PLATFORM_PM_EXCLUDED_TYPE_MAX];
-/* from zephyr */
-extern int32_t z_get_next_timeout_expiry(void);
-extern struct _timeout *get_first_timeout(void);
-extern struct _timeout *get_next_timeout(struct _timeout *);
-extern void z_timer_expiration_handler(struct _timeout *t);
-extern void z_thread_timeout(struct _timeout *t);
-extern void sys_clock_announce_only_add_ticks(int32_t ticks);
-
-void os_pm_return_to_idle_task_zephyr(void)
-{
-    arch_kernel_init();//perform arm v81mainline initialization: including fault exception init & msp setting.
-
-    RamVectorTableUpdate(GDMA0_Channel9_VECTORn, _isr_wrapper);
-
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
-    NVIC_SetPriority(SysTick_IRQn, 0xff);
-
-    uint32_t z_idle_stack_ptr;
-    struct k_thread *thread = &z_idle_threads[0];
-
-    z_idle_stack_ptr = thread->stack_info.start + thread->stack_info.size - thread->stack_info.delta;
-
-    __set_PSP(z_idle_stack_ptr);
-    __ISB();
-
-    __set_CONTROL(__get_CONTROL() | BIT1);
-    __ISB();
-
-    extern void z_thread_entry(k_thread_entry_t, void *, void *, void *);
-    extern void idle(void *, void *, void *);
-    z_thread_entry(idle, 0, 0, 0);
-    return;
-}
-
-bool os_sched_restore_zephyr(void)
-{
-    extern void prvSetupFPU(void); //do zephyr need it?
-    prvSetupFPU();
-
-    return true;
-}
-
-void os_pm_store_zephyr(void)
-{
-    os_pm_store_tickcount();
-}
-
-void os_pm_restore_zephyr(void)
-{
-    os_pm_restore_tickcount();
-
-    os_sched_restore_zephyr();
-}
-
-void os_systick_handler_zephyr(void)
-{
-    sys_clock_announce_only_add_ticks(1);
-    return;
-}
-
-uint64_t os_sys_tick_increase_zephyr(uint32_t tick_increment)
-{
-    int64_t old_tick = sys_clock_tick_get();
-    sys_clock_announce_only_add_ticks(tick_increment);
-    return old_tick;
-}
-
 uint32_t os_sys_tick_rate_get_zephyr(void)
 {
     return (uint32_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC;
@@ -1380,99 +1305,6 @@ uint32_t os_sys_tick_rate_get_zephyr(void)
 uint32_t os_sys_tick_clk_get_zephyr(void)
 {
     return (uint32_t)CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC;
-}
-
-uint32_t os_pm_next_timeout_value_get_zephyr(void)
-{
-    /* Solution with the exclude timer mechanism. */
-    uint32_t timeout_tick_res = 0xFFFFFFFF;
-    uint32_t timeout_tick = 0;
-    struct k_timer *timer;
-    struct k_thread *thread;
-
-    bool handle_checked;
-
-    for (struct _timeout *t = get_first_timeout(); t != NULL; t = get_next_timeout(t))
-    {
-        handle_checked = true;
-        timeout_tick += t->dticks;
-
-        if (t->fn == z_timer_expiration_handler) //z_timer_expiration_handler
-        {
-            timer = CONTAINER_OF(t, struct k_timer, timeout);
-            T_OS_QUEUE_ELEM *p_cur_queue_item = lpm_excluded_handle[0].p_first;
-            while (p_cur_queue_item != NULL)
-            {
-                void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
-                if (cur_excluded_handle != NULL)
-                {
-                    if (timer == cur_excluded_handle)
-                    {
-                        long is_auto_reload;
-                        os_timer_get_auto_reload_zephyr(&cur_excluded_handle, &is_auto_reload);
-                        if (is_auto_reload)
-                        {
-                            LOG_ERR("[PM]!!handle=0x%x, exclude timer cannot be auto_reload\n",
-                                    (unsigned int)cur_excluded_handle);
-                            __ASSERT(0, "[PM]!!handle=0x%x", (unsigned int) cur_excluded_handle);
-                        }
-                        handle_checked = false;
-                        break;
-                    }
-                }
-                p_cur_queue_item = p_cur_queue_item->p_next;
-            }
-
-            if (handle_checked)
-            {
-                timeout_tick_res = timeout_tick;
-                break;
-            }
-        }
-        else if (t->fn == z_thread_timeout) //z_thread_timeout
-        {
-            thread = CONTAINER_OF(t, struct k_thread, base.timeout);
-
-            T_OS_QUEUE_ELEM *p_cur_queue_item = lpm_excluded_handle[1].p_first;
-            while (p_cur_queue_item != NULL)
-            {
-                void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
-                if (cur_excluded_handle != NULL)
-                {
-                    if (thread == cur_excluded_handle)
-                    {
-                        handle_checked = false;
-                        break;
-                    }
-                }
-                p_cur_queue_item = p_cur_queue_item->p_next;
-            }
-            if (handle_checked)
-            {
-                timeout_tick_res = timeout_tick;
-                break;
-            }
-        }
-        else//other timeout type(e.g. workqueue item)
-        {
-            timeout_tick_res = timeout_tick;
-            break;
-        }
-    }
-
-    return timeout_tick_res;
-
-}
-
-void os_pm_init_zephyr(void)
-{
-    power_manager_slave_register_function_to_return(os_pm_return_to_idle_task_zephyr);
-
-    platform_pm_register_callback_func_with_priority((void *)os_pm_check, PLATFORM_PM_CHECK, 1);
-    platform_pm_register_callback_func_with_priority((void *)os_pm_store_zephyr, PLATFORM_PM_STORE, 1);
-    platform_pm_register_callback_func_with_priority((void *)os_pm_restore_zephyr, PLATFORM_PM_RESTORE,
-                                                     1);
-    return;
 }
 
 /* ************************************************* OSIF PATCH ************************************************* */
@@ -1565,14 +1397,14 @@ extern bool os_register_pm_excluded_handle_imp(void **handle, PlatformExcludedHa
 extern bool os_unregister_pm_excluded_handle_imp(void **handle, PlatformExcludedHandleType type);
 void osif_pm_func_init_zephyr(void)
 {
-    os_pm_init = os_pm_init_zephyr;
-    os_sched_restore = os_sched_restore_zephyr;
-    os_systick_handler = os_systick_handler_zephyr;
+    //os_pm_init = os_pm_init_zephyr;
+    //os_sched_restore = os_sched_restore_zephyr;
+    // os_systick_handler = os_systick_handler_zephyr;
     os_sys_tick_rate_get = os_sys_tick_rate_get_zephyr;
     os_sys_tick_clk_get = os_sys_tick_clk_get_zephyr;
-    os_sys_tick_increase = os_sys_tick_increase_zephyr;
+    //os_sys_tick_increase = os_sys_tick_increase_zephyr;
 
-    os_pm_next_timeout_value_get = os_pm_next_timeout_value_get_zephyr;
+    //os_pm_next_timeout_value_get = os_pm_next_timeout_value_get_zephyr;
 
     os_register_pm_excluded_handle = os_register_pm_excluded_handle_imp;
     os_unregister_pm_excluded_handle = os_unregister_pm_excluded_handle_imp;
