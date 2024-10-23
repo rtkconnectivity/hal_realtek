@@ -1273,12 +1273,10 @@ bool os_timer_get_timer_number_zephyr(void **pp_handle, uint8_t *p_timer_num)
             }
         }
     }
-    else
-    {
-        *p_timer_num = 0xFF;
-        arch_irq_unlock(key);
-        return false;
-    }
+    *p_timer_num = 0xFF;
+    LOG_ERR("Get timer number error! Second Timer Pointer:%x", (unsigned int)pp_handle);
+    arch_irq_unlock(key);
+    return false;
 }
 
 bool os_timer_dump_zephyr(void)
