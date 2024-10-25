@@ -30,7 +30,8 @@ typedef struct
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 
 #define LOWSTACK_STACKSIZE (768 * 4)
-K_THREAD_STACK_DEFINE(lowstack_stack, LOWSTACK_STACKSIZE);
+// K_THREAD_STACK_DEFINE(lowstack_stack, LOWSTACK_STACKSIZE);
+struct z_thread_stack_element *lowstack_stack;
 struct k_thread lowstack_thread_handle;
 
 typedef struct timer_info
@@ -73,7 +74,13 @@ static void *os_heap_choice(struct sys_multi_heap *mheap, void *cfg, size_t alig
 
     if (p == NULL)
     {
-        DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed!");
+        DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed! ram_type:%d alloc_size:0x%x", ram_type, size);
+#ifdef CONFIG_SYS_HEAP_RUNTIME_STATS
+        extern bool os_mem_peek_zephyr(RAM_TYPE ram_type, size_t *p_size);
+        size_t p_size;
+        os_mem_peek_zephyr(RAM_TYPE_DATA_ON, &p_size);
+        os_mem_peek_zephyr(RAM_TYPE_BUFFER_ON, &p_size);
+#endif
     }
 
     return p;
@@ -94,11 +101,9 @@ void os_heap_init_zephyr(void)
     atomic_set(&state, 1);
 
     /* ram type: RAM_TYPE_DATA_ON */
-    // DBG_DIRECT("add RAM_TYPE_DATA_ON to multi heap");
     MULTI_HEAP_ADD(RAM_TYPE_DATA_ON, heap0);
 
     /* ram type: RAM_TYPE_BUFFER_ON */
-    // DBG_DIRECT("add RAM_TYPE_BUFFER_ON to multi heap");
     MULTI_HEAP_ADD(RAM_TYPE_BUFFER_ON, heap1);
 
 }
@@ -123,7 +128,7 @@ bool os_mem_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
     *pp = sys_multi_heap_alloc(&multi_heap, (void *)ram_type, size);
     if (*pp == NULL)
     {
-        DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed!");
+        // DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed!");
     }
     return true;
 }
@@ -137,7 +142,7 @@ bool os_mem_zalloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
     *pp = sys_multi_heap_alloc(&multi_heap, (void *)ram_type, size);
     if (*pp == NULL)
     {
-        DBG_DIRECT("os_mem_zalloc_intern_zephyr alloc failed!");
+        // DBG_DIRECT("os_mem_zalloc_intern_zephyr alloc failed! ram_type:%d", ram_type);
     }
     else
     {
@@ -191,18 +196,27 @@ bool os_mem_peek_zephyr(RAM_TYPE ram_type, size_t *p_size)
 
 #ifdef CONFIG_SYS_HEAP_RUNTIME_STATS
     struct sys_memory_stats stats;
+    uint32_t heap_size;
 
+    sys_heap_runtime_stats_get(&(k_heap_array[ram_type].heap), &stats);
+    *p_size = stats.free_bytes;
+    if (ram_type == RAM_TYPE_DATA_ON)
+    {
+        heap_size =  DT_REG_SIZE(DT_NODELABEL(heap0));
+    }
+    else
+    {
+        heap_size =  DT_REG_SIZE(DT_NODELABEL(heap1));
+    }
 
-    sys_heap_runtime_stats_get((&sys_heap_array[ram_type]), &stats);
-    *p_size =  DT_REG_SIZE(DT_NODELABEL(heap));
 
     // printk("RAM type of heap: %d, heap size: %zu, allocated %zu, free %zu, max allocated %zu\n",
-    //        ram_type, *p_size, stats.allocated_bytes, stats.free_bytes,
+    //        ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
     //        stats.max_allocated_bytes);
 
     /* use DBG_DIRECT when zephyr log system is not initialized*/
     DBG_DIRECT("RAM type of heap: %d, heap size: %d, allocated %d, free %d, max allocated %d\n",
-               ram_type, *p_size, stats.allocated_bytes, stats.free_bytes,
+               ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
                stats.max_allocated_bytes);
 
 #else
@@ -637,6 +651,17 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
 
     if (strcmp(p_name, "low_stack_task") == 0)
     {
+        /* place lowstack_stack(3KB) at RAM_TYPE_BUFFER_ON */
+        k_thread_stack_t *lowstack_stack;
+        lowstack_stack = (k_thread_stack_t *) \
+                         sys_multi_heap_aligned_alloc(&multi_heap, RAM_TYPE_BUFFER_ON,
+                                                      8, LOWSTACK_STACKSIZE);
+        if (lowstack_stack == NULL)
+        {
+            DBG_DIRECT("alloc thread stack failed because buffer ram heap is full");
+            *p_is_create_success = false;
+            return true;
+        }
         *pp_handle = &lowstack_thread_handle;
         thread_id = k_thread_create(&lowstack_thread_handle, lowstack_stack, LOWSTACK_STACKSIZE,
                                     (k_thread_entry_t) p_routine, p_param, NULL, NULL,
