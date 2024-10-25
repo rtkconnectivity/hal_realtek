@@ -168,11 +168,11 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
 
     if (strcmp(p_name, "low_stack_task") == 0)
     {
-        *pp_handle = &lowstack_thread_data;
         ret_thread_handle = k_thread_create(&lowstack_thread_data, lowstack_stack, 768 * 4,
                                             (k_thread_entry_t) p_routine, p_param, NULL, NULL,
                                             K_HIGHEST_THREAD_PRIO, 0, K_MSEC(10));
         k_thread_name_set(ret_thread_handle, p_name);
+        *pp_handle = &lowstack_thread_data;
         return true;
     }
 
@@ -193,6 +193,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
     }
     /****************************** dynamic stack ******************************/
     k_thread_stack_t *stack_buffer;
+
     stack_buffer = (k_thread_stack_t *) k_heap_aligned_alloc(&data_on_heap, 8,
                                                              stack_size, K_NO_WAIT);
     if (stack_buffer == NULL)
@@ -203,7 +204,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
         return false;
     }
     memset(stack_buffer, 0, stack_size);
-    ret_thread_handle = k_thread_create(*pp_handle, stack_buffer, stack_size,
+    ret_thread_handle = k_thread_create(thread_handle, stack_buffer, stack_size,
                                         (k_thread_entry_t) p_routine, p_param, NULL, NULL,
                                         switch_priority, 0, K_MSEC(10));
 
