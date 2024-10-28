@@ -1002,8 +1002,14 @@ bool os_timer_id_get_zephyr(void **pp_handle, uint32_t *p_timer_id)
 bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t timer_id,
                             uint32_t interval_ms, bool reload, void (*p_timer_callback)())
 {
-    uint8_t i;
     k_timeout_t timer_ticks;
+    uint8_t i;
+
+    if (*pp_handle != NULL)
+    {
+        LOG_ERR("Timer has been created!");
+        return false;
+    }
 
     timer_ticks = K_MSEC(interval_ms);
 
