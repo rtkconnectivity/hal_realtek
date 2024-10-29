@@ -29,7 +29,12 @@ typedef struct
 } task_sem_item;
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 
-#define LOWSTACK_STACKSIZE (768 * 4)
+
+#if (CONFIG_REALTEK_BT_CONTROLLER_STACK_SIZE < (1024+512))
+#error "CONFIG_REALTEK_CONTROLLER_STACK_SIZE should be larger than 1.5KB"
+#endif
+#define LOWSTACK_STACKSIZE CONFIG_REALTEK_BT_CONTROLLER_STACK_SIZE
+
 // K_THREAD_STACK_DEFINE(lowstack_stack, LOWSTACK_STACKSIZE);
 struct z_thread_stack_element *lowstack_stack;
 struct k_thread lowstack_thread_handle;

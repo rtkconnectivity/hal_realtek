@@ -1,5 +1,6 @@
-config REALTEK_USING_SDK_LIB
-	bool "RealTek sdk library"
+config REALTEK_BT_CONTROLLER_STACK_SIZE
+	int "RealTek bt lowstack stack size"
+	default 3072
+	depends on SOC_SERIES_RTL8752H
 	help
-	  This option enables the sdk library.
-
+	  This option set the bt lowstack stack size.
