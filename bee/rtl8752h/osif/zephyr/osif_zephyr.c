@@ -11,8 +11,11 @@
 #include <kernel_internal.h> //for z_idle_threads and arch_kernel_init
 
 #include "patch_os.h"
+#include "os_pm.h"
+#include "os_queue.h"
 #include "mem_types.h"
-#include "trace.h"
+
+#include "dlps.h"
 typedef enum
 {
     SCHEDULER_SUSPENDED = 0,
@@ -48,11 +51,28 @@ typedef struct timer_info
 Timer_Info timer_number_array[TIMER_NUMBER_MAX];
 
 BOOL_PATCH_FUNC patch_osif_os_task_name_get;
+// extern function
+extern void os_queue_func_init(void);
+extern void sys_clock_only_add_cycle_count(int32_t ticks);
 extern void sys_clock_announce_only_add_ticks(int32_t ticks);
-/************************************************************ Mem Management ************************************************************/
+extern void z_thread_timeout(struct _timeout *t);
+extern struct _timeout *get_first_timeout(void);
+extern struct _timeout *get_next_timeout(struct _timeout *t);
+typedef void (*PMFuncToReturn)(void);
+extern void power_manager_slave_register_function_to_return(PMFuncToReturn func);
+extern void (*platform_pm_register_callback_func_with_priority)(void *, PlatformPMStage, int8_t);
+// extern variable
+extern T_OS_QUEUE lpm_excluded_handle[PLATFORM_PM_EXCLUDED_TYPE_MAX];
 
-// static struct sys_heap data_on_heap;
-// static struct sys_heap buffer_on_heap;
+#define REALTEK_OSIF_DBG     1
+#if REALTEK_OSIF_DBG
+#include "trace.h"
+#define DBG_DIRECT_OPTIONAL(...) DBG_DIRECT(__VA_ARGS__)
+#else
+#define DBG_DIRECT_OPTIONAL(...) do { } while(0)
+#endif
+
+/************************************************************ Mem Management ************************************************************/
 
 static struct k_heap k_heap_array[RAM_TYPE_NUM];
 struct sys_multi_heap multi_heap;
@@ -70,10 +90,6 @@ static void *os_heap_choice(struct sys_multi_heap *mheap, void *cfg, size_t alig
 
     /* debug */
     // DBG_DIRECT("os_heap_choice, ram_type:%d",ram_type);
-
-    // k_spinlock_key_t key = k_spin_lock((&k_heap_array[ram_type])->lock);
-    // p = sys_heap_aligned_alloc((&k_heap_array[ram_type])->heap, align, size);
-    // k_spin_unlock((&k_heap_array[ram_type])->lock, key);
 
     p = k_heap_aligned_alloc(&k_heap_array[ram_type], align, size, K_NO_WAIT);
 
@@ -264,7 +280,6 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, uint32_t msg_num, uint3
             *pp_handle = queue_obj;
 
             /* alloc msgq buffer */
-            // queue_buffer = shared_multi_heap_aligned_alloc(RAM_TYPE_DATA_ON, 4, total_size);
             queue_buffer = sys_multi_heap_aligned_alloc(&multi_heap, (void *)RAM_TYPE_DATA_ON,
                                                         4, total_size);
             if (queue_buffer != NULL)
@@ -275,7 +290,6 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, uint32_t msg_num, uint3
             }
             else
             {
-                // shared_multi_heap_free(queue_obj);
                 sys_multi_heap_free(&multi_heap, queue_obj);
                 DBG_DIRECT("alloc queue buffer failed because data ram heap is full");
                 ret = -ENOMEM;
@@ -307,13 +321,12 @@ bool os_msg_queue_delete_intern_zephyr(void *p_handle, const char *p_func, uint3
 
     if ((obj->flags & K_MSGQ_FLAG_ALLOC) != 0U)
     {
-        // shared_multi_heap_free(obj->buffer_start);
         sys_multi_heap_free(&multi_heap, obj->buffer_start);
         obj->buffer_start = NULL;
         obj->flags &= ~K_MSGQ_FLAG_ALLOC;
-        // shared_multi_heap_free(obj);
         sys_multi_heap_free(&multi_heap, obj);
         *p_result = true;
+        return true;
     }
     *p_result = false;
     return true;
@@ -432,14 +445,6 @@ bool os_delay_zephyr(uint32_t ms)
 }
 
 /************************************************************ SYSTICK ************************************************************/
-bool os_systick_handler_zephyr(void)
-{
-    // ToDo
-    // extern void sys_clock_isr(void *arg);
-    // sys_clock_isr(NULL);
-    sys_clock_announce_only_add_ticks(1);
-    return true;
-}
 
 bool os_sys_time_get_zephyr(uint64_t *p_time_ms)
 {
@@ -454,10 +459,19 @@ bool os_sys_tick_get_zephyr(uint64_t *p_sys_tick)
     return true;
 }
 
+bool os_systick_handler_zephyr(void)
+{
+    DBG_DIRECT("%s is called", __func__);
+    sys_clock_only_add_cycle_count(1);
+    sys_clock_announce_only_add_ticks(1);
+    return true;
+}
+
 bool os_sys_tick_increase_zephyr(uint32_t tick_increment,
-                                 uint64_t *p_old_tick)
+                                 k_ticks_t *p_old_tick)
 {
     *p_old_tick = sys_clock_tick_get();
+    sys_clock_only_add_cycle_count(tick_increment);
     sys_clock_announce_only_add_ticks(tick_increment);
     return true;
 }
@@ -920,12 +934,12 @@ bool os_task_notify_take_zephyr(long xClearCountOnExit, uint32_t xTicksToWait,
 bool os_task_notify_give_zephyr(void *p_handle, bool *p_result)
 {
     *p_result = false;
+    struct k_sem *sem;
     for (uint8_t i = 0; i < TASK_SEM_ARRAY_NUMBER; i++)
     {
         if (task_sem_array[i].task_handle == p_handle)
         {
-            struct k_sem *sem = task_sem_array[i].sem_handle;
-
+            sem = task_sem_array[i].sem_handle;
             k_sem_give(sem);
             *p_result = true;
             return true;
@@ -1193,6 +1207,27 @@ bool os_timer_number_get_zephyr(void **pp_handle, uint32_t *p_timer_num, bool *p
     *p_result = false;
     return true;
 }
+
+bool os_timer_get_auto_reload_zephyr(void **pp_handle, long *p_autoreload)
+{
+    if (pp_handle && *pp_handle)
+    {
+        struct k_timer *obj;
+
+        obj = (struct k_timer *)*pp_handle;
+
+        if (K_TIMEOUT_EQ(obj->period, K_NO_WAIT))
+        {
+            *p_autoreload = 0;
+        }
+        else
+        {
+            *p_autoreload = 1;
+        }
+    }
+    return true;
+}
+
 typedef void (*PendedFunctionOS_t)(void *para1, uint32_t para2);
 typedef struct pend_call
 {
@@ -1208,18 +1243,19 @@ void pendcall_handler(struct k_work *item)
 {
     Pend_Call *cb =
         CONTAINER_OF(item, Pend_Call, work);
-    DBG_DIRECT("pendcall para1: %x para2: %x\n", (uint32_t)cb->para1, cb->para2);
+    DBG_DIRECT("pendcall func:%x p1: %x p2: %x\n",cb->Pend_func, (uint32_t)cb->para1, cb->para2);
     cb->Pend_func(cb->para1, cb->para2);
     sys_multi_heap_free(&multi_heap, cb);
 }
 
 uint32_t xPendFunctionCall_zephyr(PendedFunctionOS_t xFunctionToPend, void *para1, uint32_t para2)
 {
-    int err;
+    int err = -1;
     Pend_Call *cb = sys_multi_heap_alloc(&multi_heap, (void *)RAM_TYPE_DATA_ON,
                                          sizeof(Pend_Call));
     if (cb != NULL)
     {
+        memset(cb, 0, sizeof(Pend_Call));
         cb->Pend_func = xFunctionToPend;
         cb->para1 = para1;
         cb->para2 = para2;
@@ -1229,9 +1265,8 @@ uint32_t xPendFunctionCall_zephyr(PendedFunctionOS_t xFunctionToPend, void *para
     else
     {
         DBG_DIRECT("alloc pendcall data failed because data ram heap is full");
-        err = 1;
     }
-    return err;
+    return err >= 0 ? true : false;
 }
 
 bool os_timer_pendcall_zephyr(PendedFunctionOS_t xFunctionToPend, void *para1, uint32_t para2,
@@ -1239,15 +1274,9 @@ bool os_timer_pendcall_zephyr(PendedFunctionOS_t xFunctionToPend, void *para1, u
 {
     uint32_t ret;
     ret = xPendFunctionCall_zephyr(xFunctionToPend, para1, para2);
-    *p_result = (ret == 0) ? true : false;
+    *p_result = ret;
     return true;
 }
-
-bool os_timer_next_timeout_value_get_zephyr(uint32_t *p_value)
-{
-    return true;
-}
-
 
 
 bool os_task_name_get_zephyr(void *p_handle, const char **p_task_name, bool *p_result)
@@ -1267,6 +1296,162 @@ bool os_task_name_get_zephyr(void *p_handle, const char **p_task_name, bool *p_r
     *p_result = true;
     return true;
 }
+#define TIMEOUT_EXCLUDE 1
+uint32_t os_pm_next_timeout_value_get_zephyr(void)
+{
+    /* Solution without the exclude timer mechanism. */
+    // uint32_t ticks = z_get_next_timeout_expiry();
+    // return ticks;
+
+    /* Solution with the exclude timer mechanism. */
+    uint32_t timeout_tick_res = 0xFFFFFFFF;
+    uint32_t timeout_tick = 0;
+    struct k_timer *timer;
+    struct k_thread *thread;
+
+    bool handle_checked;
+
+    for (struct _timeout *t = get_first_timeout(); t != NULL; t = get_next_timeout(t))
+    {
+        handle_checked = true;
+        timeout_tick += t->dticks;
+        /** kernel timer's timeout function is z_timer_expiration_handler
+         *  exclude selectd kernel timer
+         */
+        if (t->fn == z_timer_expiration_handler)
+        {
+            timer = CONTAINER_OF(t, struct k_timer, timeout);
+#if TIMEOUT_EXCLUDE
+            T_OS_QUEUE_ELEM *p_cur_queue_item = lpm_excluded_handle[PLATFORM_PM_EXCLUDED_TIMER].p_first;
+            while (p_cur_queue_item != NULL)
+            {
+                void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
+                if (cur_excluded_handle != NULL)
+                {
+                    if (timer == cur_excluded_handle)
+                    {
+                        long is_auto_reload;
+                        os_timer_get_auto_reload_zephyr(&cur_excluded_handle, &is_auto_reload);
+                        if (is_auto_reload)
+                        {
+                            DBG_DIRECT("[PM]!!handle=0x%x, exclude timer cannot be auto_reload", cur_excluded_handle);
+                            __ASSERT(0, "[PM]!!handle=0x%x", (unsigned int) cur_excluded_handle);
+                        }
+                        handle_checked = false;
+                        break;
+                    }
+                }
+                p_cur_queue_item = p_cur_queue_item->p_next;
+            }
+#endif /* TIMEOUT_EXCLUDE */
+
+            if (handle_checked)
+            {
+                timeout_tick_res = timeout_tick;
+                break;
+            }
+        }
+        /** thread k_sleep's timeout function is z_thread_timeout
+         *  exclude selectd thread
+         */
+        else if (t->fn == z_thread_timeout)
+        {
+            thread = CONTAINER_OF(t, struct k_thread, base.timeout);
+#if TIMEOUT_EXCLUDE
+            T_OS_QUEUE_ELEM *p_cur_queue_item = lpm_excluded_handle[PLATFORM_PM_EXCLUDED_TASK].p_first;
+            while (p_cur_queue_item != NULL)
+            {
+                void *cur_excluded_handle = *(((PlatformPMExcludedHandleQueueElem *)p_cur_queue_item)->handle);
+                if (cur_excluded_handle != NULL)
+                {
+                    if (thread == cur_excluded_handle)
+                    {
+                        handle_checked = false;
+                        break;
+                    }
+                }
+                p_cur_queue_item = p_cur_queue_item->p_next;
+            }
+#endif
+            if (handle_checked)
+            {
+                timeout_tick_res = timeout_tick;
+                break;
+            }
+        }
+        /* other timeout (e.g. time slice, work queue) */
+        else
+        {
+
+            timeout_tick_res = timeout_tick;
+            break;
+        }
+    }
+    DBG_DIRECT("timeout_tick_res=%d", timeout_tick_res);
+    return timeout_tick_res;
+}
+
+uint32_t os_sys_tick_rate_get_zephyr(void)
+{
+    return (uint32_t)CONFIG_SYS_CLOCK_TICKS_PER_SEC;
+}
+
+uint32_t os_sys_tick_clk_get_zephyr(void)
+{
+    return (uint32_t)CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC;
+}
+
+void os_task_dlps_return_idle_task_zephyr(void)
+{
+    DBG_DIRECT("%s is called", __func__);
+
+    arch_kernel_init();//perform arm initialization: including fault exception init & msp setting.
+
+    // ToDo: check if need
+    // RamVectorTableUpdate(GDMA0_Channel9_VECTORn, _isr_wrapper);
+
+    // ToDo: check zephyr PendSV_IRQn and SysTick_IRQn priority has been restored in power.c 与BTMAC唤醒无关
+    // NVIC_SetPriority(PendSV_IRQn, 0xff);
+    // NVIC_SetPriority(SysTick_IRQn, 0xff);
+
+    uint32_t z_idle_stack_ptr;
+    struct k_thread *thread = &z_idle_threads[0];
+
+    z_idle_stack_ptr = thread->stack_info.start + thread->stack_info.size - thread->stack_info.delta;
+
+    __set_PSP(z_idle_stack_ptr);
+    __ISB();
+
+    __set_CONTROL(__get_CONTROL() | BIT1);
+    __ISB();
+
+    extern void z_thread_entry(k_thread_entry_t, void *, void *, void *);
+    extern void idle(void *, void *, void *);
+    z_thread_entry(idle, 0, 0, 0);
+    return;
+}
+
+bool os_sched_restore_zephyr(void)
+{
+    // extern void prvSetupFPU(void); //do zephyr need it?
+    // prvSetupFPU();
+
+    return true;
+}
+
+void os_pm_store_zephyr(void)
+{
+    os_pm_store_tickcount();
+}
+
+void os_pm_restore_zephyr(void)
+{
+    os_pm_restore_tickcount();
+
+    // os_sched_restore_zephyr();
+}
+
+
 /* ************************************************* OSIF PATCH ************************************************* */
 void osif_mem_func_init_zephyr()
 {
@@ -1290,8 +1475,6 @@ void osif_msg_func_init_zephyr()
 void osif_sched_func_init_zephyr(void)
 {
     patch_osif_os_init = os_init_zephyr;
-
-    patch_osif_os_systick_handler = os_systick_handler_zephyr;
     patch_osif_os_delay = os_delay_zephyr;
     patch_osif_os_sys_time_get = os_sys_time_get_zephyr;
     patch_osif_os_sys_tick_get = os_sys_tick_get_zephyr;
@@ -1348,14 +1531,44 @@ void osif_timer_func_init_zephyr(void)
     patch_osif_os_timer_number_get = (BOOL_PATCH_FUNC)os_timer_number_get_zephyr;
 }
 
+void os_pm_init_zephyr(void)
+{
+    power_manager_slave_register_function_to_return(os_task_dlps_return_idle_task_zephyr);
+
+    // platform_pm_register_schedule_bottom_half_callback_func(os_pm_bottom_half_zephyr); //may use syswork queue in zephyr? (still need to evaluate)
+
+    platform_pm_register_callback_func_with_priority((void *)os_pm_check, PLATFORM_PM_CHECK, 1);
+    platform_pm_register_callback_func_with_priority((void *)os_pm_store_zephyr, PLATFORM_PM_STORE, 1);
+    platform_pm_register_callback_func_with_priority((void *)os_pm_restore_zephyr, PLATFORM_PM_RESTORE,
+                                                     1);
+    return;
+}
+
+void osif_pm_func_init_zephyr(void)
+{
+    // os_pm_init = os_pm_init_zephyr;
+    os_pm_store = os_pm_store_zephyr;
+    os_pm_restore = os_pm_restore_zephyr;
+    patch_osif_os_task_dlps_return_idle_task = (BOOL_PATCH_FUNC)os_task_dlps_return_idle_task_zephyr;
+
+    patch_osif_os_sys_tick_increase = os_sys_tick_increase_zephyr;
+
+    patch_osif_os_timer_pend_function_call = os_timer_pendcall_zephyr;
+    patch_osif_os_systick_handler = os_systick_handler_zephyr;
+    os_pm_next_timeout_value_get = os_pm_next_timeout_value_get_zephyr;
+    os_sched_restore = os_sched_restore_zephyr;
+}
+
 void os_zephyr_patch_init(void)
 {
     osif_mem_func_init_zephyr();
     osif_msg_func_init_zephyr();
-    // os_queue_func_init();
     osif_sched_func_init_zephyr();
     osif_sync_func_init_zephyr();
     osif_task_func_init_zephyr();
     osif_timer_func_init_zephyr();
-    // osif_pm_func_init_zephyr();
+    /* use rom default os_queue implementation */
+    // os_queue_func_init();
+
+    osif_pm_func_init_zephyr();
 }
