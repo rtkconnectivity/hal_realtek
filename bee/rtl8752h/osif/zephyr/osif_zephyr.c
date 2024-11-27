@@ -659,7 +659,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
         /* place lowstack_stack(3KB) at RAM_TYPE_BUFFER_ON */
         k_thread_stack_t *lowstack_stack;
         lowstack_stack = (k_thread_stack_t *) \
-                         sys_multi_heap_aligned_alloc(&multi_heap, RAM_TYPE_BUFFER_ON,
+                         sys_multi_heap_aligned_alloc(&multi_heap, (void *)RAM_TYPE_BUFFER_ON,
                                                       8, LOWSTACK_STACKSIZE);
         if (lowstack_stack == NULL)
         {
@@ -1250,7 +1250,7 @@ bool os_timer_next_timeout_value_get_zephyr(uint32_t *p_value)
 
 
 
-bool os_task_name_get_zephyr(void *p_handle, char **p_task_name, bool *p_result)
+bool os_task_name_get_zephyr(void *p_handle, const char **p_task_name, bool *p_result)
 {
     struct k_thread *thread_obj;
 
@@ -1270,21 +1270,21 @@ bool os_task_name_get_zephyr(void *p_handle, char **p_task_name, bool *p_result)
 /* ************************************************* OSIF PATCH ************************************************* */
 void osif_mem_func_init_zephyr()
 {
-    patch_osif_os_mem_alloc_intern         = os_mem_alloc_intern_zephyr;
-    patch_osif_os_mem_zalloc_intern        = os_mem_zalloc_intern_zephyr;
-    patch_osif_os_mem_aligned_alloc_intern = os_mem_aligned_alloc_intern_zephyr;
-    patch_osif_os_mem_free                 = os_mem_free_zephyr;
-    patch_osif_os_mem_aligned_free         = os_mem_aligned_free_zephyr;
-    patch_osif_os_mem_peek                 = os_mem_peek_zephyr;
-    patch_osif_os_mem_check_heap_usage     = os_mem_check_heap_usage_zephyr;
+    patch_osif_os_mem_alloc_intern         = (BOOL_PATCH_FUNC)os_mem_alloc_intern_zephyr;
+    patch_osif_os_mem_zalloc_intern        = (BOOL_PATCH_FUNC)os_mem_zalloc_intern_zephyr;
+    patch_osif_os_mem_aligned_alloc_intern = (BOOL_PATCH_FUNC)os_mem_aligned_alloc_intern_zephyr;
+    patch_osif_os_mem_free                 = (BOOL_PATCH_FUNC)os_mem_free_zephyr;
+    patch_osif_os_mem_aligned_free         = (BOOL_PATCH_FUNC)os_mem_aligned_free_zephyr;
+    patch_osif_os_mem_peek                 = (BOOL_PATCH_FUNC)os_mem_peek_zephyr;
+    patch_osif_os_mem_check_heap_usage     = (BOOL_PATCH_FUNC)os_mem_check_heap_usage_zephyr;
 }
 void osif_msg_func_init_zephyr()
 {
-    patch_osif_os_msg_queue_create_intern = os_msg_queue_create_intern_zephyr;
-    patch_osif_os_msg_queue_delete_intern = os_msg_queue_delete_intern_zephyr;
-    patch_osif_os_msg_queue_peek_intern = os_msg_queue_peek_intern_zephyr;
-    patch_osif_os_msg_send_intern = os_msg_send_intern_zephyr;
-    patch_osif_os_msg_recv_intern = os_msg_recv_intern_zephyr;
+    patch_osif_os_msg_queue_create_intern = (BOOL_PATCH_FUNC)os_msg_queue_create_intern_zephyr;
+    patch_osif_os_msg_queue_delete_intern = (BOOL_PATCH_FUNC)os_msg_queue_delete_intern_zephyr;
+    patch_osif_os_msg_queue_peek_intern   = (BOOL_PATCH_FUNC)os_msg_queue_peek_intern_zephyr;
+    patch_osif_os_msg_send_intern = (BOOL_PATCH_FUNC)os_msg_send_intern_zephyr;
+    patch_osif_os_msg_recv_intern = (BOOL_PATCH_FUNC)os_msg_recv_intern_zephyr;
     // patch_osif_os_msg_peek_intern = os_msg_peek_intern_zephyr;
 }
 void osif_sched_func_init_zephyr(void)
@@ -1319,33 +1319,33 @@ void osif_sync_func_init_zephyr(void)
 
 void osif_task_func_init_zephyr(void)
 {
-    patch_osif_os_task_create = os_task_create_zephyr;
-    patch_osif_os_task_delete = os_task_delete_zephyr;
-    patch_osif_os_task_suspend = os_task_suspend_zephyr;
-    patch_osif_os_task_resume = os_task_resume_zephyr;
-    patch_osif_os_task_yield = os_task_yield_zephyr;
-    patch_osif_os_task_handle_get = os_task_handle_get_zephyr;
-    patch_osif_os_task_priority_get = os_task_priority_get_zephyr;
-    patch_osif_os_task_priority_set = os_task_priority_set_zephyr;
-    patch_osif_os_task_signal_create = os_task_signal_create_zephyr;
-    patch_osif_os_task_notify_take = os_task_notify_take_zephyr;
-    patch_osif_os_task_notify_give = os_task_notify_give_zephyr;
-    patch_osif_os_task_status_dump = os_task_status_dump_zephyr;
-    patch_osif_os_task_name_get = os_task_name_get_zephyr;
+    patch_osif_os_task_create  = (BOOL_PATCH_FUNC)os_task_create_zephyr;
+    patch_osif_os_task_delete  = (BOOL_PATCH_FUNC)os_task_delete_zephyr;
+    patch_osif_os_task_suspend = (BOOL_PATCH_FUNC)os_task_suspend_zephyr;
+    patch_osif_os_task_resume  = (BOOL_PATCH_FUNC)os_task_resume_zephyr;
+    patch_osif_os_task_yield   = (BOOL_PATCH_FUNC)os_task_yield_zephyr;
+    patch_osif_os_task_handle_get    = (BOOL_PATCH_FUNC)os_task_handle_get_zephyr;
+    patch_osif_os_task_priority_get  = (BOOL_PATCH_FUNC)os_task_priority_get_zephyr;
+    patch_osif_os_task_priority_set  = (BOOL_PATCH_FUNC)os_task_priority_set_zephyr;
+    patch_osif_os_task_signal_create = (BOOL_PATCH_FUNC)os_task_signal_create_zephyr;
+    patch_osif_os_task_notify_take   = (BOOL_PATCH_FUNC)os_task_notify_take_zephyr;
+    patch_osif_os_task_notify_give   = (BOOL_PATCH_FUNC)os_task_notify_give_zephyr;
+    patch_osif_os_task_status_dump   = (BOOL_PATCH_FUNC)os_task_status_dump_zephyr;
+    patch_osif_os_task_name_get      = (BOOL_PATCH_FUNC)os_task_name_get_zephyr;
 }
 
 void osif_timer_func_init_zephyr(void)
 {
-    patch_osif_os_timer_id_get = os_timer_id_get_zephyr;
-    patch_osif_os_timer_create =  os_timer_create_zephyr;
-    patch_osif_os_timer_start = os_timer_start_zephyr;
-    patch_osif_os_timer_restart = os_timer_restart_zephyr;
-    patch_osif_os_timer_stop = os_timer_stop_zephyr;
-    patch_osif_os_timer_delete = os_timer_delete_zephyr;
-    patch_osif_os_timer_dump = os_timer_dump_zephyr;
-    patch_osif_os_timer_state_get = os_timer_state_get_zephyr;
-    patch_osif_os_timer_init = os_timer_init_zephyr;
-    patch_osif_os_timer_number_get = os_timer_number_get_zephyr;
+    patch_osif_os_timer_id_get  = (BOOL_PATCH_FUNC)os_timer_id_get_zephyr;
+    patch_osif_os_timer_create  = (BOOL_PATCH_FUNC)os_timer_create_zephyr;
+    patch_osif_os_timer_start   = (BOOL_PATCH_FUNC)os_timer_start_zephyr;
+    patch_osif_os_timer_restart = (BOOL_PATCH_FUNC)os_timer_restart_zephyr;
+    patch_osif_os_timer_stop    = (BOOL_PATCH_FUNC)os_timer_stop_zephyr;
+    patch_osif_os_timer_delete  = (BOOL_PATCH_FUNC)os_timer_delete_zephyr;
+    patch_osif_os_timer_dump    = (BOOL_PATCH_FUNC)os_timer_dump_zephyr;
+    patch_osif_os_timer_state_get  = (BOOL_PATCH_FUNC)os_timer_state_get_zephyr;
+    patch_osif_os_timer_init       = (BOOL_PATCH_FUNC)os_timer_init_zephyr;
+    patch_osif_os_timer_number_get = (BOOL_PATCH_FUNC)os_timer_number_get_zephyr;
 }
 
 void os_zephyr_patch_init(void)
