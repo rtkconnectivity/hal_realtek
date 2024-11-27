@@ -1,13 +1,13 @@
 # Copyright (c) 2024 Realtek Semiconductor Corp.
 # SPDX-License-Identifier: Apache-2.0
-config REALTEK_AON_QDEC
-	bool "REALTEK MCU aon qdec driver"
+config REALTEK_BEE_AON_QDEC
+	bool "REALTEK Bee MCU aon qdec driver"
 	default y
-	depends on USE_HAL_REALTEK_AON_QDEC
+	depends on USE_HAL_REALTEK_BEE_AON_QDEC
 
-	select USE_HAL_REALTEK_RCC
-	select USE_HAL_REALTEK_PINMUX
-	select USE_HAL_REALTEK_NVIC
+	select USE_HAL_REALTEK_BEE_RCC
+	select USE_HAL_REALTEK_BEE_PINMUX
+	select USE_HAL_REALTEK_BEE_NVIC
 
 	help
-	  This option enables the aon qdec driver for REALTEK MCU.
+	  This option enables the aon qdec driver for REALTEK Bee MCU.
