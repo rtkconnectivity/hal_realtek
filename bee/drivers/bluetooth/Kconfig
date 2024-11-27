@@ -1,9 +1,9 @@
 # Copyright (c) 2024 Realtek Semiconductor Corp.
 # SPDX-License-Identifier: Apache-2.0
-config REALTEK_BT
-	bool "REALTEK MCU bluetooth driver"
+config REALTEK_BEE_BT
+	bool "REALTEK Bee MCU bluetooth driver"
 	default y
 
 	help
-	  This option enables the bluetooth driver for REALTEK family of
+	  This option enables the bluetooth driver for REALTEK bee family of
 	  processors.
