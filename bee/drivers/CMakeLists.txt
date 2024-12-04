@@ -35,6 +35,8 @@ if (CONFIG_REALTEK_AON_QDEC OR CONFIG_REALTEK_QDEC)
 add_subdirectory(qdec)
 endif()
 
+add_subdirectory_ifdef(CONFIG_REALTEK_CAN can)
+
 add_subdirectory_ifdef(CONFIG_REALTEK_SPI spi)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_USB usb)
