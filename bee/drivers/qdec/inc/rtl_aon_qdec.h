@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_aon_qdec.h
+* \brief    The header file of the peripheral AON_QDECODER driver.
+* \details  This file provides all AON_QDECODER firmware functions.
+* \author   Grace_yan
+* \date     2023-10-17
+* \version  v1.0
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,12 +24,12 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "rtl876x.h"
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "qdec/src/rtl87x2g/rtl_aon_qdec_def.h"
 #endif
 
-/** \defgroup 87X2G_AON_QDEC    AON_QDEC
+/** \defgroup AON_QDEC    AON_QDEC
   * \brief
   * \{
   */
@@ -35,11 +42,9 @@ extern "C" {
   * \{
   */
 
-#define IS_AON_QDEC_PERIPH(PERIPH) ((PERIPH) == AON_QDEC)
-
 /**
- * \brief       AON_QDEC Counter Scale
- *
+ * \defgroup    AON_QDEC_Counter_Scale AON_QDEC Counter Scale
+ * \{
  * \ingroup     AON_QDEC_Exported_Constants
  */
 typedef enum
@@ -50,9 +55,13 @@ typedef enum
 
 #define IS_CNT_SCALE_PHASE_TYPE(TYPE) ((TYPE) <= 0x01)
 
+/** End of AON_QDEC_Counter_Scale
+  * \}
+  */
+
 /**
- * \brief       AON_QDEC Init Phase
- *
+ * \defgroup    AON_QDEC_Init_Phase AON_QDEC Init Phase
+ * \{
  * \ingroup     AON_QDEC_Exported_Constants
  */
 typedef enum
@@ -65,9 +74,13 @@ typedef enum
 
 #define IS_PHSAE_MODE_TYPE(TYPE) ((TYPE) <= 0x03)
 
+/** End of AON_QDEC_Init_Phase
+  * \}
+  */
+
 /**
- * \brief       AON_QDEC Axis Direction
- *
+ * \defgroup    AON_QDEC_Axis_Direction AON_QDEC Axis Direction
+ * \{
  * \ingroup     AON_QDEC_Exported_Constants
  */
 typedef enum
@@ -78,6 +91,10 @@ typedef enum
 
 #define IS_AON_QDEC_AXIS_DIR_TYPE(TYPE) ((TYPE) <= 0x01)
 
+/** End of AON_QDEC_Axis_Direction
+  * \}
+  */
+
 /**
  * \defgroup    AON_QDEC_Interrupts AON_QDEC Interrupts
  * \{
@@ -86,11 +103,11 @@ typedef enum
 #define AON_QDEC_X_INT_NEW_DATA                     BIT0//get New data and state change
 #define AON_QDEC_X_INT_ILLEAGE                      BIT1//illeage
 
+#define IS_AON_QDEC_INT_CONFIG(CONFIG) (((CONFIG) == AON_QDEC_X_INT_NEW_DATA) || ((CONFIG) == AON_QDEC_X_INT_ILLEAGE))
+
 /** End of AON_QDEC_Interrupts
   * \}
   */
-
-#define IS_AON_QDEC_INT_CONFIG(CONFIG) (((CONFIG) == AON_QDEC_X_INT_NEW_DATA) || ((CONFIG) == AON_QDEC_X_INT_ILLEAGE))
 
 /**
  * \defgroup    AON_QDEC_Interrupts_Mask AON_QDEC Interrupts Mask
@@ -102,11 +119,11 @@ typedef enum
 #define AON_QDEC_X_CT_INT_MASK                      BIT8//get New data and state change
 #define AON_QDEC_X_ILLEAGE_INT_MASK                 BIT7//illeage
 
+#define IS_AON_QDEC_INT_MASK_CONFIG(CONFIG) (((CONFIG) == AON_QDEC_X_CT_INT_MASK) || ((CONFIG) == AON_QDEC_X_ILLEAGE_INT_MASK))
+
 /** End of AON_QDEC_Interrupts_Mask
   * \}
   */
-
-#define IS_AON_QDEC_INT_MASK_CONFIG(CONFIG) (((CONFIG) == AON_QDEC_X_CT_INT_MASK) || ((CONFIG) == AON_QDEC_X_ILLEAGE_INT_MASK))
 
 /**
  * \defgroup    AON_QDEC_Clr_Flag AON_QDEC Clr Flag
@@ -120,13 +137,13 @@ typedef enum
 #define AON_QDEC_CLR_NEW_CT_X                       BIT1
 #define AON_QDEC_CLR_ACC_CT_X                       BIT0
 
-/** End of AON_QDEC_Clr_Flag
-  * \}
-  */
-
 #define IS_AON_QDEC_INT_CLR_CONFIG(CONFIG) (((CONFIG) == AON_QDEC_CLR_ACC_CT_X) ||  ((CONFIG) == AON_QDEC_CLR_ILLEGAL_INT_X)\
                                             || ((CONFIG) == AON_QDEC_CLR_UNDERFLOW_X) ||((CONFIG) == AON_QDEC_CLR_OVERFLOW_X)\
                                             || ((CONFIG) == AON_QDEC_CLR_NEW_CT_X))
+
+/** End of AON_QDEC_Clr_Flag
+  * \}
+  */
 
 /**
  * \defgroup    AON_QDEC_Flag AON_QDEC Flag
@@ -138,13 +155,13 @@ typedef enum
 #define AON_QDEC_FLAG_UNDERFLOW_X                   BIT2
 #define AON_QDEC_FLAG_ILLEGAL_STATUS_X              BIT4
 
-/** End of AON_QDEC_Flag
-  * \}
-  */
-
 #define IS_AON_QDEC_CLR_INT_STATUS(INT) (((INT) == AON_QDEC_FLAG_ILLEGAL_STATUS_X) || ((INT) == AON_QDEC_FLAG_NEW_CT_STATUS_X)\
                                          || ((INT) == AON_QDEC_FLAG_OVERFLOW_X) || ((INT) == AON_QDEC_FLAG_UNDERFLOW_X)\
                                          || ((INT) == AON_QDEC_FLAG_AUTO_STATUS_X))
+
+/** End of AON_QDEC_Flag
+  * \}
+  */
 
 /**
  * \defgroup    AON_QDEC_Axis AON_QDEC Axis
@@ -265,7 +282,7 @@ void AON_QDEC_Init(AON_QDEC_TypeDef *AON_QDECx, AON_QDEC_InitTypeDef *AON_QDEC_I
 void AON_QDEC_StructInit(AON_QDEC_InitTypeDef *AON_QDEC_InitStruct);
 
 /**
- * \brief  Enables or disables the specified AON Qdecoder interrupt source.
+ * \brief  Enable or disable the specified AON Qdecoder interrupt source.
  *
  * \param[in] AON_QDECx: Selected AON Qdecoder peripheral.
  * \param[in] AON_QDEC_IT: Specifies the AON QDECODER interrupts sources to be enabled or disabled.
@@ -300,8 +317,7 @@ void AON_QDEC_INTConfig(AON_QDEC_TypeDef *AON_QDECx, uint32_t AON_QDEC_IT,
  *            \arg AON_QDEC_FLAG_OVERFLOW_X: The overflow flag for x-axis accumulation counter.
  *            \arg AON_QDEC_FLAG_UNDERFLOW_X: The underflow flag for x-axis accumulation counter.
  *
- * \return None.
- * \retval The new state of AON_QDEC_FLAG (SET or RESET).
+ * \return The new state of AON_QDEC_FLAG (SET or RESET).
  *
  * <b>Example usage</b>
  * \code{.c}
@@ -315,7 +331,7 @@ void AON_QDEC_INTConfig(AON_QDEC_TypeDef *AON_QDECx, uint32_t AON_QDEC_IT,
 FlagStatus AON_QDEC_GetFlagState(AON_QDEC_TypeDef *AON_QDECx, uint32_t AON_QDEC_FLAG);
 
 /**
- * \brief  Enables or disables mask the specified AON Qdecoder axis interrupts.
+ * \brief  Enable or disable mask the specified AON Qdecoder axis interrupts.
  *
  * \param[in] AON_QDECx: Selected AON Qdecoder peripheral.
  * \param[in] AON_QDEC_AXIS: Specifies the AON Qdecoder axis.
@@ -397,7 +413,7 @@ void AON_QDEC_ClearINTPendingBit(AON_QDEC_TypeDef *AON_QDECx, uint32_t AON_QDEC_
  *            This parameter parameter can be one of the following values:
  *            \arg  AON_QDEC_AXIS_X: The AON qdecoder X axis.
  *
- * \return The direction of the axis. This parameter parameter can be one of the following values:
+ * \return The direction of the axis.
  * \retval AON_QDEC_AXIS_DIR_UP: The axis is rolling up.
  * \retval AON_QDEC_AXIS_DIR_DOWN: The axis is rolling down.
  *

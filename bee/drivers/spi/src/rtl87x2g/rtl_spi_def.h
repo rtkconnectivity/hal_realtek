@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_spi_def.h
+* \brief    Pinmux related definitions for RTL8762G
+* \details
+* \author   renee
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_SPI_DEF_H
 #define RTL_SPI_DEF_H
@@ -18,6 +25,11 @@ extern "C" {
 /*============================================================================*
  *                          SPI Defines
  *============================================================================*/
+/** \defgroup SPI         SPI
+  * \brief
+  * \{
+  */
+
 /** \defgroup SPI_Exported_Constants SPI Exported Constants
   * \brief
   * \{
@@ -28,21 +40,26 @@ extern "C" {
  * \{
  * \ingroup  SPI_Exported_Constants
  */
-#define CHIP_SPI_NUM                                   (3)
 #define SPI_TX_FIFO_SIZE                               (32)
 #define SPI_RX_FIFO_SIZE                               (32)
 #define SPI0_SLAVE_TX_FIFO_SIZE                        (64)
 #define SPI0_SLAVE_RX_FIFO_SIZE                        (64)
 #define SPI_SUPPORT_WRAP_MODE                          (0)
 #define SPI0_SUPPORT_MASTER_SLAVE                      (0)
-#define SPI0_SUPPORT_HS                                (0)
-#define SPI_SUPPORT_APH_BRIDGE_FOR_HIGH_SPEED          (0)
-
+#define SPI0_SUPPORT_HS                                (1)
+#define SPI_SUPPORT_APH_BRIDGE_FOR_HIGH_SPEED          (1)
+#define SPI_SUPPORT_CLOCK_SOURCE_SWITCH                (0)
+#define SPI_SUPPORT_CLOCK_SOURCE_CONFIG                (1)
+#define SPI_DFS_BIT_FIELD                              dfs_32
 /** End of SPI_Defines
   * \}
   */
 
 /** End of SPI_Exported_Constants
+  * \}
+  */
+
+/** End of SPI
   * \}
   */
 
@@ -82,7 +99,12 @@ typedef struct
 /*============================================================================*
  *                         SPI Declaration
  *============================================================================*/
-/** \defgroup 87X2G_SPI      SPI
+/** \defgroup SPI         SPI
+  * \brief
+  * \{
+  */
+
+/** \defgroup SPI_Exported_Constants SPI Exported Constants
   * \brief
   * \{
   */
@@ -92,11 +114,23 @@ typedef struct
   * \{
   */
 
-#define SPI0               ((SPI_TypeDef *) SPI0_REG_BASE)
-#define SPI1               ((SPI_TypeDef *) SPI1_REG_BASE)
-#define SPI0_SLAVE         ((SPI_TypeDef *) SPI_SLAVE_REG_BASE)
+#define SPI0                      ((SPI_TypeDef *) SPI0_REG_BASE)
+#define SPI1                      ((SPI_TypeDef *) SPI1_REG_BASE)
+#define SPI0_SLAVE                ((SPI_TypeDef *) SPI_SLAVE_REG_BASE)
+#define SPI0_HS                   ((SPI_TypeDef *) SPI0_HS_REG_BASE)
+
+#define IS_SPIM_PERIPH(PERIPH)    (((PERIPH) == SPI0) || \
+                                   ((PERIPH) == SPI1) || \
+                                   ((PERIPH) == SPI0_HS))
+#define IS_SPIS_PERIPH(PERIPH)    (((PERIPH) == SPI0_SLAVE))
+#define IS_SPI_ALL_PERIPH(PERIPH) (IS_SPIM_PERIPH(PERIPH) || \
+                                   IS_SPIS_PERIPH(PERIPH))
 
 /** End of SPI_Declaration
+  * \}
+  */
+
+/** End of SPI_Exported_Constants
   * \}
   */
 
@@ -808,28 +842,95 @@ typedef union
             } b;
         } SPI_M_RSDR_TypeDef;
 
-    /*============================================================================*
-     *                          SPI TYPE/API Wrappers
-     *============================================================================*/
+    /* ================================================================================ */
+    /* ================                   SPI  Constants               ================ */
+    /* ================================================================================ */
+    /** \defgroup SPI         SPI
+      * \brief
+      * \{
+      */
+
     /** \defgroup SPI_Exported_Constants SPI Exported Constants
       * \brief
       * \{
       */
 
     /**
-     * \defgroup SPI_API_Wrapper SPI API Wrapper
+     * \defgroup    SPI_Clock_Source SPI Clock Source
      * \{
-     * \ingroup  SPI_Exported_Constants
+     * \ingroup     SPI_Exported_Constants
      */
+    typedef enum
+{
+    SPI_CLOCK_SRC_PLL1 = 0x0,
+    SPI_CLOCK_SRC_PLL2 = 0x1,
+    SPI_CLOCK_SRC_40M = 0x2,
+} SPIClockSrc_TypeDef;
+
+#define IS_SPI_CLK_SOURCE(PERIPH)     (((PERIPH) == SPI_CLOCK_SRC_40M) || \
+                                       ((PERIPH) == SPI_CLOCK_SRC_PLL1) || \
+                                       ((PERIPH) == SPI_CLOCK_SRC_PLL2))
+
+/** End of SPI_Clock_Source
+  * \}
+  */
+
+/**
+ * \defgroup    SPI_Clock_Divider SPI Clock Divider
+ * \{
+ * \ingroup     SPI_Exported_Constants
+ */
+typedef enum
+{
+    SPI_CLOCK_DIVIDER_1 = 0x0,
+    SPI_CLOCK_DIVIDER_2 = 0x1,
+    SPI_CLOCK_DIVIDER_4 = 0x2,
+    SPI_CLOCK_DIVIDER_8 = 0x3,
+    SPI_CLOCK_DIVIDER_16 = 0x4,
+    SPI_CLOCK_DIVIDER_32 = 0x5,
+    SPI_CLOCK_DIVIDER_40 = 0x6,
+    SPI_CLOCK_DIVIDER_64 = 0x7,
+} SPIClockDiv_TypeDef;
+
+#define IS_SPI_CLK_DIV(DIV) (((DIV) == SPI_CLOCK_DIVIDER_1) || \
+                             ((DIV) == SPI_CLOCK_DIVIDER_2) || \
+                             ((DIV) == SPI_CLOCK_DIVIDER_4) || \
+                             ((DIV) == SPI_CLOCK_DIVIDER_8) || \
+                             ((DIV) == SPI_CLOCK_DIVIDER_16) || \
+                             ((DIV) == SPI_CLOCK_DIVIDER_32) || \
+                             ((DIV) == SPI_CLOCK_DIVIDER_40) || \
+                             ((DIV) == SPI_CLOCK_DIVIDER_64))
+
+/** End of SPI_Clock_Divider
+  * \}
+  */
+
+/*============================================================================*
+ *                          SPI TYPE/API Wrappers
+ *============================================================================*/
+/**
+ * \defgroup SPI_API_Wrapper SPI API Wrapper
+ * \{
+ * \ingroup  SPI_Exported_Constants
+ */
 #define SPI_Change_CLK                  SPI_ChangeClock
+#define SPI_NDF                         SPI_RXNDF
 
-    /** End of SPI_API_Wrapper
-      * \}
-      */
+#define CK_40M_SPI                      SPI_CLOCK_SRC_40M
+#define CK_PLL1_SPI                     SPI_CLOCK_SRC_PLL1
+#define CK_PLL2_SPI                     SPI_CLOCK_SRC_PLL2
 
-    /** End of SPI_Exported_Constants
-      * \}
-      */
+/** End of SPI_API_Wrapper
+  * \}
+  */
+
+/** End of SPI_Exported_Constants
+  * \}
+  */
+
+/** End of SPI
+  * \}
+  */
 
 #ifdef  __cplusplus
 }

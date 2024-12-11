@@ -1,14 +1,21 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_gdma.c
+* \brief    This file provides all the GDMA firmware internal functions.
+* \details
+* \author
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "dma/inc/rtl_gdma.h"
-#include "rcc/inc/rtl_rcc.h"
+#include "rtl_gdma.h"
+#include "rtl_rcc.h"
 
 /*============================================================================*
  *                           Public Functions
@@ -74,5 +81,14 @@ bool GDMA_IsValidHandshake(uint8_t handshake)
     return true;
 }
 
+bool GDMA_IsGatherScatterChannel(GDMA_ChannelTypeDef *GDMA_Channelx)
+{
+    return false;
+}
+
+bool GDMA_IsHalfBlcokChannel(GDMA_TypeDef *GDMAx)
+{
+    return false;
+}
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/
 

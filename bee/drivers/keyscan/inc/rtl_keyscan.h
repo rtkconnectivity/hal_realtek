@@ -1,8 +1,16 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_keyscan.h
+* \brief    The header file of the peripheral KEYSCAN driver.
+* \details  This file provides all KEYSCAN firmware functions.
+* \author   yuzhuo_liu
+* \date     2024-07-24
+* \version  v1.0
+* *********************************************************************************************************
+*/
+
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
@@ -16,15 +24,18 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "keyscan/src/rtl87x2g/rtl_keyscan_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "keyscan/src/rtl87x3e/rtl_keyscan_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "keyscan/src/rtl8763d/rtl_keyscan_def.h"
+#include "keyscan/src/rtl87x3d/rtl_keyscan_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "keyscan/src/rtl87x2j/rtl_keyscan_def.h"
 #endif
 
-/** \defgroup 87X2G_KEYSCAN     KEYSCAN
+/** \defgroup KEYSCAN     KEYSCAN
   * \brief
   * \{
   */
@@ -37,52 +48,75 @@ extern "C" {
   * \{
   */
 
-#define IS_KeyScan_PERIPH(PERIPH) ((PERIPH) == KEYSCAN)
+/**
+ * \defgroup    KEYSCAN_FIFO_Depth KEYSCAN FIFO Depth
+ * \{
+ * \ingroup     KEYSCAN_Exported_Constants
+ */
 #define KEYSCAN_FIFO_DEPTH              26
 
+/** End of KEYSCAN_FIFO_Depth
+  * \}
+  */
+
 /**
- * \brief       Keyscan Row Number
- *
+ * \defgroup    KEYSCAN_Row_Number KEYSCAN Row Number
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
-
 #define IS_KEYSCAN_ROW_NUM(ROW) ((ROW) <= 12)
 
+/** End of KEYSCAN_Row_Number
+  * \}
+  */
+
 /**
- * \brief       Keyscan Column Number
- *
+ * \defgroup    KEYSCAN_Column_Number KEYSCAN Column Number
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
-
 #define IS_KEYSCAN_COL_NUM(COL) ((COL) <= 20)
 
+/** End of KEYSCAN_Column_Number
+  * \}
+  */
+
 /**
- * \brief       Keyscan Debounce Config
- *
+ * \defgroup    KEYSCAN_Debounce_Config KEYSCAN Debounce Config
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
-
 #define IS_KEYSCAN_DEBOUNCE_EN(EN) (((EN) == ENABLE) || ((EN) == DISABLE))
 
+/** End of KEYSCAN_Debounce_Config
+  * \}
+  */
+
 /**
- * \brief       Keyscan Scan Interval Enable
- *
+ * \defgroup    KEYSCAN_Scan_Interval_Enable KEYSCAN Scan Interval Enable
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
-
 #define IS_KEYSCAN_SCANINTERVAL_EN(EN) (((EN) == ENABLE) || ((EN) == DISABLE))
 
+/** End of KEYSCAN_Scan_Interval_Enable
+  * \}
+  */
+
 /**
- * \brief       Keyscan Release Detect Timer Enable
- *
+ * \defgroup    KEYSCAN_Release_Detect_Timer_Enable KEYSCAN Release Detect Timer Enable
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
-
 #define IS_KEYSCAN_RELEASE_DETECT_EN(EN) (((EN) == ENABLE) || ((EN) == DISABLE))
 
+/** End of KEYSCAN_Release_Detect_Timer_Enable
+  * \}
+  */
+
 /**
- * \brief       Keyscan scan mode
- *
+ * \defgroup    KEYSCAN_Scan_Mode KEYSCAN Scan Mode
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
 typedef enum
@@ -90,11 +124,16 @@ typedef enum
     KeyScan_Manual_Scan_Mode = 0x00,
     KeyScan_Auto_Scan_Mode = 0x01,
 } KEYSCANScanMode_TypeDef;
+
 #define IS_KEYSCAN_SCAN_MODE(MODE)  (((MODE) == KeyScan_Manual_Scan_Mode) || ((MODE) == KeyScan_Auto_Scan_Mode))
 
+/** End of KEYSCAN_Scan_Mode
+  * \}
+  */
+
 /**
- * \brief       Keyscan Press Detect Mode
- *
+ * \defgroup    KEYSCAN_Press_Detect_Mode KEYSCAN Press Detect Mode
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
 typedef enum
@@ -102,11 +141,16 @@ typedef enum
     KeyScan_Detect_Mode_Edge = 0x00,
     KeyScan_Detect_Mode_Level = 0x01,
 } KEYSCANPressDetectMode_TypeDef;
+
 #define IS_KEYSCAN_DETECT_MODE(MODE)    (((MODE) == KeyScan_Detect_Mode_Edge) || ((MODE) == KeyScan_Detect_Mode_Level))
 
+/** End of KEYSCAN_Press_Detect_Mode
+  * \}
+  */
+
 /**
- * \brief       Keyscan Fifo Overflow Control
- *
+ * \defgroup    KEYSCAN_FIFO_Overflow_Control KEYSCAN FIFO Overflow Control
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
 typedef enum
@@ -114,11 +158,16 @@ typedef enum
     KeyScan_FIFO_OVR_CTRL_DIS_ALL = 0x00,
     KeyScan_FIFO_OVR_CTRL_DIS_LAST = 0x01,
 } KEYSCANFifoOverflowControl_TypeDef;
+
 #define IS_KEYSCAN_FIFO_OVR_CTRL(CTRL)  (((CTRL) == KeyScan_FIFO_OVR_CTRL_DIS_ALL) || ((CTRL) == KeyScan_FIFO_OVR_CTRL_DIS_LAST))
 
+/** End of KEYSCAN_FIFO_Overflow_Control
+  * \}
+  */
+
 /**
- * \brief       Keyscan Manual Mode
- *
+ * \defgroup    KEYSCAN_Manual_Sel_Mode KEYSCAN Manual Sel Mode
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
 typedef enum
@@ -127,15 +176,54 @@ typedef enum
     KeyScan_Manual_Sel_Key = 0x01,
 } KEYSCANManualMode_TypeDef;
 
+/** End of KEYSCAN_Manual_Sel_Mode
+  * \}
+  */
+
+#if (KEYSCAN_SUPPORT_RAP_FUNCTION == 1)
 /**
- * \brief       Keyscan Key Limit
- *
+ * \defgroup    KEYSCAN_Qactive_Force KEYSCAN Qactive Force
+ * \{
+ * \ingroup     KEYSCAN_Exported_Constants
+ */
+typedef enum
+{
+    KEYSCAN_QACTIVE_FW_FORCE = 0x0,
+    KEYSCAN_QACTIVE_FW_FORCE_PCLK = 0x1,
+} KeyScanQactiveForce_TypeDef;
+
+/** End of KEYSCAN_Qactive_Force
+  * \}
+  */
+
+/**
+ * \defgroup    KEYSCAN_Task KEYSCAN Task
+ * \{
+ * \ingroup     KEYSCAN_Exported_Constants
+ */
+typedef enum
+{
+    KEYSCAN_TASK_MANUAL = 0,
+} KEYSCANTask_TypeDef;
+
+/** End of KEYSCAN_Task
+  * \}
+  */
+#endif
+
+/**
+ * \defgroup    KEYSCAN_Key_Limit KEYSCAN Key Limit
+ * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
 #define IS_KEYSCAN_KEY_LIMIT(DATA_NUM) ((DATA_NUM) <= KEYSCAN_FIFO_DEPTH) //0 means no limit
 
+/** End of KEYSCAN_Key_Limit
+  * \}
+  */
+
 /**
- * \defgroup    Keyscan_Interrupt Keyscan Interrupt
+ * \defgroup    KEYSCAN_Interrupt KEYSCAN Interrupt
  * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
@@ -146,12 +234,12 @@ typedef enum
 #define KEYSCAN_INT_ALL_RELEASE                  BIT0
 #define IS_KEYSCAN_CONFIG_IT(IT) ((((IT) & (uint32_t)0xFFF8) == 0x00) && ((IT) != 0x00))
 
-/** End of Keyscan_Interrupt
+/** End of KEYSCAN_Interrupt
   * \}
   */
 
 /**
- * \defgroup    Keyscan_Flag Keyscan Flag
+ * \defgroup    KEYSCAN_Flag KEYSCAN Flag
  * \{
  * \ingroup     KEYSCAN_Exported_Constants
  */
@@ -168,7 +256,7 @@ typedef enum
 #define IS_KEYSCAN_FLAG(FLAG)       ((((FLAG) & (uint32_t)0x01FF) == 0x00) && ((FLAG) != (uint32_t)0x00))
 #define IS_KEYSCAN_CLEAR_FLAG(FLAG) ((((FLAG) & (uint32_t)0x00C0) == 0x00) && ((FLAG) != (uint32_t)0x00))
 
-/** End of Keyscan_Flag
+/** End of KEYSCAN_Flag
   * \}
   */
 
@@ -185,22 +273,22 @@ typedef enum
   */
 
 /**
- * \brief       Keyscan initialize parameters
+ * \brief       KEYSCAN initialize parameters
  *
  * \ingroup     KEYSCAN_Exported_Types
  */
 typedef struct
 {
-    uint16_t rowSize;                               /*!< Specifies Keyscan Row Size.
+    uint16_t rowSize;                               /*!< Specifies KEYSCAN Row Size.
                                                          This parameter can be a value <=12. */
 
-    uint16_t colSize;                               /*!< Specifies Keyscan Column Size.
+    uint16_t colSize;                               /*!< Specifies KEYSCAN Column Size.
                                                          This parameter can be a value <=20. */
 
-    uint16_t clockdiv;                              /*!< Specifies Keyscan clock divider.
+    uint16_t clockdiv;                              /*!< Specifies KEYSCAN clock divider.
                                                          scan clock = system clock/(SCAN_DIV+1). */
 
-    uint8_t delayclk;                               /*!< Specifies Keyscan delay clock divider.
+    uint8_t delayclk;                               /*!< Specifies KEYSCAN delay clock divider.
                                                          delay clock = scan clock/(DELAY_DIV+1). */
 
     FunctionalState debounceEn;                     /*!< Enable or disable debounce. */
@@ -209,26 +297,33 @@ typedef struct
 
     FunctionalState detecttimerEn;                  /*!< Enable or disable detect timer. */
 
-    uint16_t debouncecnt;                            /*!< Specifies Keyscan Debounce time. */
+    uint16_t debouncecnt;                            /*!< Specifies KEYSCAN Debounce time. */
 
-    uint16_t scanInterval;                          /*!< Specifies Keyscan release time. */
+    uint16_t scanInterval;                          /*!< Specifies KEYSCAN release time. */
 
-    uint16_t releasecnt;                             /*!< Specifies Keyscan release time. */
+    uint16_t releasecnt;                             /*!< Specifies KEYSCAN release time. */
 
-    KEYSCANScanMode_TypeDef scanmode;               /*!< Specifies Keyscan mode. */
+    KEYSCANScanMode_TypeDef scanmode;               /*!< Specifies KEYSCAN mode. */
 
     KEYSCANPressDetectMode_TypeDef detectMode;      /*!< Specifies Key Detect mode. */
 
-    uint16_t fifotriggerlevel;                      /*!< Specifies Keyscan fifo threshold
+    uint16_t fifotriggerlevel;                      /*!< Specifies KEYSCAN fifo threshold
                                                          to trigger interrupt KEYSCAN_INT_THRESHOLD. */
 
     KEYSCANFifoOverflowControl_TypeDef
-    fifoOvrCtrl;                                    /*!< Specifies Keyscan fifo over flow control. */
+    fifoOvrCtrl;                                    /*!< Specifies KEYSCAN fifo over flow control. */
 
     uint8_t keylimit;                               /*!< Specifies max scan data allowable in each scan. */
 
     KEYSCANManualMode_TypeDef
     manual_sel;                /*!< Specifies trigger mode in manual mode. */
+
+#if KEYSCAN_SUPPORT_ROW_LEVEL_CONFIGURE
+    FunctionalState rowpullhighEn;
+#endif
+#if KEYSCAN_SUPPORT_COLUNM_LEVEL_CONFIGURE
+    FunctionalState colunmoutputhighEn;
+#endif
 } KEYSCAN_InitTypeDef;
 
 /** End of KEYSCAN_Exported_Types
@@ -244,7 +339,7 @@ typedef struct
   */
 
 /**
- * \brief  Deinitializes the Keyscan peripheral registers to their default reset values(turn off keyscan clock).
+ * \brief  Deinitializes the KEYSCAN peripheral registers to their default reset values(turn off keyscan clock).
  *
  * \param[in]  KeyScan: Selected KeyScan peripheral.
  *
@@ -298,7 +393,7 @@ void KeyScan_DeInit(KEYSCAN_TypeDef *KeyScan);
 void KeyScan_Init(KEYSCAN_TypeDef *KeyScan, KEYSCAN_InitTypeDef *KeyScan_InitStruct);
 
 /**
- * \brief  Fills each Keyscan_InitStruct member with its default value.
+ * \brief  Fills each KEYSCAN_InitStruct member with its default value.
  *
  * \param[in]  KeyScan_InitStruct: Pointer to a KEYSCAN_InitTypeDef structure which will be initialized.
  *
@@ -331,7 +426,7 @@ void KeyScan_Init(KEYSCAN_TypeDef *KeyScan, KEYSCAN_InitTypeDef *KeyScan_InitStr
 void KeyScan_StructInit(KEYSCAN_InitTypeDef *KeyScan_InitStruct);
 
 /**
- * \brief  Enables or disables the specified KeyScan interrupt.
+ * \brief  Enable or disable the specified KeyScan interrupt.
  *
  * \param[in] KeyScan: Selected KeyScan peripheral.
  * \param[in] KeyScan_IT: Specifies the KeyScan interrupts sources to be enabled or disabled.
@@ -457,7 +552,7 @@ void KeyScan_FilterDataConfig(KEYSCAN_TypeDef *KeyScan, uint16_t data,
  * \brief   KeyScan debounce time config.
  *
  * \param[in] KeyScan: selected KeyScan peripheral.
- * \param[in] time: Keyscan hardware debounce time.
+ * \param[in] time: KEYSCAN hardware debounce time.
  * \param[in] NewState: New state of the KeyScan debounce function.
  *            This parameter can be: ENABLE or DISABLE.
  *
@@ -580,7 +675,7 @@ FlagStatus KeyScan_GetFlagState(KEYSCAN_TypeDef *KeyScan, uint32_t KeyScan_FLAG)
  *
  * \param[in] KeyScan: Selected KeyScan peripheral.
  *
- * \return Keyscan FIFO data.
+ * \return KEYSCAN FIFO data.
  *
  * <b>Example usage</b>
  * \code{.c}
@@ -592,6 +687,17 @@ FlagStatus KeyScan_GetFlagState(KEYSCAN_TypeDef *KeyScan, uint32_t KeyScan_FLAG)
  * \endcode
  */
 uint16_t KeyScan_ReadFifoData(KEYSCAN_TypeDef *KeyScan);
+
+
+#if (KEYSCAN_SUPPORT_RAP_FUNCTION == 1)
+
+void KeyScan_RAPModeCmd(KEYSCAN_TypeDef *KeyScan, FunctionalState NewState);
+
+void KEYSCAN_TaskTrigger(KEYSCAN_TypeDef *KeyScan, uint32_t Task);
+
+void KeyScan_RAPQactiveCtrl(KEYSCAN_TypeDef *KeyScan, uint32_t Qactive, FunctionalState NewState);
+
+#endif
 
 /** End of KEYSCAN_Exported_Functions
   * \}
@@ -608,4 +714,4 @@ uint16_t KeyScan_ReadFifoData(KEYSCAN_TypeDef *KeyScan);
 #endif /* RTL_KEYSCAN_H */
 
 
-/******************* (C) COPYRIGHT 2023 Realtek Semiconductor *****END OF FILE****/
+/******************* (C) COPYRIGHT 2024 Realtek Semiconductor *****END OF FILE****/

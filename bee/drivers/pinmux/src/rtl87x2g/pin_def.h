@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     pin_def.h
+* \brief    The header file of all the peripheral driver.
+* \details  This file provides all firmware functions.
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -14,7 +21,7 @@
 extern "C" {
 #endif
 
-/** \defgroup RTL87X2G_PIN_DEFINE       PIN_DEFINE
+/** \defgroup PIN_DEFINE       PIN DEFINE
   * \brief
   * \{
   */
@@ -123,17 +130,6 @@ extern "C" {
 #define P10_1       81      /*!< GPIOB_30 */
 #define P10_2       82      /*!< GPIOB_31 */
 
-//#define DAC1_P      100
-//#define MIC3_N      101
-//#define SPIC0_CSN   61
-//#define SPIC0_CLK   62
-//#define SPIC0_SIO0  63
-//#define SPIC0_SIO1  64
-//#define SPIC0_SIO2  65
-//#define SPIC0_SIO3  66
-
-//#define BOOT_SEL_PAD 186
-
 #define ADC_0       P2_0    /*!< GPIO16   */
 #define ADC_1       P2_1    /*!< GPIO17   */
 #define ADC_2       P2_2    /*!< GPIO18   */
@@ -143,8 +139,8 @@ extern "C" {
 #define ADC_6       P2_6    /*!< GPIO22   */
 #define ADC_7       P2_7    /*!< GPIO23   */
 
-#define TOTAL_PIN_NUM       185
-#define MAX_PIN_NUM         186
+#define TOTAL_PIN_NUM         (83)
+#define IS_PIN_NUMBER(NUMBER) ((NUMBER) < TOTAL_PIN_NUM)
 
 /** End of Pin_Number
   * \}

@@ -1,14 +1,20 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_pinmux.c
+* \brief    This file provides all the PINMUX firmware functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0.0
+*********************************************************************************************************
+*/
+
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "rtl_rcc.h"
 #include "rtl_pinmux.h"
-#include "rtl_aon_reg.h"
 
 /*============================================================================*
  *                           Private Functions
@@ -51,7 +57,8 @@ static void pad_aon_write(uint32_t reg_addr, uint32_t reg_value)
 #define DEBIO_WAKEUP                (BIT14)
 #define DEBIO_WAKEUP_STS            (BIT15)
 
-#define MAX_PIN_ADDR_NUM            (MAX_PIN_NUM/2+1)//pad num:42
+#define MAX_PIN_ADDR_NUM            ((TOTAL_PIN_NUM / 2) + ((TOTAL_PIN_NUM % 2) != 0)) /* pad Register number: 42 */
+#define MAX_PIN_REG_NUM             ((TOTAL_PIN_NUM / 4) + ((TOTAL_PIN_NUM % 4) != 0)) /* pinmux Register number: 21 */
 
 #define PAD_DEBOUNCE_WKUP_STS       0x40001AACUL
 #define PAD_HS_MUX_SEL              (*((volatile uint32_t *)0x40002560UL))
@@ -108,7 +115,7 @@ void Pinmux_Deinit(uint8_t Pin_Num)
 {
     uint8_t pinmux_reg_num;
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -130,7 +137,7 @@ void Pinmux_Config(uint8_t Pin_Num, uint8_t Pin_Func)
     uint8_t pinmux_reg_num;
     uint8_t reg_offset;
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -174,7 +181,7 @@ void Pinmux_AON_Config(uint16_t Pin_Func)
   */
 void Pinmux_HS_Config(uint32_t Pin_Func)
 {
-    if (Pin_Func < (uint32_t)SDHC_HS)
+    if (Pin_Func < (uint32_t)SDHC_HS_MUX)
     {
         PAD_HS_MUX_SEL &= ~0xF;
         PAD_HS_MUX_SEL |= Pin_Func;
@@ -226,7 +233,7 @@ void Pad_Config(uint8_t                 Pin_Num,
     uint32_t reg_value;
     bool P40_gate_offset = 0;
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -375,7 +382,7 @@ void Pad_Dedicated_Config(uint8_t Pin_Num, FunctionalState Status)
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
     uint32_t reg_value = 0;
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -580,7 +587,7 @@ void Pad_SetDrivingCurrent(uint8_t Pin_Num, PADDrivingCurrent_TypeDef PAD_Drivin
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -595,34 +602,38 @@ void Pad_SetDrivingCurrent(uint8_t Pin_Num, PADDrivingCurrent_TypeDef PAD_Drivin
         reg_addr = PAD_REG_BASE + PINADDR_TABLE[(Pin_Num + 1) / 2];
     }
 
+    uint8_t driver_current_e2 = 0;
+    uint8_t driver_current_e3 = 0;
+    if (PAD_Driving_Current == PAD_DRIVING_CURRENT_4mA)
+    {
+        driver_current_e2 = 0;
+        driver_current_e3 = 0;
+    }
+    else if (PAD_Driving_Current == PAD_DRIVING_CURRENT_8mA)
+    {
+        driver_current_e2 = 1;
+        driver_current_e3 = 0;
+    }
+    else if (PAD_Driving_Current == PAD_DRIVING_CURRENT_12mA)
+    {
+        driver_current_e2 = 0;
+        driver_current_e3 = 1;
+    }
+    else if (PAD_Driving_Current == PAD_DRIVING_CURRENT_16mA)
+    {
+        driver_current_e2 = 1;
+        driver_current_e3 = 1;
+    }
+
+    /* Set driving current E2 */
     reg_value = pad_aon_read(reg_addr);
-
-    if (PAD_Driving_Current == PAD_DRIVING_CURRENT_8mA)
-    {
-        if (reg_value_high_low) //1
-        {
-            reg_value &= ~(Driving_Current << 16);
-            reg_value |= Driving_Current << 16;
-        }
-        else
-        {
-            reg_value &= ~Driving_Current;
-            reg_value |= Driving_Current;
-        }
-    }
-    else
-    {
-        if (reg_value_high_low) //1
-        {
-            reg_value &= ~(Driving_Current << 16);
-        }
-        else
-        {
-            reg_value &= ~Driving_Current;
-        }
-    }
-
+    reg_value = driver_current_e2 ?
+                (reg_value | (Driving_Current << (16 * reg_value_high_low))) :
+                (reg_value & ~(Driving_Current << (16 * reg_value_high_low)));
     pad_aon_write(reg_addr, reg_value);
+
+    /* Set driving current E3 */
+    pad_aon_write(PAD_REG_BASE + 0xC8, driver_current_e3);
 }
 
 /**
@@ -640,7 +651,7 @@ void Pad_SetControlMode(uint8_t Pin_Num, PADMode_TypeDef PAD_Mode)
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -686,7 +697,7 @@ void Pad_OutputCmd(uint8_t Pin_Num, PADOutputMode_TypeDef Status)
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -746,7 +757,7 @@ void Pad_SetOutputLevel(uint8_t Pin_Num, uint8_t value)
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -806,7 +817,7 @@ void Pad_PullCmd(uint8_t Pin_Num, FunctionalState Status)
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -867,7 +878,7 @@ void Pad_SetPullMode(uint8_t Pin_Num, PADPullMode_TypeDef PAD_Pull_Mode)
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
     uint32_t reg_value = 0;
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -928,7 +939,7 @@ void Pad_SetPullStrength(uint8_t Pin_Num, PADPullStrengthMode_TypeDef PAD_Pull_S
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -988,7 +999,7 @@ void Pad_PowerCmd(uint8_t Pin_Num, PADPowerMode_TypeDef PWR_Mode)
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -1047,7 +1058,7 @@ static void Pad_WakeupConfig(uint8_t Pin_Num, PADWakeupCmd_TypeDef Status)
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -1105,7 +1116,7 @@ static void Pad_SetWakeupPolarity(uint8_t Pin_Num, PADWakeupPolarity_TypeDef Wak
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -1162,7 +1173,7 @@ static void Pad_WakeupDebounceCmd(uint8_t Pin_Num, PADWakeupDebCmd_TypeDef Statu
     uint32_t reg_value_high_low = Pin_Num % 2;
     uint32_t reg_addr = PAD_REG_BASE + PINADDR_TABLE[Pin_Num / 2];
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }
@@ -1219,7 +1230,7 @@ static uint8_t Pad_GetWakeupINTStatus(uint8_t Pin_Num)
     uint32_t num_temp = 0;
     uint32_t order_temp = 0;
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return 0xFF;
     }
@@ -1273,7 +1284,7 @@ static uint8_t Pad_GetWakeupINTStatus(uint8_t Pin_Num)
 }
 
 /**
- * \brief  Clear the interrupt pendign bit of the specified pin
+ * \brief  Clear the interrupt pending bit of the specified pin
  * \param  Pin_Num: Pin number to be configured. \ref Pin_Number.
  * \return None.
  */
@@ -1283,7 +1294,7 @@ void Pad_ClearWakeupINTPendingBit(uint8_t Pin_Num)
     uint32_t num_temp = 0;
     uint32_t order_temp = 0;
 
-    if (Pin_Num >= MAX_PIN_NUM)
+    if (!IS_PIN_NUMBER(Pin_Num))
     {
         return;
     }

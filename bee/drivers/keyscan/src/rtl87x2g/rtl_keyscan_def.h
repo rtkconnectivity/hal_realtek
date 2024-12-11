@@ -1,8 +1,14 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+* \file    rtl_keyscan_def.h
+* \brief   KEYSCAN related definitions for RTL87x2G.
+* \author
+* \date    2023-11-16
+* \version v1.0
+* *************************************************************************************
+*/
 
 #ifndef RTL_KEYSCAN_DEF_H
 #define RTL_KEYSCAN_DEF_H
@@ -13,6 +19,39 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+/*============================================================================*
+ *                         KEYSCAN Defines
+ *============================================================================*/
+/** \defgroup KEYSCAN         KEYSCAN
+  * \brief
+  * \{
+  */
+
+/** \defgroup KEYSCAN_Exported_Constants KEYSCAN Exported Constants
+  * \brief
+  * \{
+  */
+
+/**
+ * \defgroup KEYSCAN_Defines KEYSCAN Defines
+ * \{
+ * \ingroup  KEYSCAN_Exported_Constants
+ */
+#define KEYSCAN_SUPPORT_COLUNM_LEVEL_CONFIGURE (0)
+#define KEYSCAN_SUPPORT_ROW_LEVEL_CONFIGURE    (1)
+#define KEYSCAN_SUPPORT_RAP_FUNCTION           (0)
+
+/** End of KEYSCAN_Defines
+  * \}
+  */
+
+/** End of KEYSCAN_Exported_Constants
+  * \}
+  */
+
+/** End of KEYSCAN
+  * \}
+  */
 
 /*============================================================================*
  *                         KEYSCAN Registers Memory Map
@@ -36,7 +75,9 @@ typedef struct
 /*============================================================================*
  *                         KEYSCAN Declaration
  *============================================================================*/
-#define KEYSCAN            ((KEYSCAN_TypeDef *) KEYSCAN_REG_BASE)
+#define KEYSCAN                     ((KEYSCAN_TypeDef *) KEYSCAN_REG_BASE)
+
+#define IS_KeyScan_PERIPH(PERIPH)   ((PERIPH) == KEYSCAN)
 
 /*============================================================================*
  *                         KEYSCAN Private Types
@@ -81,7 +122,7 @@ typedef union
         17:9    R/W    keyscan_interval_timer_cnt          9'h10
         26:18   R/W    keyscan_deb_timer_cnt               9'h10
         27      R      reserved_dummy04_27                 1'h0
-        28      R/W    keyscan_push_high_en                1'h1
+        28      R/W    keyscan_row_pull_high_en            1'h1
         29      R/W    keyscan_release_timer_en            1'h0
         30      R/W    keyscan_interval_timer_en           1'h1
         31      R/W    keyscan_deb_timer_en                1'h1
@@ -96,7 +137,7 @@ typedef union
                 uint32_t keyscan_interval_timer_cnt: 9;
                 uint32_t keyscan_deb_timer_cnt: 9;
                 const uint32_t reserved_0: 1;
-                uint32_t keyscan_push_high_en: 1;
+                uint32_t keyscan_row_pull_high_en: 1;
                 uint32_t keyscan_release_timer_en: 1;
                 uint32_t keyscan_interval_timer_en: 1;
                 uint32_t keyscan_deb_timer_en: 1;

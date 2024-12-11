@@ -1,14 +1,22 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_adc_def.h
+* \brief    ADC related definitions for RTL87x2G
+* \details
+* \author
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_ADC_DEF_H
 #define RTL_ADC_DEF_H
 
 #include "utils/rtl_utils.h"
 #include "address_map.h"
+#include "aon_reg.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -17,6 +25,11 @@ extern "C" {
 /*============================================================================*
  *                         ADC Defines
  *============================================================================*/
+/** \defgroup ADC         ADC
+  * \brief
+  * \{
+  */
+
 /** \defgroup ADC_Exported_Constants ADC Exported Constants
   * \brief
   * \{
@@ -34,6 +47,7 @@ extern "C" {
 #define ADC_SUPPORT_INT_FIFO_FULL                      (0)
 #define ADC_SUPPORT_VADPIN_MODE                        (0)
 #define ADC_SUPPORT_POWER_OFF                          (1)
+#define ADC_SUPPORT_POWER_ON_DELAY                     (1)
 
 /** End of ADC_Defines
   * \}
@@ -43,6 +57,9 @@ extern "C" {
   * \}
   */
 
+/** End of ADC
+  * \}
+  */
 /*============================================================================*
  *                         ADC Registers Memory Map
  *============================================================================*/
@@ -94,8 +111,8 @@ typedef struct
 /*============================================================================*
  *                         ADC Declaration
  *============================================================================*/
-#define ADC                ((ADC_TypeDef *) SAR_ADC_REG_BASE)
-
+#define ADC                     ((ADC_TypeDef *) SAR_ADC_REG_BASE)
+#define IS_ADC_PERIPH(PERIPH)   ((PERIPH) == ADC)
 /*============================================================================*
  *                         ADC Private Types
  *============================================================================*/
@@ -272,9 +289,9 @@ typedef union
 
 
     /* 0x50
-        1:0     R/W    adc_rg0x_auxadc_0_delay_sel     2'h0
-        3:2     R/W    adc_rg0x_auxadc_1_delay_sel     2'h0
-        5:4     R/W    adc_rg2x_auxadc_0_delay_sel     2'h0
+        1:0     R/W    adc_reg0x_aux_v09_1_delay_sel   2'h0
+        3:2     R/W    adc_reg0x_ldo_2_delay_sel       2'h0
+        5:4     R/W    adc_reg0x_ldo_1_delay_sel       2'h0
         8:6     R/W    adc_data_delay                  3'h1
         9       R      reserved_dummy50_9              1'h0
         14:10   R/W    adc_poweron_select              5'h0
@@ -295,9 +312,9 @@ typedef union
             uint8_t d8[4];
             struct
             {
-                uint32_t adc_rg0x_auxadc_0_delay_sel: 2;
-                uint32_t adc_rg0x_auxadc_1_delay_sel: 2;
-                uint32_t adc_rg2x_auxadc_0_delay_sel: 2;
+                uint32_t adc_reg0x_aux_v09_1_delay_sel: 2;
+                uint32_t adc_reg0x_ldo_2_delay_sel: 2;
+                uint32_t adc_reg0x_ldo_1_delay_sel: 2;
                 uint32_t adc_data_delay: 3;
                 const uint32_t reserved_5: 1;
                 uint32_t adc_poweron_select: 5;
@@ -363,6 +380,53 @@ typedef union
                 uint32_t adc_convert_time_period_sel: 2;
             } b;
         } ADC_TIME_PERIOD_TypeDef;
+
+
+    /*============================================================================*
+     *                          ADC MODE Wrappers
+     *============================================================================*/
+    /** \defgroup ADC        ADC
+      * \brief
+      * \{
+      */
+
+    /** \defgroup ADC_Exported_Constants ADC Exported Constants
+      * \brief
+      * \{
+      */
+
+    /**
+     * \defgroup ADC_Constant_Wrapper ADC Constant Wrapper
+     * \{
+     * \ingroup  ADC_Exported_Constants
+     */
+#define ADC_MODE_SINGLE_ENDED_VALUE     0x0
+#define ADC_MODE_DIFFERENTIAL_VALUE     0x1
+#define ADC_MODE_INTERNAL_VALUE         0x2
+#define ADC_MODE_RESERVED_VALUE         0x3
+
+    /** End of ADC_Constant_Wrapper
+      * \}
+      */
+
+    /**
+     * \defgroup ADC_Function_Wrapper ADC Function Wrapper
+     * \{
+     * \ingroup  ADC_Exported_Constants
+     */
+#define ADC_SchTableConfig(ADCx, Index, AdcMode) ADC_SchIndexConfig(ADCx, AdcMode, Index)
+
+    /** End of ADC_Function_Wrapper
+      * \}
+      */
+
+    /** End of ADC_Exported_Constants
+      * \}
+      */
+
+    /** End of ADC
+      * \}
+      */
 
 #ifdef  __cplusplus
 }
