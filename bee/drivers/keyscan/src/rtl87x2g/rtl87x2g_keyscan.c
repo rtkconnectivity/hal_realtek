@@ -1,14 +1,22 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_keyscan.c
+* \brief    This file provides all the KEYSCAN firmware internal functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_keyscan.h"
 #include "rtl_rcc.h"
+#include "app_section.h"
 
 /*============================================================================*
  *                           Public Functions
@@ -19,6 +27,7 @@
   * \param  StoreBuf: Store buffer to store KEYSCAN register data.
   * \return None.
   */
+RAM_FUNCTION
 void KEYSCAN_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     KEYSCANStoreReg_Typedef *store_buf = (KEYSCANStoreReg_Typedef *)StoreBuf;
@@ -41,6 +50,7 @@ void KEYSCAN_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore KEYSCAN register data.
   * \return None
   */
+RAM_FUNCTION
 void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     KEYSCANStoreReg_Typedef *store_buf = (KEYSCANStoreReg_Typedef *)StoreBuf;

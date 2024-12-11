@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_aon_qdec_def.h
+* \brief    AON QDEC Registers Structures Section
+* \details
+* \author   grace yan
+* \date     2023-02-20
+* \version  v1.1
+* *********************************************************************************************************
+*/
 #ifndef RTL_AON_QDEC_DEF_H
 #define RTL_AON_QDEC_DEF_H
 
@@ -26,7 +33,9 @@ typedef struct
 /*============================================================================*
  *                         AON QDEC Declaration
  *============================================================================*/
-#define AON_QDEC           ((AON_QDEC_TypeDef *)  QUAD_DECODER_REG_BASE)
+#define AON_QDEC                    ((AON_QDEC_TypeDef *)  QUAD_DECODER_REG_BASE)
+
+#define IS_AON_QDEC_PERIPH(PERIPH)  ((PERIPH) == AON_QDEC)
 
 /*============================================================================*
  *                         AON QDEC Registers and Field Descriptions

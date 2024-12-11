@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file      rtl_wdt.h
+* \brief     header file of watch dog timer driver.
+* \details
+* \author    renee
+* \date      2023-11-16
+* \version   v1.0
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,16 +24,18 @@ extern "C" {
 /*============================================================================*
  *                               Header Files
 *============================================================================*/
-#include <stdbool.h>
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "wdt/src/rtl87x2g/rtl_wdt_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "wdt/src/rtl87x3e/rtl_wdt_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "wdt/src/rtl8763d/rtl_wdt_def.h"
+#include "wdt/src/rtl87x3d/rtl_wdt_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "wdt/src/rtl87x2j/rtl_wdt_def.h"
 #endif
 
-/** \defgroup 87X2G_WDT         WDT
+/** \defgroup WDT         WDT
   * \brief
   * \{
   */
@@ -46,17 +55,15 @@ extern "C" {
   */
 typedef enum
 {
-#if (WDT_SUPPORT_RESET_CORE_DOMAIN == 1)
-    INTERRUPT_CPU = 0,            /**< Interrupt CPU. */
-    RESET_CORE_DOMAIN = 1,        /**< Reset core domain. */
-    RESET_ALL_EXCEPT_AON = 2,    /**< Reset all except RTC and some AON register. */
-    RESET_ALL = 3                /**< Reset all. */
-#else
     RESET_ALL = 0,               /**< Reset all. */
     RESET_ALL_EXCEPT_AON = 1,    /**< Reset all except RTC and some AON register. */
     INTERRUPT_CPU = 2,           /**< Interrupt CPU. */
-#endif
+    WDT_MODE_NUM = 3,            /**< Interrupt CPU. */
 } WDTMode_TypeDef;
+
+#define IS_WDT_Mode(MODE) (((MODE) == RESET_ALL) || \
+                           ((MODE) == RESET_ALL_EXCEPT_AON) || \
+                           ((MODE) == INTERRUPT_CPU))
 
 /** End of group WDT_Exported_Types
   * \}
@@ -76,6 +83,12 @@ typedef enum
   * \return true or false.
   */
 bool WDT_Start(uint32_t TimeMs, WDTMode_TypeDef Mode);
+
+/**
+  * \brief  Enable WDT.
+  * \return None.
+  */
+void WDT_Enable(void);
 
 /**
   * \brief  Disable WDT.

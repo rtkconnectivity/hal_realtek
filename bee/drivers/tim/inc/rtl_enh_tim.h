@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_enh_tim.h
+* \brief    The header file of the peripheral Enhance ENHTIMER driver.
+* \details  This file provides all Enhance ENHTIMER firmware functions.
+* \author   Grace_yan
+* \date     2023-10-17
+* \version  v1.0
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,12 +24,13 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "tim/src/rtl87x2g/rtl_enhtim_def.h"
 #include "pinmux/src/rtl87x2g/pin_def.h"
 #endif
 
-/** \defgroup 87X2G_ENHTIM      ENHTIM
+/** \defgroup ENHTIM      ENHTIM
   * \brief
   * \{
   */
@@ -35,27 +43,9 @@ extern "C" {
   * \{
   */
 
-#if (CHIP_ENHTIM_CHANNEL_NUM == 4)
-#define IS_ENHTIM_ALL_PERIPH(PERIPH) (((PERIPH) == ENH_ENHTIM0) || \
-                                      ((PERIPH) == ENH_ENHTIM1)|| \
-                                      ((PERIPH) == ENH_ENHTIM2)|| \
-                                      ((PERIPH) == ENH_ENHTIM3))
-#endif
-
-#if (CHIP_ENHTIM_CHANNEL_NUM > 4)
-#define IS_ENHTIM_ALL_PERIPH(PERIPH) (((PERIPH) == ENH_ENHTIM0) || \
-                                      ((PERIPH) == ENH_ENHTIM1)|| \
-                                      ((PERIPH) == ENH_ENHTIM2)|| \
-                                      ((PERIPH) == ENH_ENHTIM3)|| \
-                                      ((PERIPH) == ENH_ENHTIM4)|| \
-                                      ((PERIPH) == ENH_ENHTIM5)|| \
-                                      ((PERIPH) == ENH_ENHTIM6)|| \
-                                      ((PERIPH) == ENH_ENHTIM7))
-#endif
-
 /**
- * \brief       ENHTIM Clock Divider
- *
+ * \defgroup    ENHTIM_Clock_Divider ENHTIM Clock Divider
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -79,9 +69,13 @@ typedef enum
                                     ((div) == ENHTIM_CLOCK_DIVIDER_40)|| \
                                     ((div) == ENHTIM_CLOCK_DIVIDER_64))
 
+/** End of ENHTIM_Clock_Divider
+  * \}
+  */
+
 /**
- * \brief       ENHTIM Latch Channel Count
- *
+ * \defgroup    ENHTIM_Latch_Channel_Count ENHTIM Latch Channel Count
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -104,9 +98,13 @@ typedef enum
 #define IS_ENHTIM_LATCH_CNT(cnt) ((cnt) == LATCH_CNT_0 || (cnt) == LATCH_CNT_1 || (cnt) == LATCH_CNT_2)
 #endif
 
+/** End of ENHTIM_Latch_Channel_Count
+  * \}
+  */
+
 /**
- * \brief       ENHTIM DMA Control Mode
- *
+ * \defgroup    ENHTIM_DMA_Control_Mode ENHTIM DMA Control Mode
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -118,9 +116,13 @@ typedef enum
 #define IS_ENHTIM_DMA_CTRL_MODE (mode) (((mode) == ENHTIM_DMAC_FLOW_CONTROL) || \
                                         ((mode) == ENHTIM_FLOW_CONTROL))
 
+/** End of ENHTIM_DMA_Control_Mode
+  * \}
+  */
+
 /**
- * \brief       ENHTIM DMA TARGET
- *
+ * \defgroup    ENHTIM_DMA_Target ENHTIM DMA Target
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -132,9 +134,13 @@ typedef enum
 #define IS_ENHTIM_DMA_TARGET(mode) (((mode) == ENHTIM_DMA_CCR_FIFO) || \
                                     ((mode) == ENHTIM_DMA_LC_FIFO))
 
+/** End of ENHTIM_DMA_Target
+  * \}
+  */
+
 /**
- * \brief       ENHTIM Latch Trigger Mode
- *
+ * \defgroup    ENHTIM_Latch_Trigger_Mode ENHTIM Latch Trigger Mode
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -148,9 +154,13 @@ typedef enum
                                          ((mode) == ENHTIM_LATCH_TRIGGER_FALLING_EDGE) || \
                                          ((mode) == ENHTIM_LATCH_TRIGGER_RISING_EDGE))
 
+/** End of ENHTIM_Latch_Trigger_Mode
+  * \}
+  */
+
 /**
- * \brief       ENHTIM Mode
- *
+ * \defgroup    ENHTIM_Mode ENHTIM Mode
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -164,9 +174,13 @@ typedef enum
                               ((mode) == ENHTIM_MODE_PWM_AUTO) || \
                               ((mode) == ENHTIM_MODE_UserDefine))
 
+/** End of ENHTIM_Mode
+  * \}
+  */
+
 /**
- * \brief       ENHTIM PWM Polarity
- *
+ * \defgroup    ENHTIM_PWM_Polarity ENHTIM PWM Polarity
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -178,9 +192,13 @@ typedef enum
 #define IS_ENHTIM_PWM_POLARITY(Pol) (((Pol) == ENHTIM_PWM_START_WITH_HIGH) || \
                                      ((Pol) == ENHTIM_PWM_START_WITH_LOW))
 
+/** End of ENHTIM_PWM_Polarity
+  * \}
+  */
+
 /**
- * \brief       ENHTIM PWM DeadZone Clock Source
- *
+ * \defgroup    ENHTIM_PWM_DeadZone_Clock_Source ENHTIM PWM DeadZone Clock Source
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -192,9 +210,13 @@ typedef enum
 #define IS_ENHTIM_PWM_DeadZone_Clock_Source(src) (((src) == ENHTIM_PWM_DZCLKSRCE_ENHTIM) || \
                                                   ((src) == ENHTIM_PWM_DZCLKSRCE_32K))
 
+/** End of ENHTIM_PWM_DeadZone_Clock_Source
+  * \}
+  */
+
 /**
- * \brief       ENHTIM PWM DeadZone Stop State
- *
+ * \defgroup    ENHPWM_DeadZone_Stop_State ENHPWM DeadZone Stop State
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
 typedef enum
@@ -203,13 +225,16 @@ typedef enum
     ENHTIM_PWM_STOP_AT_HIGH = 0x1,
 } ENHTIMPWMDZStopState_TypeDef;
 
+/** End of ENHPWM_DeadZone_Stop_State
+  * \}
+  */
+
 #if ENHTIM_SUPPORT_PWM_SRC_SELECT
 /**
- * \brief       ENHTIM PWM reference selection
- *
+ * \defgroup    ENHPWM_Reference_Selection ENHPWM Reference Selection
+ * \{
  * \ingroup     ENHTIM_Exported_Constants
  */
-
 typedef enum
 {
     ENHTIM_DZ_REF_PWMPN = 0x0,
@@ -217,6 +242,10 @@ typedef enum
     ENHTIM_DZ_REF_PWMPP = 0x2,
     ENHTIM_DZ_REF_PWMNP = 0x3,
 } ENHTIMPWMDZRef_TypeDef;
+
+/** End of ENHPWM_Reference_Selection
+  * \}
+  */
 #endif
 
 /**
@@ -229,13 +258,13 @@ typedef enum
 #define ENHTIM_INT_LATCH_CNT_FIFO_THD             (0x42)
 #define ENHTIM_INT_LATCH_CNT_FIFO_EMPTY           (0x01) /*!< Empty interrupt flag bit but no interrupt. */
 
-/** End of ENHTIM_Interrupts
-  * \}
-  */
-
 #define IS_ENHTIM_INT(INT) (((INT) == ENHTIM_INT_TIM) || \
                             ((INT) == ENHTIM_INT_LATCH_CNT_FIFO_FULL) || \
                             ((INT) == ENHTIM_INT_LATCH_CNT_FIFO_THD))
+
+/** End of ENHTIM_Interrupts
+  * \}
+  */
 
 /**
  * \defgroup    ENHTIM_Flag ENHTIM Flag
@@ -247,15 +276,14 @@ typedef enum
 #define ENHTIM_FLAG_LC_FIFO_EMPTY         1
 #define ENHTIM_FLAG_LC_FIFO_FULL          0
 
-/** End of ENHTIM_Flag
-  * \}
-  */
-
 #define IS_ENHTIM_FLAG(flag) (((flag) == ENHTIM_FLAG_CCR_FIFO_FULL) || \
                               ((flag) == ENHTIM_FLAG_CCR_FIFO_EMPTY)|| \
                               ((flag) == ENHTIM_FLAG_LC_FIFO_FULL)  || \
                               ((flag) == ENHTIM_FLAG_LC_FIFO_EMPTY) ))
 
+/** End of ENHTIM_Flag
+  * \}
+  */
 
 /**
  * \defgroup    ENHTIM_FIFO_Clear_Flag ENHTIM FIFO Clear Flag
@@ -322,6 +350,9 @@ typedef struct
     FunctionalState ENHTIM_DmaEn;              /*!< Specifies enable Enhtimer DMA.
                                                     This parameter can be a value of DISABLE or ENABLE. */
     ENHTIMDmaTarget_TypeDef ENHTIM_DmaTragget; /*!< Specifies Enhtimer DMA target. */
+#if ENHTIM_SUPPORT_ONESHOT_CMD
+    FunctionalState ENHTIM_OneShotEn;          /*!< Specifies the one shot mode. */
+#endif
 } ENHTIM_InitTypeDef;
 
 /** End of ENHTIM_Exported_Types
@@ -390,7 +421,7 @@ void ENHTIM_Init(ENHTIM_TypeDef *ENHTIMx, ENHTIM_InitTypeDef *ENHTIM_TimeBaseIni
  */
 void ENHTIM_StructInit(ENHTIM_InitTypeDef *ENHTIM_InitStruct);
 /**
- * \brief     Enables or disables the specified ENHTIM peripheral.
+ * \brief     Enable or disable the specified ENHTIM peripheral.
  *
  * \param[in] ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
  * \param[in] NewState: New state of the ENHTIMx peripheral.
@@ -418,7 +449,7 @@ void ENHTIM_StructInit(ENHTIM_InitTypeDef *ENHTIM_InitStruct);
  */
 void ENHTIM_Cmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState);
 /**
- * \brief     Enables or disables ENHTIMx interrupt.
+ * \brief     Enable or disable ENHTIMx interrupt.
  *
  * \param[in] ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
  * \param[in] ENHTIM_INT: Specifies the ENHTIMx interrupt source which to be enabled or disabled.
@@ -449,22 +480,6 @@ void ENHTIM_Cmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState);
  *     ENHTIM_INTConfig(ENH_TIM0, ENABLE);
  */
 void ENHTIM_INTConfig(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT, FunctionalState NewState);
-/**
- * \brief     Get ENHTIMx current value when timer is running.
- *
- * \param[in] ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
- *
- * \return    The counter value.
- *
- * <b>Example usage</b>
- * \code{.c}
- *
- * void enhance_timer_demo(void)
- * {
- *     uint32_t cur_value = ENHTIM_GetCurrentValue(ENH_TIM0);
- * }
- * \endcode
- */
 
 /**
  * \brief     Read ENHTIMx latch counter fifo data.
@@ -844,7 +859,7 @@ uint32_t ENHTIM_GetAllINTStatus(void);
 
 #if ENHTIM_SUPPORT_ONESHOT_CMD
 /**
- * \brief  Enables or disables the specified ENHTIM peripheral.
+ * \brief  Enable or disable the specified ENHTIM peripheral.
  *
  * \param[in]  ENHTIMx: Where x can be 0 to 3 to select the ENHTIMx peripheral.
  * \param[in]  NewState: New state of the ENHTIMx peripheral.
@@ -906,6 +921,32 @@ ITStatus ENHTIM_GetLCFIFOStatus(ENHTIM_TypeDef *ENHTIMx);
  */
 void ENHTIM_PWMChangeFreqAndDuty(ENHTIM_TypeDef *ENHTIMx, uint16_t enhtim_mode, uint32_t max_count,
                                  uint32_t high_count);
+
+#if ENHTIM_SUPPORT_CLOCK_SOURCE_CONFIG
+/**
+ * \brief  ENHTIM clock config.
+ *
+ * \param[in]  ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
+ * \param[in]  ClockSrc: specifies the PLL clock source.  \ref ENHTIM_Clock_Source
+ * \param[in]  ClockDiv: specifies the APB peripheral to gates its clock.  \ref ENHTIM_Clock_Divider
+ *
+ * \return None
+ */
+void ENHTIM_ClkConfig(ENHTIM_TypeDef *ENHTIMx, ENHTIMClkSrc_TypdDef ClockSrc,
+                      ENHTIMClkDiv_TypeDef ClockDiv);
+
+/**
+ * \brief  Get ENHTIM clock config.
+ *
+ * \param[in]  ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
+ * \param[out]  ClockSrc: specifies the PLL clock source. \ref ENHTIM_Clock_Source
+ * \param[out]  ClockDiv: specifies the APB peripheral to gates its clock. \ref ENHTIM_Clock_Divider
+ *
+ * \return None
+ */
+bool ENHTIM_ClkGet(ENHTIM_TypeDef *ENHTIMx, ENHTIMClkSrc_TypdDef *ClockSrc,
+                   ENHTIMClkDiv_TypeDef *ClockDiv);
+#endif
 
 /** End of ENHTIM_Exported_Functions
   * \}

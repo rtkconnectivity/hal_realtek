@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_wdt_def.h
+* \brief    WDT related definitions for RTL8762G
+* \details
+* \author   renee
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_WDT_DEF_H
 #define RTL_WDT_DEF_H
@@ -17,8 +24,6 @@ extern "C" {
 /*============================================================================*
  *                          WDT Defines
  *============================================================================*/
-
-#define WDT_SUPPORT_RESET_CORE_DOMAIN                  (0)
 
 /*============================================================================*
  *                         WDT Registers Memory Map
@@ -43,7 +48,12 @@ typedef struct                              /*!< WDT Structure */
 /*============================================================================*
  *                         WDT Declaration
  *============================================================================*/
-/** \defgroup 87X2G_WDT      WDT
+/** \defgroup WDT         WDT
+  * \brief
+  * \{
+  */
+
+/** \defgroup WDT_Exported_Constants WDT Exported Constants
   * \brief
   * \{
   */
@@ -58,6 +68,10 @@ typedef struct                              /*!< WDT Structure */
 
 
 /** End of WDT_Declaration
+  * \}
+  */
+
+/** End of WDT_Exported_Constants
   * \}
   */
 

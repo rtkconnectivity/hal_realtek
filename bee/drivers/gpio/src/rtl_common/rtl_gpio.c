@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_gpio.c
+* \brief    This file provides all the GPIO firmware functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
@@ -13,21 +20,13 @@
 /*============================================================================*
  *                          Private Macros
  *============================================================================*/
-#ifdef _IS_ASIC_
-#define GPIO_CLOCK_SOURCE         (40000000)
-#define GPIO_CLOCK_SOURCE_KHZ     (40000)
-#else
-#define GPIO_CLOCK_SOURCE         (20000000)
-#define GPIO_CLOCK_SOURCE_KHZ     (20000)
-#endif
-
-#define GPIO_CLOCK_SOURCE_KHZ_40M       (40000)
-#define GPIO_CLOCK_SOURCE_KHZ_32K       (32)
 
 /*============================================================================*
  *                          Private Functions
  *============================================================================*/
-extern void GPIO_ExtDebInInit(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_InitStruct);
+extern void GPIO_ExtPolarity(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin,
+                             GPIOITPolarity_TypeDef Int_Polarity);
+
 #if (GPIO_SUPPORT_SWAP_DEB_PINBIT == 1)
 extern uint32_t GPIO_SwapDebPinBit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin);
 #endif
@@ -42,24 +41,32 @@ extern uint32_t GPIO_SwapDebPinBit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin);
   */
 void GPIO_DeInit(GPIO_TypeDef *GPIOx)
 {
-    if (GPIOx == GPIOA)
+    switch ((uint32_t)GPIOx)
     {
+#ifdef GPIOA
+    case (uint32_t)GPIOA:
         RCC_PeriphClockCmd(APBPeriph_GPIOA, APBPeriph_GPIOA_CLOCK, DISABLE);
-    }
-    else if (GPIOx == GPIOB)
-    {
-        RCC_PeriphClockCmd(APBPeriph_GPIOB, APBPeriph_GPIOB_CLOCK, DISABLE);
-    }
-#if (CHIP_GPIO_NUMBER > 64)
-    else if (GPIOx == GPIOC)
-    {
-        RCC_PeriphClockCmd(APBPeriph_GPIOC, APBPeriph_GPIOC_CLOCK, DISABLE);
-    }
-    else if (GPIOx == GPIOD)
-    {
-        RCC_PeriphClockCmd(APBPeriph_GPIOD, APBPeriph_GPIOD_CLOCK, DISABLE);
-    }
+        break;
 #endif
+#ifdef GPIOB
+    case (uint32_t)GPIOB:
+        RCC_PeriphClockCmd(APBPeriph_GPIOB, APBPeriph_GPIOB_CLOCK, DISABLE);
+        break;
+#endif
+#ifdef GPIOC
+    case (uint32_t)GPIOC:
+        RCC_PeriphClockCmd(APBPeriph_GPIOC, APBPeriph_GPIOC_CLOCK, DISABLE);
+        break;
+#endif
+#ifdef GPIOD
+    case (uint32_t)GPIOD:
+        RCC_PeriphClockCmd(APBPeriph_GPIOD, APBPeriph_GPIOD_CLOCK, DISABLE);
+        break;
+#endif
+
+    default:
+        break;
+    }
 }
 
 /**
@@ -106,7 +113,6 @@ void GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_InitStruct)
             GPIOx->GPIO_SRC |= (GPIO_InitStruct->GPIO_Pin);
         }
 #endif
-
     }
     else
     {
@@ -122,32 +128,41 @@ void GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_InitStruct)
             {
                 GPIOx->GPIO_INT_LV &= (~GPIO_InitStruct->GPIO_Pin);
 
+#if (GPIO_SUPPORT_LS_SYNC == 1)
                 /* Level-sensitive synchronization enable register */
                 GPIOx->GPIO_LS_SYNC = 0x1;
+#endif
             }
             else if (GPIO_InitStruct->GPIO_ITTrigger == GPIO_INT_TRIGGER_EDGE)
             {
                 GPIOx->GPIO_INT_LV = (GPIOx->GPIO_INT_LV & (~GPIO_InitStruct->GPIO_Pin))
                                      | GPIO_InitStruct->GPIO_Pin;
             }
+#if GPIO_SUPPORT_INT_BOTHEDGE
+            else if (GPIO_InitStruct->GPIO_ITTrigger == GPIO_INT_TRIGGER_BOTH_EDGE)
+            {
+                GPIOx->GPIO_INT_BOTHEDGE |= GPIO_InitStruct->GPIO_Pin;
+            }
+#endif
 
             /* configure Interrupt polarity register */
+            GPIO_ExtPolarity(GPIOx,
 #if (GPIO_SUPPORT_SWAP_DEB_PINBIT == 1)
-            uint32_t GPIO_Pin_Swap = GPIO_SwapDebPinBit(GPIOx, GPIO_InitStruct->GPIO_Pin);
+                             GPIO_SwapDebPinBit(GPIOx, GPIO_InitStruct->GPIO_Pin), GPIO_InitStruct->GPIO_ITPolarity);
 #else
-            uint32_t GPIO_Pin_Swap = GPIO_InitStruct->GPIO_Pin;
+                             GPIO_InitStruct->GPIO_Pin, GPIO_InitStruct->GPIO_ITPolarity);
 #endif
-            if (GPIO_InitStruct->GPIO_ITPolarity == GPIO_INT_POLARITY_ACTIVE_LOW)
-            {
-                GPIOx->GPIO_EXT_DEB_POL_CTL &= (~GPIO_Pin_Swap);
-            }
-            else
-            {
-                GPIOx->GPIO_EXT_DEB_POL_CTL = (GPIOx->GPIO_EXT_DEB_POL_CTL & (~GPIO_Pin_Swap)) | GPIO_Pin_Swap;
-            }
 
             /* configure Debounce enable register */
-            GPIO_ExtDebInInit(GPIOx, GPIO_InitStruct);
+            if (GPIO_InitStruct->GPIO_ITDebounce == GPIO_INT_DEBOUNCE_ENABLE)
+            {
+                GPIO_ExtDebUpdate(GPIOx, GPIO_InitStruct->GPIO_Pin,
+                                  GPIO_InitStruct->GPIO_DebounceClkSource,
+                                  GPIO_InitStruct->GPIO_DebounceClkDiv,
+                                  GPIO_InitStruct->GPIO_DebounceCntLimit);
+            }
+            GPIO_ExtDebCmd(GPIOx, GPIO_InitStruct->GPIO_Pin,
+                           (FunctionalState) GPIO_InitStruct->GPIO_ITDebounce);
         }
     }
 }
@@ -275,13 +290,14 @@ uint8_t GPIO_ReadInputDataBit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
     /* Check the parameters */
     assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
 
-    uint8_t bitstatus = RESET;
     if (GPIOx->GPIO_PAD_STATE & GPIO_Pin)
     {
-        bitstatus = (uint8_t)SET;
+        return SET;
     }
-
-    return bitstatus;
+    else
+    {
+        return RESET;
+    }
 }
 
 /**
@@ -305,13 +321,14 @@ uint8_t GPIO_ReadOutputDataBit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
     /* Check the parameters */
     assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
 
-    uint8_t bitstatus = RESET;
     if (GPIOx->GPIO_DR & GPIO_Pin)
     {
-        bitstatus = (uint8_t)SET;
+        return SET;
     }
-
-    return bitstatus;
+    else
+    {
+        return RESET;
+    }
 }
 
 /**
@@ -464,21 +481,12 @@ void GPIO_SetPolarity(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin,
     /* Check the parameters */
     assert_param(IS_GPIOIT_POLARITY_TYPE(int_type));
 
+    GPIO_ExtPolarity(GPIOx,
 #if (GPIO_SUPPORT_SWAP_DEB_PINBIT == 1)
-    uint32_t GPIO_Pin_Swap = GPIO_SwapDebPinBit(GPIOx, GPIO_Pin);
+                     GPIO_SwapDebPinBit(GPIOx, GPIO_Pin), int_type);
 #else
-    uint32_t GPIO_Pin_Swap = GPIO_Pin;
+                     GPIO_Pin, int_type);
 #endif
-
-    /* configure Interrupt polarity register */
-    if (int_type == GPIO_INT_POLARITY_ACTIVE_LOW)
-    {
-        GPIOx->GPIO_EXT_DEB_POL_CTL &= (~GPIO_Pin_Swap);
-    }
-    else
-    {
-        GPIOx->GPIO_EXT_DEB_POL_CTL = (GPIOx->GPIO_EXT_DEB_POL_CTL & (~GPIO_Pin_Swap)) | GPIO_Pin_Swap;
-    }
 }
 
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/

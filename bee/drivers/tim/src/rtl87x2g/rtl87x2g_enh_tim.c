@@ -1,14 +1,22 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_enh_tim.c
+* \brief    This file provides all the ENHTIM firmware internal functions.
+* \details
+* \author   Bert
+* \date     2024-08-01
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_enh_tim.h"
 #include "rtl_rcc.h"
+#include "app_section.h"
 
 /*============================================================================*
  *                          Private Macros
@@ -42,11 +50,42 @@ ENHPWM_TypeDef *ENHTIM_GetPwmID(uint32_t enhtim_id)
     }
 }
 
-/**
- * \brief  ENHTIM PWM complementary output emergency stop.
- * \param  ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
- * \return FIFO data length.
- */
+bool ENHTIM_ClkGet(ENHTIM_TypeDef *ENHTIMx, ENHTIMClkSrc_TypdDef *ClockSrc,
+                   ENHTIMClkDiv_TypeDef *ClockDiv)
+{
+    uint32_t enhtim_id = ((uint32_t)ENHTIMx - (uint32_t)ENH_TIM0) / 0x24;
+    uint32_t enhtim_id_odd = enhtim_id % 2;
+    uint32_t enhtim_id_temp = enhtim_id / 2;
+
+    uint32_t temp_addr_value = *((uint32_t *)(&(REG_ENHTIMER_CLOCK_CTRL)) + enhtim_id_temp);
+    *ClockSrc = (temp_addr_value >> 4) & 0x7;
+
+    *ClockDiv = (((temp_addr_value >> (3 + 16 * enhtim_id_odd)) & BIT0) == 0) ? ENHTIM_CLOCK_DIVIDER_1 :
+                ((temp_addr_value >> (16 * enhtim_id_odd)) & 0x7);
+
+    return true;
+}
+
+void ENHTIM_ClkConfig(ENHTIM_TypeDef *ENHTIMx, ENHTIMClkSrc_TypdDef ClockSrc,
+                      ENHTIMClkDiv_TypeDef ClockDiv)
+{
+    uint32_t enhtim_id = ((uint32_t)ENHTIMx - (uint32_t)ENH_TIM0) / 0x24;
+    uint32_t enhtim_id_odd = enhtim_id % 2;
+    uint32_t enhtim_id_temp = enhtim_id / 2;
+    uint8_t ENHTIM_ClockDiv_En = ClockDiv == 0 ? DISABLE : ENABLE;
+
+    *((uint32_t *)(&(REG_ENHTIMER_CLOCK_CTRL)) + enhtim_id_temp) &= ~(0x7 << 4);
+    *((uint32_t *)(&(REG_ENHTIMER_CLOCK_CTRL)) + enhtim_id_temp) |= (ClockSrc << 4);
+
+    /*Clear ENHTIM Clock DIV */
+    *((uint32_t *)(&(REG_ENHTIMER_CLOCK_CTRL)) + enhtim_id_temp) &= ~(0xF << 16 * enhtim_id_odd);
+    if ((ENHTIM_ClockDiv_En != DISABLE))
+    {
+        *((uint32_t *)(&(REG_ENHTIMER_CLOCK_CTRL)) + enhtim_id_temp) |= BIT3 << 16 * enhtim_id_odd;
+        *((uint32_t *)(&(REG_ENHTIMER_CLOCK_CTRL)) + enhtim_id_temp) |= (ClockDiv << 16 * enhtim_id_odd);
+    }
+}
+
 void ENHTIM_PWMDeadZoneEMStop(ENHTIM_TypeDef *ENHTIMx)
 {
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);
@@ -157,12 +196,6 @@ void ENHTIM_PWMDeadzoneConfig(uint32_t enhtim_id, \
 }
 
 #if ENHTIM_SUPPORT_PWM_SRC_SELECT
-/**
- * \brief  ENHTIM PWMP/N Source Select.
- * \param  ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
- * \param  PWMSrcSel: State of the ENHTIMx PWMP/N.
- * \return None.
- */
 void ENHTIM_PWMSrcSelect(ENHTIM_TypeDef *ENHTIMx, ENHTIMPWMDZRef_TypeDef PWMSrcSel)
 {
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);
@@ -174,12 +207,8 @@ void ENHTIM_PWMSrcSelect(ENHTIM_TypeDef *ENHTIMx, ENHTIMPWMDZRef_TypeDef PWMSrcS
 }
 #endif
 
-/**
-  * \brief  Store ENHTIM register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the ENHTIM peripheral.
-  * \param  StoreBuf: Store buffer to store ENHTIM register data.
-  * \return None.
-  */
+
+RAM_FUNCTION
 void ENHTIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     ENHTIMStoreReg_Typedef *store_buf = (ENHTIMStoreReg_Typedef *)StoreBuf;
@@ -230,12 +259,7 @@ void ENHTIM_DLPSEnter(void *PeriReg, void *StoreBuf)
     store_buf->enhpwm_reg[3] = ENH_TIM3_PWM->ENHTIMER_PWM_CFG;
 }
 
-/**
-  * \brief  Restore ENHTIM register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the ENHTIM peripheral.
-  * \param  StoreBuf: Restore buffer to restore ENHTIM register data.
-  * \return None
-  */
+RAM_FUNCTION
 void ENHTIM_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     ENHTIMStoreReg_Typedef *store_buf = (ENHTIMStoreReg_Typedef *)StoreBuf;
@@ -286,5 +310,5 @@ void ENHTIM_DLPSExit(void *PeriReg, void *StoreBuf)
     ENH_TIM3_PWM->ENHTIMER_PWM_CFG = store_buf->enhpwm_reg[3];
 }
 
-/******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/
+/******************* (C) COPYRIGHT 2024 Realtek Semiconductor Corporation *****END OF FILE****/
 

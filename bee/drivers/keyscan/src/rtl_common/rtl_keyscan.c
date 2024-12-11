@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl_keyscan.c
+* \brief    This file provides all the KEYSCAN firmware functions.
+* \details
+* \author   yuzhuo_liu
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
@@ -79,6 +86,12 @@ void KeyScan_Init(KEYSCAN_TypeDef *KeyScan, KEYSCAN_InitTypeDef *KeyScan_InitStr
     keyscan_0x04.b.keyscan_deb_timer_cnt = KeyScan_InitStruct->debouncecnt;
     keyscan_0x04.b.keyscan_interval_timer_cnt = KeyScan_InitStruct->scanInterval;
     keyscan_0x04.b.keyscan_release_timer_cnt = KeyScan_InitStruct->releasecnt;
+#if KEYSCAN_SUPPORT_ROW_LEVEL_CONFIGURE
+    keyscan_0x04.b.keyscan_row_pull_high_en = KeyScan_InitStruct->rowpullhighEn;
+#endif
+#if KEYSCAN_SUPPORT_COLUNM_LEVEL_CONFIGURE
+    keyscan_0x04.b.keyscan_column_output_high_en = KeyScan_InitStruct->colunmoutputhighEn;
+#endif
     /* Set col map, config which col to work */
     keyscan_0x0c.b.keyscan_col_num = KeyScan_InitStruct->colSize - 1;
     keyscan_0x0c.b.keyscan_col_sel = (1 << KeyScan_InitStruct->colSize) - 1;
@@ -126,11 +139,18 @@ void KeyScan_StructInit(KEYSCAN_InitTypeDef *KeyScan_InitStruct)
     KeyScan_InitStruct->fifotriggerlevel = 1;
     KeyScan_InitStruct->fifoOvrCtrl      = KeyScan_FIFO_OVR_CTRL_DIS_LAST;
     KeyScan_InitStruct->keylimit         = 0x03;
+
+#if KEYSCAN_SUPPORT_ROW_LEVEL_CONFIGURE
+    KeyScan_InitStruct->rowpullhighEn    = ENABLE;
+#endif
+#if KEYSCAN_SUPPORT_COLUNM_LEVEL_CONFIGURE
+    KeyScan_InitStruct->colunmoutputhighEn  = DISABLE;
+#endif
     return;
 }
 
 /**
-  * \brief  Enables or disables the specified KeyScan interrupt.
+  * \brief  Enable or disable the specified KeyScan interrupt.
   * \param  KeyScan: Selected KeyScan peripheral.
   * \param  KeyScan_IT: Specifies the KeyScan interrupts sources to be enabled or disabled.
   *         This parameter can be any combination of the following values:
@@ -163,7 +183,7 @@ void KeyScan_INTConfig(KEYSCAN_TypeDef *KeyScan, uint32_t KeyScan_IT, Functional
 }
 
 /**
-  * \brief  Enables or disables the specified KeyScan interrupts mask.
+  * \brief  Enable or disable the specified KeyScan interrupts mask.
   * \param  KeyScan: Selected KeyScan peripheral.
   * \param  NewState: New state of the specified KeyScan interrupts mask.
   *         This parameter can be: ENABLE or DISABLE.
@@ -210,7 +230,7 @@ void KeyScan_Read(KEYSCAN_TypeDef *KeyScan, uint16_t *outBuf, uint16_t count)
 }
 
 /**
-  * \brief  Enables or disables the KeyScan peripheral.
+  * \brief  Enable or disable the KeyScan peripheral.
   * \param  KeyScan: Selected KeyScan peripheral.
   * \param  NewState: New state of the KeyScan peripheral.
   *         This parameter can be: ENABLE or DISABLE.
@@ -393,5 +413,51 @@ uint16_t KeyScan_ReadFifoData(KEYSCAN_TypeDef *KeyScan)
 
     return (uint16_t)(KeyScan->KEYSCAN_FIFO_ENTRY);
 }
+#if (KEYSCAN_SUPPORT_RAP_FUNCTION == 1)
+void KeyScan_RAPModeCmd(KEYSCAN_TypeDef *KeyScan, FunctionalState NewState)
+{
+    /* Check the parameters */
+    assert_param(IS_KeyScan_PERIPH(KeyScan));
 
+    KEYSCAN_TASK_CTRL_TypeDef keyscan_0x38 = {.d32 = KeyScan->KEYSCAN_TASK_CTRL};
+    keyscan_0x38.b.rap_mode = NewState;
+    KeyScan->KEYSCAN_TASK_CTRL = keyscan_0x38.d32;
+
+    return;
+}
+
+void KEYSCAN_TaskTrigger(KEYSCAN_TypeDef *KeyScan, uint32_t Task)
+{
+    /* Check the parameters */
+    assert_param(IS_ADC_ALL_PERIPH(KeyScan));
+
+    KEYSCAN_TASK_CTRL_TypeDef keyscan_0x38 = {.d32 = KeyScan->KEYSCAN_TASK_CTRL};
+    if (Task == KEYSCAN_TASK_MANUAL)
+    {
+        keyscan_0x38.b.task_manual = 0x1;
+    }
+    KeyScan->KEYSCAN_TASK_CTRL = keyscan_0x38.d32;
+
+    return;
+}
+
+void KeyScan_RAPQactiveCtrl(KEYSCAN_TypeDef *KeyScan, uint32_t Qactive, FunctionalState NewState)
+{
+    /* Check the parameters */
+    assert_param(IS_ADC_ALL_PERIPH(KeyScan));
+
+    KEYSCAN_QACTIVE_CTRL_TypeDef keyscan_0x3C = {.d32 = KeyScan->KEYSCAN_QACTIVE_CTRL};
+    if (Qactive == KEYSCAN_QACTIVE_FW_FORCE)
+    {
+        keyscan_0x3C.b.qact_clk_force_en = NewState;
+    }
+    if (Qactive == KEYSCAN_QACTIVE_FW_FORCE_PCLK)
+    {
+        keyscan_0x3C.b.qact_pclk_force_en = NewState;
+    }
+    KeyScan->KEYSCAN_QACTIVE_CTRL = keyscan_0x3C.d32;
+
+    return;
+}
+#endif
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/

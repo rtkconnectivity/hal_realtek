@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_rtc.h
+* \brief    The header file of the peripheral RTC driver.
+* \details  This file provides all RTC firmware functions.
+* \author   grace_yan
+* \date     2023-10-17
+* \version  v1.0
+* *******************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,15 +24,18 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "rtc/src/rtl87x2g/rtl_rtc_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "rtc/src/rtl87x3e/rtl_rtc_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "rtc/src/rtl8763d/rtl_rtc_def.h"
+#include "rtc/src/rtl87x3d/rtl_rtc_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "rtc/src/rtl87x2j/rtl_rtc_def.h"
 #endif
 
-/** \defgroup 87X2G_RTC         RTC
+/** \defgroup RTC         RTC
   * \brief
   * \{
   */
@@ -38,17 +48,9 @@ extern "C" {
   * \{
   */
 
-#if (RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL == 1)
-/* 32K Register BIT MASK */
-#define EXT32K_GPIO_MSK              (0x1UL << 6)
-#define RTC_OUT_SEL_MSK              (0x1FFFUL)
-#define EN_32K_GPIO_IN_MSK           (0x1UL << 12)
-#define RTC_IN_SEL_MSK               (0x1FUL)
-#endif
-
 /**
- * \brief       RTC Comparator Definition
- *
+ * \defgroup    RTC_Comparator_Definition RTC Comparator Definition
+ * \{
  * \ingroup     RTC_Exported_Constants
  */
 
@@ -65,9 +67,14 @@ typedef enum
                            ((COMP) == RTC_COMP2) || \
                            ((COMP) == RTC_COMP3))
 
+/** End of RTC_Comparator_Definition
+  * \}
+  */
+
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
 /**
- * \brief       RTC ComparatorGT Definition
- *
+ * \defgroup    RTC_ComparatorGT_Definition RTC ComparatorGT Definition
+ * \{
  * \ingroup     RTC_Exported_Constants
  */
 
@@ -84,37 +91,9 @@ typedef enum
                              ((COMP) == RTC_COMP2GT) || \
                              ((COMP) == RTC_COMP3GT))
 
-/**
- * \brief       RTC in selection type
- *
- * \ingroup     RTC_Exported_Constants
- */
-#if (RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL == 1)
-typedef enum
-{
-    PAD_RTC_IN_DISABLE,
-    PAD_RTC_IN_P0_1,
-    PAD_RTC_IN_P1_2,
-    PAD_RTC_IN_P2_0,
-    PAD_RTC_IN_P2_7,
-    PAD_RTC_IN_P4_7,
-    PAD_RTC_IN_P5_0,
-    PAD_RTC_IN_P8_6,
-    PAD_RTC_IN_P9_3,
-    PAD_RTC_IN_P10_6,
-    PAD_RTC_IN_P13_7,
-    PAD_RTC_IN_P14_7,
-    PAD_RTC_IN_P16_3,
-    PAD_RTC_IN_P20_5,
-} RTCInSel_TypeDef;
-
-#define RTC_ALL_IN_SEL         (PAD_RTC_IN_DISABLE | PAD_RTC_IN_P0_1 | \
-                                PAD_RTC_IN_P1_2 | PAD_RTC_IN_P2_0 | \
-                                PAD_RTC_IN_P2_7 | PAD_RTC_IN_P4_7 | \
-                                PAD_RTC_IN_P5_0 | PAD_RTC_IN_P8_6 | \
-                                PAD_RTC_IN_P9_3 | PAD_RTC_IN_P10_6 | \
-                                PAD_RTC_IN_P13_7 | PAD_RTC_IN_P14_7 | \
-                                PAD_RTC_IN_P16_3 | PAD_RTC_IN_P20_5)
+/** End of RTC_ComparatorGT_Definition
+  * \}
+  */
 #endif
 
 /**
@@ -131,10 +110,6 @@ typedef enum
 #define RTC_INT_COMP2          BIT18
 #define RTC_INT_COMP3          BIT19
 
-/** End of RTC_Interrupts
-  * \}
-  */
-
 #define IS_RTC_INT(INT) (((INT) == RTC_INT_TICK) || \
                          ((INT) == RTC_INT_OVF) || \
                          ((INT) == RTC_INT_COMP0) || \
@@ -143,6 +118,10 @@ typedef enum
                          ((INT) == RTC_INT_COMP3) || \
                          ((INT) == RTC_INT_PRE_COMP) || \
                          ((INT) == RTC_INT_PRE_COMP3))
+
+/** End of RTC_Interrupts
+  * \}
+  */
 
 /**
  * \defgroup    RTC_Wakeup RTC Wakeup
@@ -154,46 +133,47 @@ typedef enum
 #define RTC_WK_OVF             BIT9
 #define RTC_WK_PRE_COMP        BIT10
 #define RTC_WK_PRE_COMP3       BIT11
+
+#define IS_RTC_WK_PRECOMP_OVF_TICK(WK) (((WK) == RTC_WK_TICK) || \
+                                        ((WK) == RTC_WK_OVF) || \
+                                        ((WK) == RTC_WK_PRE_COMP) || \
+                                        ((WK) == RTC_WK_PRE_COMP3))
+#else
+#define IS_RTC_WK_PRECOMP_OVF_TICK(WK) (0)
 #endif
+
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
 #define RTC_WK_COMP0GT         BIT12
 #define RTC_WK_COMP1GT         BIT13
 #define RTC_WK_COMP2GT         BIT14
 #define RTC_WK_COMP3GT         BIT15
+
+#define IS_RTC_WK_CMPGT(WK) (((WK) == RTC_WK_COMP0GT) || \
+                             ((WK) == RTC_WK_COMP1GT) || \
+                             ((WK) == RTC_WK_COMP2GT) || \
+                             ((WK) == RTC_WK_COMP3GT))
+#else
+#define IS_RTC_WK_CMPGT(WK) (0)
+#endif
+
 #define RTC_WK_COMP0           BIT20
 #define RTC_WK_COMP1           BIT21
 #define RTC_WK_COMP2           BIT22
 #define RTC_WK_COMP3           BIT23
 
+#define IS_RTC_WK(WK)         (((WK) == RTC_WK_COMP0) || \
+                               ((WK) == RTC_WK_COMP1) || \
+                               ((WK) == RTC_WK_COMP2) || \
+                               ((WK) == RTC_WK_COMP3) || \
+                               (IS_RTC_WK_CMPGT(WK)) || \
+                               (IS_RTC_WK_PRECOMP_OVF_TICK(WK)))
+
 /** End of RTC_Wakeup
   * \}
   */
 
-#if (RTC_SUPPORT_PRE_COMP_OVF_TICK_WAKE_UP == 1)
-#define IS_RTC_WK(WK) (((WK) == RTC_WK_TICK) || \
-                       ((WK) == RTC_WK_OVF) || \
-                       ((WK) == RTC_WK_PRE_COMP) || \
-                       ((WK) == RTC_WK_PRE_COMP3) || \
-                       ((WK) == RTC_WK_COMP0GT) || \
-                       ((WK) == RTC_WK_COMP1GT) || \
-                       ((WK) == RTC_WK_COMP2GT) || \
-                       ((WK) == RTC_WK_COMP3GT) || \
-                       ((WK) == RTC_WK_COMP0) || \
-                       ((WK) == RTC_WK_COMP1) || \
-                       ((WK) == RTC_WK_COMP2) || \
-                       ((WK) == RTC_WK_COMP3))
-#else
-#define IS_RTC_WK(WK) (((WK) == RTC_WK_COMP0GT) || \
-                       ((WK) == RTC_WK_COMP1GT) || \
-                       ((WK) == RTC_WK_COMP2GT) || \
-                       ((WK) == RTC_WK_COMP3GT) || \
-                       ((WK) == RTC_WK_COMP0) || \
-                       ((WK) == RTC_WK_COMP1) || \
-                       ((WK) == RTC_WK_COMP2) || \
-                       ((WK) == RTC_WK_COMP3))
-#endif
-
 /**
- * \defgroup    RTC_Int_Clear RTC Int Clear
+ * \defgroup    RTC_Interrupt_Clear RTC Interrupt Clear
  * \{
  * \ingroup     RTC_Exported_Constants
  */
@@ -206,37 +186,102 @@ typedef enum
 #define RTC_OVERFLOW_CLR            (RTC_INT_OVF       >> 8)
 #define RTC_TICK_CLR                (RTC_INT_TICK      >> 8)
 
-#define RTC_ALL_INT_CLR             (RTC_PRE_COMP3_CLR | RTC_PRE_COMP_CLR | \
-                                     RTC_COMP3_CLR | RTC_COMP2_CLR | \
-                                     RTC_COMP1_CLR | RTC_COMP0_CLR | \
-                                     RTC_OVERFLOW_CLR | RTC_TICK_CLR)
+#define RTC_ALL_INT_CLR             (RTC_PRE_COMP3_CLR | \
+                                     RTC_PRE_COMP_CLR | \
+                                     RTC_COMP3_CLR | \
+                                     RTC_COMP2_CLR | \
+                                     RTC_COMP1_CLR | \
+                                     RTC_COMP0_CLR | \
+                                     RTC_OVERFLOW_CLR | \
+                                     RTC_TICK_CLR)
 
-/** End of RTC_Int_Clear
+/** End of RTC_Interrupt_Clear
   * \}
   */
 
 /**
- * \defgroup    RTC_WK_Clear RTC WK Clear
+ * \defgroup    RTC_Wakeup_Clear RTC Wakeup Clear
  * \{
  * \ingroup     RTC_Exported_Constants
  */
-#define RTC_COMP3_WK_CLR            (RTC_WK_COMP3   >> 8)
-#define RTC_COMP2_WK_CLR            (RTC_WK_COMP2   >> 8)
-#define RTC_COMP1_WK_CLR            (RTC_WK_COMP1   >> 8)
-#define RTC_COMP0_WK_CLR            (RTC_WK_COMP0   >> 8)
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
 #define RTC_COMP3GT_CLR             (RTC_WK_COMP3GT >> 8)
 #define RTC_COMP2GT_CLR             (RTC_WK_COMP2GT >> 8)
 #define RTC_COMP1GT_CLR             (RTC_WK_COMP1GT >> 8)
 #define RTC_COMP0GT_CLR             (RTC_WK_COMP0GT >> 8)
 
-#define RTC_ALL_WAKEUP_CLR          (RTC_COMP3_WK_CLR | RTC_COMP2_WK_CLR | \
-                                     RTC_COMP1_WK_CLR | RTC_COMP0_WK_CLR | \
-                                     RTC_COMP3GT_CLR | RTC_COMP2GT_CLR | \
-                                     RTC_COMP1GT_CLR | RTC_COMP0GT_CLR)
+#define RTC_COMPGT_WAKEUP_CLR       (RTC_COMP3GT_CLR | \
+                                     RTC_COMP2GT_CLR | \
+                                     RTC_COMP1GT_CLR | \
+                                     RTC_COMP0GT_CLR)
+#else
+#define RTC_COMPGT_WAKEUP_CLR       (0)
+#endif
 
-/** End of RTC_WK_Clear
+#define RTC_COMP3_WK_CLR            (RTC_WK_COMP3   >> 8)
+#define RTC_COMP2_WK_CLR            (RTC_WK_COMP2   >> 8)
+#define RTC_COMP1_WK_CLR            (RTC_WK_COMP1   >> 8)
+#define RTC_COMP0_WK_CLR            (RTC_WK_COMP0   >> 8)
+
+#define RTC_ALL_WAKEUP_CLR          (RTC_COMP3_WK_CLR | \
+                                     RTC_COMP2_WK_CLR | \
+                                     RTC_COMP1_WK_CLR | \
+                                     RTC_COMP0_WK_CLR | \
+                                     RTC_COMPGT_WAKEUP_CLR)
+
+/** End of RTC_Wakeup_Clear
   * \}
   */
+
+#if (RTC_SUPPORT_RAP_FUNCTION == 1)
+/**
+ * \defgroup    RTC_Task RTC Task
+ * \{
+ * \ingroup     RTC_Exported_Constants
+ */
+typedef enum
+{
+    RTC_TASK_START = 0,
+    RTC_TASK_STOP  = 1,
+    RTC_TASK_CLR = 2,
+} RTCTask_TypeDef;
+
+/** End of RTC_Task
+  * \}
+  */
+
+/**
+ * \defgroup    RTC_Shortcut_Task RTC Shortcut Task
+ * \{
+ * \ingroup     RTC_Exported_Constants
+ */
+typedef enum
+{
+    RTC_SHORTCUT_TASK_STOP = 1,
+    RTC_SHORTCUT_TASK_CLEAR = 2,
+} RTCShortcutTask_TypeDef;
+
+/** End of RTC_Shortcut_Task
+  * \}
+  */
+
+/**
+ * \defgroup    RTC_Shortcut_Event RTC Shortcut Event
+ * \{
+ * \ingroup     RTC_Exported_Constants
+ */
+typedef enum
+{
+    RTC_SHORTCUT_EVENT_COM0 = 0,
+    RTC_SHORTCUT_EVENT_COM1 = 1,
+    RTC_SHORTCUT_EVENT_COM2 = 2,
+    RTC_SHORTCUT_EVENT_COM3 = 3,
+} RTCShortcutEvent_TypeDef;
+
+/** End of RTC_Shortcut_Event
+  * \}
+  */
+#endif
 
 /** End of RTC_Exported_Constants
   * \}
@@ -666,6 +711,7 @@ void RTC_ClearOverFlowINT(void);
  */
 void RTC_ClearTickINT(void);
 
+#if (RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL == 1)
 /**
  * \brief  Select source clock to gpio input of RTC.
  *
@@ -682,7 +728,6 @@ void RTC_ClearTickINT(void);
  * }
  * \endcode
  */
-#if (RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL == 1)
 void RTC_SelectSrcToGpioInput(RTCInSel_TypeDef rtc_in);
 #endif
 
@@ -719,6 +764,7 @@ void RTC_SelectSrcToGpioInput(RTCInSel_TypeDef rtc_in);
  */
 void RTC_SetCompValue(RTCComIndex_TypeDef index, uint32_t value);
 
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
 /**
  * \brief     Set RTC comparator GT value.
  *
@@ -751,6 +797,7 @@ void RTC_SetCompValue(RTCComIndex_TypeDef index, uint32_t value);
  * \endcode
  */
 void RTC_SetCompGTValue(RTCCmopGTIndex_TypeDef index, uint32_t value);
+#endif
 
 /**
  * \brief     Set RTC prescaler comparator value.
@@ -838,6 +885,7 @@ uint32_t RTC_GetPreCounter(void);
  */
 uint32_t RTC_GetCompValue(RTCComIndex_TypeDef index);
 
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
 /**
  * \brief     Get RTC comparator gt value.
  *
@@ -855,6 +903,7 @@ uint32_t RTC_GetCompValue(RTCComIndex_TypeDef index);
  * \endcode
  */
 uint32_t RTC_GetCompGTValue(RTCCmopGTIndex_TypeDef index);
+#endif
 
 /**
  * \brief     Get RTC prescaler comparator value.
@@ -877,7 +926,7 @@ uint32_t RTC_GetPreCompValue(void);
 /**
  * \brief     Write backup register for store time information.
  *
- * \param[in] value: valuer=write to back up reister
+ * \param[in] value: value=write to back up register
  *
  * \return    None.
  *
@@ -909,6 +958,18 @@ void RTC_WriteBackupReg(uint32_t value);
  * \endcode
  */
 uint32_t RTC_ReadBackupReg(void);
+
+#if (RTC_SUPPORT_RAP_FUNCTION == 1)
+
+void RTC_RAPQactiveCtrl(uint32_t Qactive, FunctionalState NewState);
+
+void RTC_RAPModeCmd(FunctionalState NewState);
+
+void RTC_TaskTrigger(uint32_t Task);
+
+void RTC_ShortcutCmd(uint32_t Task, uint32_t Event, FunctionalState NewState);
+
+#endif
 
 /** End of RTC_Exported_Functions
   * \}

@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_gpio_def.h
+* \brief    GPIO related definitions for RTL8762G
+* \details
+* \author   renee
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_GPIO_DEF_H
 #define RTL_GPIO_DEF_H
@@ -17,6 +24,11 @@ extern "C" {
 /*============================================================================*
  *                          GPIO Defines
  *============================================================================*/
+/** \defgroup GPIO        GPIO
+  * \brief
+  * \{
+  */
+
 /** \defgroup GPIO_Exported_Constants GPIO Exported Constants
   * \brief
   * \{
@@ -27,15 +39,20 @@ extern "C" {
  * \{
  * \ingroup  GPIO_Exported_Constants
  */
-#define CHIP_GPIO_NUMBER                               (64)
 #define GPIO_SUPPORT_SET_CONTROL_MODE                  (0)
 #define GPIO_SUPPORT_SWAP_DEB_PINBIT                   (1)
+#define GPIO_SUPPORT_LS_SYNC                           (1)
+#define GPIO_SUPPORT_INT_BOTHEDGE                      (0)
 
 /** End of GPIO_Defines
   * \}
   */
 
 /** End of GPIO_Exported_Constants
+  * \}
+  */
+
+/** End of GPIO
   * \}
   */
 
@@ -72,7 +89,12 @@ typedef struct
 /*============================================================================*
  *                         GPIO Declaration
  *============================================================================*/
-/** \defgroup 87X2G_GPIO      GPIO
+/** \defgroup GPIO        GPIO
+  * \brief
+  * \{
+  */
+
+/** \defgroup GPIO_Exported_Constants GPIO Exported Constants
   * \brief
   * \{
   */
@@ -87,10 +109,12 @@ typedef struct
 #define GPIOB              ((GPIO_TypeDef          *) GPIOB_REG_BASE)
 #define GPIOA_DEB          ((GPIO_Debounce_TypeDef *) GPIOA_DEB_REG_BASE)
 #define GPIOB_DEB          ((GPIO_Debounce_TypeDef *) GPIOB_DEB_REG_BASE)
-#define GPIOA_REG2_BASE                    (GPIOA_REG_BASE + 0x0100)
-#define GPIOB_REG2_BASE                    (GPIOB_REG_BASE + 0x0100)
 
 /** End of GPIO_Declaration
+  * \}
+  */
+
+/** End of GPIO_Exported_Constants
   * \}
   */
 
@@ -333,18 +357,72 @@ typedef union
 
 
     /*============================================================================*
-     *                          GPIO TYPE/API Wrappers
+     *                          GPIO Constants
      *============================================================================*/
+    /** \defgroup GPIO        GPIO
+      * \brief
+      * \{
+      */
+
     /** \defgroup GPIO_Exported_Constants GPIO Exported Constants
       * \brief
       * \{
       */
 
+
     /**
-     * \defgroup GPIO_Constant_Wrapper GPIO Constant Wrapper
+     * \defgroup    GPIO_Debounce_Source GPIO Debounce Dource
      * \{
-     * \ingroup  GPIO_Exported_Constants
+     * \ingroup     GPIO_Exported_Constants
      */
+    typedef enum
+{
+    GPIO_DEBOUNCE_32K = 0x0, /**< 32KHz. */
+    GPIO_DEBOUNCE_S11 = 0x1, /**< S11_clk. */
+} GPIODebounceSrc_TypeDef;
+
+#define IS_GPIO_DEBOUNCE_SRC_TYPE(TYPE) (((TYPE) == GPIO_DEBOUNCE_32K) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_S11))
+
+/** End of GPIO_Debounce_Source
+  * \}
+  */
+
+/**
+ * \defgroup    GPIO_Debounce_Divide GPIO Debounce Divide
+ * \{
+ * \ingroup     GPIO_Exported_Constants
+ */
+typedef enum
+{
+    GPIO_DEBOUNCE_DIVIDER_1  = 0x0, /**< debounce divide 1. */
+    GPIO_DEBOUNCE_DIVIDER_2  = 0x1, /**< debounce divide 2. */
+    GPIO_DEBOUNCE_DIVIDER_4  = 0x2, /**< debounce divide 4. */
+    GPIO_DEBOUNCE_DIVIDER_8  = 0x3, /**< debounce divide 8. */
+    GPIO_DEBOUNCE_DIVIDER_16 = 0x4, /**< debounce divide 16. */
+    GPIO_DEBOUNCE_DIVIDER_32 = 0x5, /**< debounce divide 32. */
+    GPIO_DEBOUNCE_DIVIDER_40 = 0x6, /**< debounce divide 40. */
+    GPIO_DEBOUNCE_DIVIDER_64 = 0x7, /**< debounce divide 64. */
+} GPIODebounceDiv_TypeDef;
+
+#define IS_GPIO_DEBOUNCE_DIV_TYPE(TYPE) (((TYPE) == GPIO_DEBOUNCE_DIVIDER_1) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_2) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_4) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_8) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_16) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_32) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_40) || \
+                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_64) || \)
+
+/** End of GPIO_Debounce_Divide
+  * \}
+  */
+
+/**
+ * \defgroup GPIO_Constant_Wrapper GPIO Constant Wrapper
+ * \{
+ * \ingroup  GPIO_Exported_Constants
+ */
 #define GPIO_Mode               GPIO_Dir
 #define GPIO_Mode_IN            GPIO_DIR_IN
 #define GPIO_Mode_OUT           GPIO_DIR_OUT
@@ -353,27 +431,31 @@ typedef union
 #define GPIO_INT_Trigger_LEVEL  GPIO_INT_TRIGGER_LEVEL
 #define GPIO_INT_Trigger_EDGE   GPIO_INT_TRIGGER_EDGE
 
-    /** End of GPIO_Constant_Wrapper
-      * \}
-      */
+/** End of GPIO_Constant_Wrapper
+  * \}
+  */
 
-    /**
-     * \defgroup GPIO_API_Wrapper GPIO API Wrapper
-     * \{
-     * \ingroup  GPIO_Exported_Constants
-     */
+/**
+ * \defgroup GPIO_API_Wrapper GPIO API Wrapper
+ * \{
+ * \ingroup  GPIO_Exported_Constants
+ */
 #define GPIO_GetPin             GPIO_GetPinBit
 #define GPIO_DBClkCmd           GPIO_ExtDebCmd
 #define GPIO_SetDebounceTime    GPIO_ExtDebUpdate
 #define GPIO_SetITPolarity      GPIO_SetPolarity
 
-    /** End of GPIO_API_Wrapper
-      * \}
-      */
+/** End of GPIO_API_Wrapper
+  * \}
+  */
 
-    /** End of GPIO_Exported_Constants
-      * \}
-      */
+/** End of GPIO_Exported_Constants
+  * \}
+  */
+
+/** End of GPIO
+  * \}
+  */
 
 #ifdef  __cplusplus
 }

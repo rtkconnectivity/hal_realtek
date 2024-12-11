@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl_gdma.c
+* \brief    This file provides all the DMA firmware functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
@@ -11,17 +18,26 @@
 #include "rtl_rcc.h"
 
 /*============================================================================*
- *                          Private Functions
+ *                        Private Defines
  *============================================================================*/
-extern GDMA_ChannelTypeDef *GDMA_GetGDMAChannelx(uint8_t GDMA_ChannelNum);
+#define CHANNEL_BIT(ch)    ((ch < 8) ? BIT(ch) : BIT(ch + 8))
+#define CHANNEL_WE_BIT(ch) ((ch < 8) ? BIT(ch + 8) : BIT(ch + 16))
+
+/*============================================================================*
+ *                        Private Functions
+ *============================================================================*/
 extern uint8_t GDMA_GetHandshakeNum(GDMA_ChannelTypeDef *GDMA_Channelx, uint8_t handshake);
 extern uint8_t GDMA_GetGDMAChannelNum(uint8_t GDMA_ChannelNum);
 extern GDMA_TypeDef *GDMA_GetGDMAxByCh(uint8_t GDMA_ChannelNum);
 extern GDMA_TypeDef *GDMA_GetGDMAx(GDMA_ChannelTypeDef *GDMA_Channelx);
 extern bool GDMA_IsValidHandshake(uint8_t handshake);
+extern bool GDMA_IsGatherScatterChannel(GDMA_ChannelTypeDef *GDMA_Channelx);
+extern bool GDMA_IsHalfBlcokChannel(GDMA_TypeDef *GDMAx);
+FlagStatus GDMA_GetSuspendCmdStatus(GDMA_ChannelTypeDef *GDMA_Channelx);
+FlagStatus GDMA_GetSuspendChannelStatus(GDMA_ChannelTypeDef *GDMA_Channelx);
 
 /*============================================================================*
- *                           Public Functions
+ *                        Public Functions
  *============================================================================*/
 /**
   * \brief  Deinitializes the GDMA registers to their default reset values.
@@ -31,10 +47,13 @@ extern bool GDMA_IsValidHandshake(uint8_t handshake);
 void GDMA_DeInit(void)
 {
     /* Disable GDMA clock */
-#if (CHIP_GDMA_NUM == 1)
+#ifdef IS_GDMA_PERIPH
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, DISABLE);
-#elif (CHIP_GDMA_NUM == 2)
+#endif
+#ifdef IS_GDMA1_PERIPH
     RCC_PeriphClockCmd(APBPeriph_GDMA1, APBPeriph_GDMA1_CLOCK, DISABLE);
+#endif
+#ifdef IS_GDMA2_PERIPH
     RCC_PeriphClockCmd(APBPeriph_GDMA2, APBPeriph_GDMA2_CLOCK, DISABLE);
 #endif
 }
@@ -62,7 +81,6 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
     uint8_t channel_num = GDMA_GetGDMAChannelNum(GDMA_InitStruct->GDMA_ChannelNum);
     uint8_t temp_hs_src = GDMA_GetHandshakeNum(GDMA_Channelx, GDMA_InitStruct->GDMA_SourceHandshake);
     uint8_t temp_hs_dst = GDMA_GetHandshakeNum(GDMA_Channelx, GDMA_InitStruct->GDMA_DestHandshake);
-    uint32_t temp_bit = 0;
 
     /* ---------------- Configure source and destination address of GDMA ---------------- */
     /* Program SARx register to set source address */
@@ -70,213 +88,177 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
     /* Program DARx register to set destination address */
     GDMA_Channelx->GDMA_DARx = GDMA_InitStruct->GDMA_DestinationAddr;
 
-    /* Enable GDMA in DmaCfgReg*/
-    GDMAx->GDMA_DmaCfgReg = 0x01;
-
-    /* Read ChEnReg to check channel is busy or not */
-    temp_bit = 0;
-    if (channel_num < 8)
-    {
-        temp_bit = BIT(channel_num);
-    }
-    else
-    {
-        temp_bit = BIT(channel_num + 16 - 8);
-    }
-    if (GDMAx->GDMA_ChEnReg & temp_bit)
-    {
-        //channel is be used
-        //error handle code
-        //while (1);
-    }
+    /* Enable GDMA in DmaCfgReg */
+    GDMAx->GDMA_DMACFGREG_L = 0x01;
 
     /* ---------------- GDMA Configuration ---------------- */
     /* Clear pending interrupts of corresponding GDMA channel */
-    temp_bit = BIT(channel_num);
-    GDMAx->GDMA_ClearTfr |= temp_bit;
-    GDMAx->GDMA_ClearBlock |= temp_bit;
+    uint32_t temp_bit = BIT(channel_num);
+    GDMAx->GDMA_CLEARTFR_L |= temp_bit;
+    GDMAx->GDMA_CLEARBLOCK_L |= temp_bit;
 #if (GDMA_SUPPORT_INT_HAIF_BLOCK == 1)
-    GDMAx->GDMA_ClearHalfBlock |= temp_bit;
+    GDMAx->GDMA_CLEARBLOCK_H |= temp_bit;
 #endif
-    GDMAx->GDMA_ClearErr |= temp_bit;
-    GDMAx->GDMA_ClearErrNonSecure |= temp_bit;
+    GDMAx->GDMA_CLEARERR_L |= temp_bit;
 
     /* Mask pending interrupts of corresponding GDMA channel */
-    temp_bit = 0;
-    if (channel_num < 8)
-    {
-        temp_bit = BIT(channel_num + 8);
-    }
-    else
-    {
-        temp_bit = BIT(channel_num + 24 - 8);
-    }
-    /* Mask write enable */
-    GDMAx->GDMA_MaskTfr = temp_bit;
-    GDMAx->GDMA_MaskBlock = temp_bit;
+    temp_bit = CHANNEL_WE_BIT(channel_num);
+    GDMAx->GDMA_MASKTFR_L = temp_bit;
+    GDMAx->GDMA_MASKBLOCK_L = temp_bit;
 #if (GDMA_SUPPORT_INT_HAIF_BLOCK == 1)
-    GDMAx->GDMA_MaskHalfBlock = temp_bit;
+    GDMAx->GDMA_MASKBLOCK_H = temp_bit;
 #endif
-    GDMAx->GDMA_MaskErr = temp_bit;
-    GDMAx->GDMA_MaskErrNonSecure = temp_bit;
+    GDMAx->GDMA_MASKERR_L = temp_bit;
 
     /* ---------------- Configure CTL register ---------------- */
     /* Config low 32 bits of CTL register  */
-    GDMA_CTL_LOWx_TypeDef gdma_0x18 = {.d32 = GDMA_Channelx->GDMA_CTL_LOWx};
-    gdma_0x18.b.INT_EN = ENABLE;
-    gdma_0x18.b.DST_TR_WIDTH = GDMA_InitStruct->GDMA_DestinationDataSize;
-    gdma_0x18.b.SRC_TR_WIDTH = GDMA_InitStruct->GDMA_SourceDataSize;
-    gdma_0x18.b.DINC = GDMA_InitStruct->GDMA_DestinationInc;
-    gdma_0x18.b.SINC = GDMA_InitStruct->GDMA_SourceInc;
-    gdma_0x18.b.DEST_MSIZE = GDMA_InitStruct->GDMA_DestinationMsize;
-    gdma_0x18.b.SRC_MSIZE = GDMA_InitStruct->GDMA_SourceMsize;
-    gdma_0x18.b.TT_FC = GDMA_InitStruct->GDMA_DIR;
-    GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+    GDMA_CTLx_L_TypeDef gdma_ctlxl = {.d32 = GDMA_Channelx->GDMA_CTLx_L};
+    gdma_ctlxl.b.int_en = ENABLE;
+    gdma_ctlxl.b.dst_tr_width = GDMA_InitStruct->GDMA_DestinationDataSize;
+    gdma_ctlxl.b.src_tr_width = GDMA_InitStruct->GDMA_SourceDataSize;
+    gdma_ctlxl.b.dinc = GDMA_InitStruct->GDMA_DestinationInc;
+    gdma_ctlxl.b.sinc = GDMA_InitStruct->GDMA_SourceInc;
+    gdma_ctlxl.b.dest_msize = GDMA_InitStruct->GDMA_DestinationMsize;
+    gdma_ctlxl.b.src_msize = GDMA_InitStruct->GDMA_SourceMsize;
+    gdma_ctlxl.b.tt_fc = GDMA_InitStruct->GDMA_DIR;
+    GDMA_Channelx->GDMA_CTLx_L = gdma_ctlxl.d32;
 
     /* Config high 32 bits of CTL register */
-    GDMA_Channelx->GDMA_CTL_HIGHx = GDMA_InitStruct->GDMA_BufferSize;
+    GDMA_Channelx->GDMA_CTLx_H = GDMA_InitStruct->GDMA_BufferSize;
 
     /* ---------------- Configure CFG register ---------------- */
-    GDMA_CFG_LOWx_TypeDef gdma_0x40 = {.d32 = GDMA_Channelx->GDMA_CFG_LOWx};
+    GDMA_CFGx_L_TypeDef gdma_cfgxl = {.d32 = GDMA_Channelx->GDMA_CFGx_L};
     switch (GDMA_InitStruct->GDMA_DIR)
     {
     case GDMA_DIR_MemoryToMemory:
-        gdma_0x40.b.HS_SEL_DST = 0x1;
-        gdma_0x40.b.HS_SEL_SRC = 0x1;
+        gdma_cfgxl.b.hs_sel_dst = 0x1;
+        gdma_cfgxl.b.hs_sel_src = 0x1;
         break;
     case GDMA_DIR_MemoryToPeripheral:
-        gdma_0x40.b.HS_SEL_DST = 0x0;
-        gdma_0x40.b.HS_SEL_SRC = 0x1;
+        gdma_cfgxl.b.hs_sel_dst = 0x0;
+        gdma_cfgxl.b.hs_sel_src = 0x1;
         break;
     case GDMA_DIR_PeripheralToMemory:
-        gdma_0x40.b.HS_SEL_DST = 0x1;
-        gdma_0x40.b.HS_SEL_SRC = 0x0;
+        gdma_cfgxl.b.hs_sel_dst = 0x1;
+        gdma_cfgxl.b.hs_sel_src = 0x0;
         break;
     case GDMA_DIR_PeripheralToPeripheral:
-        gdma_0x40.b.HS_SEL_DST = 0x0;
-        gdma_0x40.b.HS_SEL_SRC = 0x0;
+        gdma_cfgxl.b.hs_sel_dst = 0x0;
+        gdma_cfgxl.b.hs_sel_src = 0x0;
         break;
     default:
-        gdma_0x40.b.HS_SEL_DST = 0x0;
-        gdma_0x40.b.HS_SEL_SRC = 0x0;
+        gdma_cfgxl.b.hs_sel_dst = 0x0;
+        gdma_cfgxl.b.hs_sel_src = 0x0;
         break;
     }
-    GDMA_Channelx->GDMA_CFG_LOWx = gdma_0x40.d32;
+    GDMA_Channelx->GDMA_CFGx_L = gdma_cfgxl.d32;
 
     /* Set for secure mode */
-    GDMA_CFG_HIGHx_TypeDef gdma_0x44 = {.d32 = GDMA_Channelx->GDMA_CFG_HIGHx};
+    GDMA_CFGx_H_TypeDef gdma_cfgxh = {.d32 = GDMA_Channelx->GDMA_CFGx_H};
+
+#if (GDMA_SUPPORT_SECURE_MODE == 1)
     if (GDMA_InitStruct->GDMA_Secure_En == 1)
     {
-        gdma_0x44.b.PROTCTL = 0x0;
+        gdma_cfgxh.b.protctl = 0x0;
     }
-    GDMA_Channelx->GDMA_CFG_HIGHx = gdma_0x44.d32;
+    GDMA_Channelx->GDMA_CFGx_H = gdma_cfgxh.d32;
+#endif
 
     /* Config multi-block mode */
     if (GDMA_InitStruct->GDMA_Multi_Block_En == 1)
     {
-        /* Clear automatic source/destination reload */
-        gdma_0x40.b.RELOAD_SRC = 0x0;
-        gdma_0x40.b.RELOAD_DST = 0x0;
-        GDMA_Channelx->GDMA_CFG_LOWx = gdma_0x40.d32;
-        /* Clear LLI for source/destination */
-        gdma_0x18.b.LLP_DST_EN = 0x0;
-        gdma_0x18.b.LLP_SRC_EN = 0x0;
-        GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
-
         if (GDMA_InitStruct->GDMA_Multi_Block_Mode & LLP_SELECTED_BIT)
         {
-            GDMA_Channelx->GDMA_LLPx = GDMA_InitStruct->GDMA_Multi_Block_Struct;
-            gdma_0x18.b.LLP_DST_EN = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT27) >> 27;
-            gdma_0x18.b.LLP_SRC_EN = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT28) >> 28;
-            GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+            GDMA_Channelx->GDMA_LLPx_L = GDMA_InitStruct->GDMA_Multi_Block_Struct;
+            gdma_ctlxl.b.llp_dst_en = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT27) >> 27;
+            gdma_ctlxl.b.llp_src_en = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT28) >> 28;
+            GDMA_Channelx->GDMA_CTLx_L = gdma_ctlxl.d32;
         }
-        gdma_0x40.b.RELOAD_SRC = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT30) >> 30;
-        gdma_0x40.b.RELOAD_DST = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT31) >> 31;
-        GDMA_Channelx->GDMA_CFG_LOWx = gdma_0x40.d32;
+        gdma_cfgxl.b.reload_src = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT30) >> 30;
+        gdma_cfgxl.b.reload_dst = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT31) >> 31;
+        GDMA_Channelx->GDMA_CFGx_L = gdma_cfgxl.d32;
+    }
+    else
+    {
+        /* Clear automatic source/destination reload */
+        gdma_cfgxl.b.reload_src = 0x0;
+        gdma_cfgxl.b.reload_dst = 0x0;
+        GDMA_Channelx->GDMA_CFGx_L = gdma_cfgxl.d32;
+        /* Clear LLI for source/destination */
+        gdma_ctlxl.b.llp_dst_en = 0x0;
+        gdma_ctlxl.b.llp_src_en = 0x0;
+        GDMA_Channelx->GDMA_CTLx_L = gdma_ctlxl.d32;
     }
 
     /* ---------------- Set handshake ---------------- */
     /* Configure peripheral parameters and configure source or destination hardware handshaking interface */
     if (GDMA_IsValidHandshake(temp_hs_src) == true)
     {
-        gdma_0x44.b.SRC_PER = temp_hs_src & 0x0F;
-        gdma_0x44.b.ExtendedSRC_PER1 = (temp_hs_src & 0x10) >> 4;
-        gdma_0x44.b.ExtendedSRC_PER2 = (temp_hs_src & 0x20) >> 5;
-        gdma_0x44.b.ExtendedSRC_PER3 = (temp_hs_src & 0x40) >> 6;
+        gdma_cfgxh.b.src_per = temp_hs_src & 0x0F;
+        gdma_cfgxh.b.extended_src_per1 = (temp_hs_src & 0x10) >> 4;
+        gdma_cfgxh.b.extended_src_per2 = (temp_hs_src & 0x20) >> 5;
+        gdma_cfgxh.b.extended_src_per3 = (temp_hs_src & 0x40) >> 6;
 
-        gdma_0x44.b.DEST_PER = temp_hs_dst & 0x0F;
-        gdma_0x44.b.ExtendedDEST_PER1 = (temp_hs_dst & 0x10) >> 4;
-        gdma_0x44.b.ExtendedDEST_PER2 = (temp_hs_dst & 0x20) >> 5;
-        gdma_0x44.b.ExtendedDEST_PER3 = (temp_hs_dst & 0x40) >> 6;
+        gdma_cfgxh.b.dest_per = temp_hs_dst & 0x0F;
+        gdma_cfgxh.b.extended_dest_per1 = (temp_hs_dst & 0x10) >> 4;
+        gdma_cfgxh.b.extended_dest_per2 = (temp_hs_dst & 0x20) >> 5;
+        gdma_cfgxh.b.extended_dest_per3 = (temp_hs_dst & 0x40) >> 6;
 
-        GDMA_Channelx->GDMA_CFG_HIGHx = gdma_0x44.d32;
+        GDMA_Channelx->GDMA_CFGx_H = gdma_cfgxh.d32;
     }
 
     /* Set DMA channel priority level */
-    gdma_0x40.b.CH_PRIOR = GDMA_InitStruct->GDMA_ChannelPriority;
-    GDMA_Channelx->GDMA_CFG_LOWx = gdma_0x40.d32;
+    gdma_cfgxl.b.ch_prior = GDMA_InitStruct->GDMA_ChannelPriority;
+    GDMA_Channelx->GDMA_CFGx_L = gdma_cfgxl.d32;
 
-    /* Enable FIFO mode and Flow control mode, fixed FIFO mode enable */
-
-#if (GDMA_SUPPORT_GATHER_SCATTER_FUNCTION == 1)
     /* ---------------- Configure scatter and gather ---------------- */
+#if (GDMA_SUPPORT_GATHER_SCATTER_FUNCTION == 1)
     /* Set for gather */
-#if (GDMA_SUPPORT_GATHER_SCATTER_ALL_CHANNEL == 1)
-    if (GDMA_InitStruct->GDMA_Gather_En == 1)
-#elif (GDMA_SUPPORT_GATHER_SCATTER_CHANNEL_2345 == 1)
-    if (GDMA_InitStruct->GDMA_Gather_En == 1 &&
-        ((GDMA_Channelx == GDMA_Channel2) || (GDMA_Channelx == GDMA_Channel3) ||
-         (GDMA_Channelx == GDMA_Channel4) || (GDMA_Channelx == GDMA_Channel5)))
-#else
-    if ((GDMA_InitStruct->GDMA_Gather_En == 1) && (GDMAx == GDMA2))
-#endif
+    if (GDMA_IsGatherScatterChannel(GDMA_Channelx))
     {
-        gdma_0x18.b.SRC_GATHER_EN = 0x1;
-        GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+        gdma_ctlxl.b.src_gather_en = GDMA_InitStruct->GDMA_Gather_En;
+        GDMA_Channelx->GDMA_CTLx_L = gdma_ctlxl.d32;
 
-        GDMA_SGR_LOW_t gdma_0x48 = {.d32 = GDMA_Channelx->GDMA_SGR_LOW};
-        gdma_0x48.b.SGI = GDMA_InitStruct->GDMA_GatherInterval & 0xFFFFF;
-        gdma_0x48.b.SGC = GDMA_InitStruct->GDMA_GatherCount & 0xFFF;
-        GDMA_Channelx->GDMA_SGR_LOW = gdma_0x48.d32;
+        if (GDMA_InitStruct->GDMA_Gather_En == 1)
+        {
+            GDMA_SGRx_L_TypeDef gdma_sgrxl = {.d32 = GDMA_Channelx->GDMA_SGRx_L};
+            gdma_sgrxl.b.sgi = GDMA_InitStruct->GDMA_GatherInterval & 0xFFFFF;
+            gdma_sgrxl.b.sgc = GDMA_InitStruct->GDMA_GatherCount & 0xFFF;
+            GDMA_Channelx->GDMA_SGRx_L = gdma_sgrxl.d32;
 
-        GDMA_SGR_HIGH_t gdma_0x4c = {.d32 = GDMA_Channelx->GDMA_SGR_HIGH};
-        gdma_0x4c.b.SGSN = GDMA_InitStruct->GDMA_GatherCircularStreamingNum;
-        GDMA_Channelx->GDMA_SGR_HIGH = gdma_0x4c.d32;
+            GDMA_SGRx_H_TypeDef gdma_sgrxh = {.d32 = GDMA_Channelx->GDMA_SGRx_H};
+            gdma_sgrxh.b.sgsn = GDMA_InitStruct->GDMA_GatherCircularStreamingNum;
+            GDMA_Channelx->GDMA_SGRx_H = gdma_sgrxh.d32;
+        }
     }
     /* Set for scatter */
-#if (GDMA_SUPPORT_GATHER_SCATTER_ALL_CHANNEL == 1)
-    if (GDMA_InitStruct->GDMA_Scatter_En == 1)
-#elif (GDMA_SUPPORT_GATHER_SCATTER_CHANNEL_2345 == 1)
-    if (GDMA_InitStruct->GDMA_Scatter_En == 1 &&
-        ((GDMA_Channelx == GDMA_Channel2) || (GDMA_Channelx == GDMA_Channel3) ||
-         (GDMA_Channelx == GDMA_Channel4) || (GDMA_Channelx == GDMA_Channel5)))
-#else
-    if ((GDMA_InitStruct->GDMA_Scatter_En == 1) && (GDMAx == GDMA2))
-#endif
+    if (GDMA_IsGatherScatterChannel(GDMA_Channelx))
     {
-        gdma_0x18.b.DST_SCATTER_EN = 0x1;
-        GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+        gdma_ctlxl.b.dst_scatter_en = GDMA_InitStruct->GDMA_Scatter_En;
+        GDMA_Channelx->GDMA_CTLx_L = gdma_ctlxl.d32;
 
-        GDMA_DSR_LOW_t gdma_0x50 = {.d32 = GDMA_Channelx->GDMA_DSR_LOW};
-        gdma_0x50.b.DSI = GDMA_InitStruct->GDMA_ScatterInterval & 0xFFFFF;
-        gdma_0x50.b.DSC = GDMA_InitStruct->GDMA_ScatterCount & 0xFFF;
-        GDMA_Channelx->GDMA_DSR_LOW = gdma_0x50.d32;
+        if ((GDMA_InitStruct->GDMA_Scatter_En == 1))
+        {
+            GDMA_DSRx_L_TypeDef gdma_dsrxl = {.d32 = GDMA_Channelx->GDMA_DSRx_L};
+            gdma_dsrxl.b.dsi = GDMA_InitStruct->GDMA_ScatterInterval & 0xFFFFF;
+            gdma_dsrxl.b.dsc = GDMA_InitStruct->GDMA_ScatterCount & 0xFFF;
+            GDMA_Channelx->GDMA_DSRx_L = gdma_dsrxl.d32;
 
-        GDMA_DSR_HIGH_t gdma_0x54 = {.d32 = GDMA_Channelx->GDMA_DSR_HIGH};
-        gdma_0x54.b.DSSN = GDMA_InitStruct->GDMA_ScatterCircularStreamingNum;
-        GDMA_Channelx->GDMA_DSR_HIGH = gdma_0x54.d32;
+            GDMA_DSRx_H_TypeDef gdma_dsrxh = {.d32 = GDMA_Channelx->GDMA_DSRx_H};
+            gdma_dsrxh.b.dssn = GDMA_InitStruct->GDMA_ScatterCircularStreamingNum;
+            GDMA_Channelx->GDMA_DSRx_H = gdma_dsrxh.d32;
+        }
     }
 #endif
 
     /* Clear pending interrupts of corresponding GDMA channel */
     temp_bit = BIT(channel_num);
-    GDMAx->GDMA_ClearTfr |= temp_bit;
-    GDMAx->GDMA_ClearBlock |= temp_bit;
+    GDMAx->GDMA_CLEARTFR_L |= temp_bit;
+    GDMAx->GDMA_CLEARBLOCK_L |= temp_bit;
 #if (GDMA_SUPPORT_INT_HAIF_BLOCK == 1)
-    GDMAx->GDMA_ClearHalfBlock |= temp_bit;
+    GDMAx->GDMA_CLEARBLOCK_H |= temp_bit;
 #endif
-    GDMAx->GDMA_ClearErr |= temp_bit;
-    GDMAx->GDMA_ClearErrNonSecure |= temp_bit;
+    GDMAx->GDMA_CLEARERR_L |= temp_bit;
 }
 
 /**
@@ -318,11 +300,13 @@ void GDMA_StructInit(GDMA_InitTypeDef *GDMA_InitStruct)
     GDMA_InitStruct->GDMA_ScatterCircularStreamingNum = 0;
 #endif
 
+#if (GDMA_SUPPORT_SECURE_MODE == 1)
     GDMA_InitStruct->GDMA_Secure_En             = ENABLE;
+#endif
 }
 
 /**
-  * \brief  Enables or disables the specified GDMA Channelx.
+  * \brief  Enable or disable the specified GDMA Channelx.
   * \param  GDMA_ChannelNum: Select the GDMA channel number. \ref GDMA_CHANNEL_NUM
   * \param  NewState: new state of the DMA Channelx.
   *         This parameter can be: ENABLE or DISABLE.
@@ -346,95 +330,49 @@ void GDMA_Cmd(uint8_t GDMA_ChannelNum, FunctionalState NewState)
     if (NewState == ENABLE)
     {
         /* Enable the selected DMA Channel */
-#if (CHIP_GDMA_CHANNEL_NUM == 27)
-        if (GDMA_ChannelNum < GDMA2_CH_NUM8)
-#else
-        if (channel_num < 8)
-#endif
-        {
-            GDMAx->GDMA_ChEnReg |= BIT(channel_num) | BIT(channel_num + 8);
-        }
-        else
-        {
-            GDMAx->GDMA_ChEnReg |= BIT(channel_num + 16 - 8) | BIT(channel_num + 24 - 8);
-        }
+        GDMAx->GDMA_CHENREG_L = CHANNEL_BIT(channel_num) | CHANNEL_WE_BIT(channel_num);
     }
     else if (NewState == DISABLE)
     {
         /* Disable the selected DMA Channel */
-#if (CHIP_GDMA_CHANNEL_NUM == 27)
-        if (GDMA_ChannelNum < GDMA2_CH_NUM8)
-#else
-        if (channel_num < 8)
-#endif
-        {
-            /*Gdma transfer not finished */
-            if (GDMAx->GDMA_ChEnReg & BIT(channel_num))
-            {
-                /* suspend gdma channel */
-                GDMA_Channelx->GDMA_CFG_LOWx |= GDMA_SUSPEND_TRANSMISSSION;
-            }
-            /* Polling fifo empty */
-            while ((GDMA_GetSuspendChannelStatus(GDMA_Channelx) != SET) && --timeout);
 
-            /*cfg bit0 not set */
-            if (GDMA_GetSuspendChannelStatus(GDMA_Channelx) != SET)
+        /* GDMA transfer not finished */
+        if (GDMAx->GDMA_CHENREG_L & CHANNEL_BIT(channel_num))
+        {
+            /* suspend gdma channel */
+            GDMA_Channelx->GDMA_CFGx_L |= GDMA_SUSPEND_TRANSMISSSION;
+        }
+        /* Polling fifo empty */
+        while ((GDMA_GetSuspendChannelStatus(GDMA_Channelx) != SET) && --timeout);
+
+        /*cfg bit0 not set */
+        if (GDMA_GetSuspendChannelStatus(GDMA_Channelx) != SET)
+        {
+            timeout = bit_need_check_times;
+            /* Polling cfg[1:2] 10 times set in 100timer check */
+            while (--timeout)
             {
-                timeout = bit_need_check_times;
-                /* Polling cfg[1:2] 10 times set in 100timer check */
-                while (--timeout)
+                if (GDMA_GetSuspendCmdStatus(GDMA_Channelx))
                 {
-                    if ((GDMA_Channelx->GDMA_CFG_LOWx & BIT1) && (GDMA_Channelx->GDMA_CFG_LOWx & BIT2))
+                    bit_set_time++;
+                    if (bit_set_time >= bit_need_set_times)
                     {
-                        bit_set_time++;
-                        if (bit_set_time >= bit_need_set_times)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-            /* Disable the selected DMAy Channelx */
-            GDMAx->GDMA_ChEnReg = BIT(channel_num + 8);
         }
-        else
-        {
-            /*gdma transfor not finished */
-            if (GDMAx->GDMA_ChEnReg & BIT(channel_num + 16 - 8))
-            {
-                /* suspend gdma channel */
-                GDMA_Channelx->GDMA_CFG_LOWx |= GDMA_SUSPEND_TRANSMISSSION;
-            }
-            /* Polling fifo empty */
-            while ((GDMA_GetSuspendChannelStatus(GDMA_Channelx) != SET) && --timeout);
 
-            /*cfg bit0 not set */
-            if (GDMA_GetSuspendChannelStatus(GDMA_Channelx) != SET)
-            {
-                timeout = bit_need_check_times;
-                /*polling cfg[1:2] 10 times set in 100timer check */
-                while (--timeout)
-                {
-                    if ((GDMA_Channelx->GDMA_CFG_LOWx & BIT1) && (GDMA_Channelx->GDMA_CFG_LOWx & BIT2))
-                    {
-                        bit_set_time++;
-                        if (bit_set_time >= bit_need_set_times)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            /* Disable the selected DMAy Channelx */
-            GDMAx->GDMA_ChEnReg = BIT(channel_num + 24 - 8);
-        }
+        /* Disable the selected DMAy Channelx */
+        GDMAx->GDMA_CHENREG_L = CHANNEL_WE_BIT(channel_num);
+
         /* unsuspend dma channel */
-        GDMA_Channelx->GDMA_CFG_LOWx &= ~(GDMA_SUSPEND_TRANSMISSSION);
+        GDMA_Channelx->GDMA_CFGx_L &= ~(GDMA_SUSPEND_TRANSMISSSION);
     }
 }
 
 /**
-  * \brief  Enables or disables the specified DMA Channelx interrupts.
+  * \brief  Enable or disable the specified DMA Channelx interrupts.
   * \param  GDMA_ChannelNum: Select the GDMA channel number. \ref GDMA_CHANNEL_NUM
   * \param  GDMA_IT: specifies the GDMA interrupts sources to be enabled or disabled.
   *         This parameter can be any combination of the following values:
@@ -460,74 +398,31 @@ void GDMA_INTConfig(uint8_t GDMA_ChannelNum, uint32_t GDMA_IT, FunctionalState N
     if (NewState == ENABLE)
     {
         /* Enable the selected DMA interrupts */
-#if (CHIP_GDMA_CHANNEL_NUM == 27)
-        if (GDMA_ChannelNum < GDMA2_CH_NUM8)
-#else
-        if (GDMA_ChannelNum < 8)
-#endif
-        {
-            temp_bit = BIT(channel_num) | BIT(channel_num + 8);
-        }
-        else
-        {
-            temp_bit = BIT(channel_num + 16 - 8) | BIT(channel_num + 24 - 8);
-        }
-
-        if (GDMA_IT & GDMA_INT_Transfer)
-        {
-            GDMAx->GDMA_MaskTfr |= temp_bit;
-        }
-        if (GDMA_IT & GDMA_INT_Block)
-        {
-            GDMAx->GDMA_MaskBlock |= temp_bit;
-        }
-#if (GDMA_SUPPORT_INT_HAIF_BLOCK == 1)
-        if (GDMA_IT & GDMA_INT_Half_Block && GDMAx == GDMA2)
-        {
-            GDMAx->GDMA_MaskHalfBlock |= temp_bit;
-        }
-#endif
-        if (GDMA_IT & GDMA_INT_Error)
-        {
-            GDMAx->GDMA_MaskErr |= temp_bit;
-            GDMAx->GDMA_MaskErrNonSecure |= temp_bit;
-        }
+        temp_bit = CHANNEL_BIT(channel_num) | CHANNEL_WE_BIT(channel_num);
     }
-    else if (NewState == DISABLE)
+    else
     {
         /* Disable the selected DMA interrupts */
-#if (CHIP_GDMA_CHANNEL_NUM == 27)
-        if (GDMA_ChannelNum < GDMA2_CH_NUM8)
-#else
-        if (GDMA_ChannelNum < 8)
-#endif
-        {
-            temp_bit = BIT(channel_num + 8);
-        }
-        else
-        {
-            temp_bit = BIT(channel_num + 24 - 8);
-        }
+        temp_bit = CHANNEL_WE_BIT(channel_num);
+    }
 
-        if (GDMA_IT & GDMA_INT_Transfer)
-        {
-            GDMAx->GDMA_MaskTfr = temp_bit;
-        }
-        if (GDMA_IT & GDMA_INT_Block)
-        {
-            GDMAx->GDMA_MaskBlock = temp_bit;
-        }
+    if (GDMA_IT & GDMA_INT_Transfer)
+    {
+        GDMAx->GDMA_MASKTFR_L = temp_bit;
+    }
+    if (GDMA_IT & GDMA_INT_Block)
+    {
+        GDMAx->GDMA_MASKBLOCK_L = temp_bit;
+    }
 #if (GDMA_SUPPORT_INT_HAIF_BLOCK == 1)
-        if (GDMA_IT & GDMA_INT_Half_Block && GDMAx == GDMA2)
-        {
-            GDMAx->GDMA_MaskHalfBlock = temp_bit;
-        }
+    if ((GDMA_IT & GDMA_INT_Half_Block) && GDMA_IsHalfBlcokChannel(GDMAx))
+    {
+        GDMAx->GDMA_MASKBLOCK_H = temp_bit;
+    }
 #endif
-        if (GDMA_IT & GDMA_INT_Error)
-        {
-            GDMAx->GDMA_MaskErr = temp_bit;
-            GDMAx->GDMA_MaskErrNonSecure = temp_bit;
-        }
+    if (GDMA_IT & GDMA_INT_Error)
+    {
+        GDMAx->GDMA_MASKERR_L = temp_bit;
     }
 }
 
@@ -541,17 +436,14 @@ ITStatus GDMA_GetTransferINTStatus(uint8_t GDMA_ChannelNum)
     /* Check the parameters */
     assert_param(IS_GDMA_ChannelNum(GDMAx_Channel_Num));
 
-    ITStatus bit_status = RESET;
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
     uint8_t channel_num = GDMA_GetGDMAChannelNum(GDMA_ChannelNum);
 
-    if ((GDMAx->GDMA_StatusTfr & BIT(channel_num)) != (uint32_t)RESET)
+    if ((GDMAx->GDMA_STATUSTFR_L & BIT(channel_num)) != (uint32_t)RESET)
     {
-        bit_status = SET;
+        return SET;
     }
-
-    /* Return the transfer interrupt status */
-    return  bit_status;
+    return RESET;
 }
 
 /**
@@ -576,29 +468,26 @@ void GDMA_ClearINTPendingBit(uint8_t GDMA_ChannelNum, uint32_t GDMA_IT)
 
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
     uint8_t channel_num = GDMA_GetGDMAChannelNum(GDMA_ChannelNum);
-    uint32_t temp_bit = 0;
+    uint32_t temp_bit = BIT(channel_num);
 
     /* clear the selected DMA interrupts */
-    temp_bit = BIT(channel_num);
-
     if (GDMA_IT & GDMA_INT_Transfer)
     {
-        GDMAx->GDMA_ClearTfr = temp_bit;
+        GDMAx->GDMA_CLEARTFR_L = temp_bit;
     }
     if (GDMA_IT & GDMA_INT_Block)
     {
-        GDMAx->GDMA_ClearBlock = temp_bit;
+        GDMAx->GDMA_CLEARBLOCK_L = temp_bit;
     }
 #if (GDMA_SUPPORT_INT_HAIF_BLOCK == 1)
-    if (GDMA_IT & GDMA_INT_Half_Block && GDMAx == GDMA2)
+    if ((GDMA_IT & GDMA_INT_Half_Block) && GDMA_IsHalfBlcokChannel(GDMAx))
     {
-        GDMAx->GDMA_ClearHalfBlock = temp_bit;
+        GDMAx->GDMA_CLEARBLOCK_H = temp_bit;
     }
 #endif
     if (GDMA_IT & GDMA_INT_Error)
     {
-        GDMAx->GDMA_ClearErr = temp_bit;
-        GDMAx->GDMA_ClearErrNonSecure = temp_bit;
+        GDMAx->GDMA_CLEARERR_L = temp_bit;
     }
 }
 
@@ -615,16 +504,14 @@ void GDMA_ClearAllTypeINT(uint8_t GDMA_ChannelNum)
 
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
     uint8_t channel_num = GDMA_GetGDMAChannelNum(GDMA_ChannelNum);
-    uint32_t temp_bit = 0;
+    uint32_t temp_bit = BIT(channel_num);
 
-    temp_bit = BIT(channel_num);
-    GDMAx->GDMA_ClearTfr = temp_bit;
-    GDMAx->GDMA_ClearBlock = temp_bit;
+    GDMAx->GDMA_CLEARTFR_L = temp_bit;
+    GDMAx->GDMA_CLEARBLOCK_L = temp_bit;
 #if (GDMA_SUPPORT_INT_HAIF_BLOCK == 1)
-    GDMAx->GDMA_ClearHalfBlock = temp_bit;
+    GDMAx->GDMA_CLEARBLOCK_H = temp_bit;
 #endif
-    GDMAx->GDMA_ClearErr = temp_bit;
-    GDMAx->GDMA_ClearErrNonSecure = temp_bit;
+    GDMAx->GDMA_CLEARERR_L = temp_bit;
 }
 
 /**
@@ -638,33 +525,17 @@ FlagStatus GDMA_GetChannelStatus(uint8_t GDMA_ChannelNum)
     /* Check the parameters */
     assert_param(IS_GDMA_ChannelNum(GDMA_ChannelNum));
 
-    FlagStatus bit_status = RESET;
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
     uint8_t channel_num = GDMA_GetGDMAChannelNum(GDMA_ChannelNum);
 
-#if (CHIP_GDMA_CHANNEL_NUM == 27)
-    if (GDMA_ChannelNum < GDMA2_CH_NUM8)
-#else
-    if (GDMA_ChannelNum < 8)
-#endif
+    if ((GDMAx->GDMA_CHENREG_L & CHANNEL_BIT(channel_num)) != (uint32_t)RESET)
     {
-        if ((GDMAx->GDMA_ChEnReg & BIT(channel_num)) != (uint32_t)RESET)
-        {
-            bit_status = SET;
-        }
+        return SET;
     }
-    else
-    {
-        if ((GDMAx->GDMA_ChEnReg & BIT(channel_num + 16 - 8)) != (uint32_t)RESET)
-        {
-            bit_status = SET;
-        }
-    }
-
-    /* Return the selected channel status */
-    return  bit_status;
+    return  RESET;
 }
 
+#if (GDMA_SUPPORT_SECURE_MODE == 1)
 /**
   * \brief  Enable or disable the specified DMA channel secure functions.
   * \param  GDMA_ChannelNum: Select the GDMA channel number. \ref GDMA_CHANNEL_NUM
@@ -677,11 +548,13 @@ void GDMA_SecureCmd(GDMA_ChannelTypeDef *GDMA_Channelx, FunctionalState NewState
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    GDMA_CFG_HIGHx_TypeDef gdma_0x44 = {.d32 = GDMA_Channelx->GDMA_CFG_HIGHx};
-    gdma_0x44.b.PROTCTL = !NewState;
-    GDMA_Channelx->GDMA_CFG_HIGHx = gdma_0x44.d32;
+    GDMA_CFGx_H_TypeDef gdma_cfgxh = {.d32 = GDMA_Channelx->GDMA_CFGx_H};
+    gdma_cfgxh.b.protctl = !NewState;
+    GDMA_Channelx->GDMA_CFGx_H = gdma_cfgxh.d32;
 }
+#endif
 
+#if (GDMA_SUPPORT_OSW_OSR_CHANGE == 1)
 /**
   * \brief  Set GDMA OSW.
   * \param  GDMA_ChannelNum: Select the GDMA channel number. \ref GDMA_CHANNEL_NUM
@@ -695,9 +568,9 @@ void GDMA_SetOSW(uint8_t GDMA_ChannelNum, uint8_t osw_count)
 
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
 
-    GDMA_DmaOsNum_TypeDef gdma_0x3b8 = {.d32 = GDMAx->GDMA_DmaOsNum};
-    gdma_0x3b8.b.OSW = osw_count & 0xFF;
-    GDMAx->GDMA_DmaOsNum = gdma_0x3b8.d32;
+    GDMA_DMAOSNUM_L_TypeDef gdma_osnum = {.d32 = GDMAx->GDMA_DMAOSNUM_L};
+    gdma_osnum.b.osw = osw_count & 0xFF;
+    GDMAx->GDMA_DMAOSNUM_L = gdma_osnum.d32;
 }
 
 /**
@@ -713,9 +586,9 @@ void GDMA_SetOSR(uint8_t GDMA_ChannelNum, uint8_t osr_count)
 
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
 
-    GDMA_DmaOsNum_TypeDef gdma_0x3b8 = {.d32 = GDMAx->GDMA_DmaOsNum};
-    gdma_0x3b8.b.OSR = osr_count & 0xFF;
-    GDMAx->GDMA_DmaOsNum = gdma_0x3b8.d32;
+    GDMA_DMAOSNUM_L_TypeDef gdma_osnum = {.d32 = GDMAx->GDMA_DMAOSNUM_L};
+    gdma_osnum.b.osr = osr_count & 0xFF;
+    GDMAx->GDMA_DMAOSNUM_L = gdma_osnum.d32;
 }
 
 /**
@@ -730,8 +603,9 @@ uint8_t GDMA_GetOSWCount(uint8_t GDMA_ChannelNum)
 
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
 
-    GDMA_DmaOsNum_TypeDef gdma_0x3b8 = {.d32 = GDMAx->GDMA_DmaOsNum};
-    return gdma_0x3b8.b.OSW & 0xFF;
+    GDMA_DMAOSNUM_L_TypeDef gdma_osnum = {.d32 = GDMAx->GDMA_DMAOSNUM_L};
+
+    return gdma_osnum.b.osw & 0xFF;
 }
 
 /**
@@ -746,10 +620,11 @@ uint8_t GDMA_GetOSRCount(uint8_t GDMA_ChannelNum)
 
     GDMA_TypeDef *GDMAx = GDMA_GetGDMAxByCh(GDMA_ChannelNum);
 
-    GDMA_DmaOsNum_TypeDef gdma_0x3b8 = {.d32 = GDMAx->GDMA_DmaOsNum};
+    GDMA_DMAOSNUM_L_TypeDef gdma_osnum = {.d32 = GDMAx->GDMA_DMAOSNUM_L};
 
-    return gdma_0x3b8.b.OSR & 0xFF;
+    return gdma_osnum.b.osr & 0xFF;
 }
+#endif
 
 /**
   * \brief  Suspend GDMA transmission safe from the source.Please check GDMA FIFO empty to guarnatee without losing data.
@@ -767,7 +642,7 @@ bool GDMA_SafeSuspend(GDMA_ChannelTypeDef *GDMA_Channelx)
     uint8_t timeout = bit_need_check_times;
 
     /* Suspend transmission */
-    GDMA_Channelx->GDMA_CFG_LOWx |= GDMA_SUSPEND_TRANSMISSSION;
+    GDMA_Channelx->GDMA_CFGx_L |= GDMA_SUSPEND_TRANSMISSSION;
 
     /* Disable the selected DMAy Channelx */
     /* polling fifo empty */
@@ -778,7 +653,7 @@ bool GDMA_SafeSuspend(GDMA_ChannelTypeDef *GDMA_Channelx)
         /*polling cfg[1:2] 10 times set in 100timer check */
         while (--timeout)
         {
-            if ((GDMA_Channelx->GDMA_CFG_LOWx & BIT1) && (GDMA_Channelx->GDMA_CFG_LOWx & BIT2))
+            if (GDMA_GetSuspendCmdStatus(GDMA_Channelx))
             {
                 bit_set_time++;
                 if (bit_set_time >= bit_need_set_times)
@@ -790,7 +665,7 @@ bool GDMA_SafeSuspend(GDMA_ChannelTypeDef *GDMA_Channelx)
         if (timeout == 0)
         {
             /* unsuspend dma channel */
-            GDMA_Channelx->GDMA_CFG_LOWx &= ~(GDMA_SUSPEND_TRANSMISSSION);
+            GDMA_Channelx->GDMA_CFGx_L &= ~(GDMA_SUSPEND_TRANSMISSSION);
             return false;
         }
     }
@@ -838,7 +713,7 @@ void GDMA_SetLLPAddress(GDMA_ChannelTypeDef *GDMA_Channelx, uint32_t Address)
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    GDMA_Channelx->GDMA_LLPx = Address & 0xFFFFFFFC;
+    GDMA_Channelx->GDMA_LLPx_L = Address & 0xFFFFFFFC;
 }
 
 /**
@@ -853,7 +728,7 @@ void GDMA_SetBufferSize(GDMA_ChannelTypeDef *GDMA_Channelx, uint32_t buffer_size
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
     /* Configure high 32 bit of CTL register */
-    GDMA_Channelx->GDMA_CTL_HIGHx = buffer_size;
+    GDMA_Channelx->GDMA_CTLx_H = buffer_size;
 }
 
 /**
@@ -866,9 +741,7 @@ uint32_t GDMA_GetSrcTransferAddress(GDMA_ChannelTypeDef *GDMA_Channelx)
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    uint32_t address = 0;
-    address = GDMA_Channelx->GDMA_SARx;
-    return address;
+    return GDMA_Channelx->GDMA_SARx;
 }
 
 /**
@@ -881,9 +754,7 @@ uint32_t GDMA_GetDstTransferAddress(GDMA_ChannelTypeDef *GDMA_Channelx)
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    uint32_t address = 0;
-    address = GDMA_Channelx->GDMA_DARx;
-    return address;
+    return GDMA_Channelx->GDMA_DARx;
 }
 
 /**
@@ -896,7 +767,7 @@ uint16_t GDMA_GetTransferLen(GDMA_ChannelTypeDef *GDMA_Channelx)
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    return (uint16_t)(GDMA_Channelx->GDMA_CTL_HIGHx & 0xffffffff);
+    return (uint16_t)(GDMA_Channelx->GDMA_CTLx_H & 0xFFFFFFFF);
 }
 
 /**
@@ -906,18 +777,17 @@ uint16_t GDMA_GetTransferLen(GDMA_ChannelTypeDef *GDMA_Channelx)
  */
 FlagStatus GDMA_GetFIFOStatus(GDMA_ChannelTypeDef *GDMA_Channelx)
 {
-    FlagStatus bit_status = RESET;
-
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    if ((GDMA_Channelx->GDMA_CFG_LOWx & GDMA_FIFO_STATUS) != (uint32_t)RESET)
+    if ((GDMA_Channelx->GDMA_CFGx_L & GDMA_FIFO_STATUS) != (uint32_t)RESET)
     {
-        bit_status = SET;
+        if (GDMA_GetSuspendCmdStatus(GDMA_Channelx))
+        {
+            return SET;
+        }
     }
-
-    /* Return the selected channel status */
-    return  bit_status;
+    return  RESET;
 }
 
 /**
@@ -936,12 +806,12 @@ void GDMA_SuspendCmd(GDMA_ChannelTypeDef *GDMA_Channelx,
     if (NewState == DISABLE)
     {
         /* Not suspend transmission*/
-        GDMA_Channelx->GDMA_CFG_LOWx &= ~(GDMA_SUSPEND_TRANSMISSSION);
+        GDMA_Channelx->GDMA_CFGx_L &= ~(GDMA_SUSPEND_TRANSMISSSION);
     }
     else
     {
         /* Suspend transmission */
-        GDMA_Channelx->GDMA_CFG_LOWx |= GDMA_SUSPEND_TRANSMISSSION;
+        GDMA_Channelx->GDMA_CFGx_L |= GDMA_SUSPEND_TRANSMISSSION;
     }
 }
 
@@ -952,18 +822,14 @@ void GDMA_SuspendCmd(GDMA_ChannelTypeDef *GDMA_Channelx,
  */
 FlagStatus GDMA_GetSuspendCmdStatus(GDMA_ChannelTypeDef *GDMA_Channelx)
 {
-    FlagStatus bit_status = RESET;
-
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    if ((GDMA_Channelx->GDMA_CFG_LOWx & GDMA_SUSPEND_CMD_STATUS) == GDMA_SUSPEND_CMD_STATUS)
+    if ((GDMA_Channelx->GDMA_CFGx_L & GDMA_SUSPEND_CMD_STATUS) == GDMA_SUSPEND_CMD_STATUS)
     {
-        bit_status = SET;
+        return SET;
     }
-
-    /* Return the selected channel suspend status */
-    return  bit_status;
+    return  RESET;
 }
 
 /**
@@ -973,18 +839,14 @@ FlagStatus GDMA_GetSuspendCmdStatus(GDMA_ChannelTypeDef *GDMA_Channelx)
  */
 FlagStatus GDMA_GetSuspendChannelStatus(GDMA_ChannelTypeDef *GDMA_Channelx)
 {
-    FlagStatus bit_status = RESET;
-
     /* Check the parameters */
     assert_param(IS_GDMA_ALL_PERIPH(GDMA_Channelx));
 
-    if ((GDMA_Channelx->GDMA_CFG_LOWx & GDMA_SUSPEND_CHANNEL_STATUS) == GDMA_SUSPEND_CHANNEL_STATUS)
+    if ((GDMA_Channelx->GDMA_CFGx_L & GDMA_SUSPEND_CHANNEL_STATUS) == GDMA_SUSPEND_CHANNEL_STATUS)
     {
-        bit_status = SET;
+        return SET;
     }
-
-    /* Return the selected channel suspend status */
-    return  bit_status;
+    return  RESET;
 }
 
 /**
@@ -995,7 +857,7 @@ FlagStatus GDMA_GetSuspendChannelStatus(GDMA_ChannelTypeDef *GDMA_Channelx)
  */
 void GDMA_SetLLPMode(GDMA_ChannelTypeDef *GDMA_Channelx, uint32_t mode)
 {
-    GDMA_Channelx->GDMA_CTL_LOWx = ((GDMA_Channelx->GDMA_CTL_LOWx & (~LLI_TRANSFER)) | mode);
+    GDMA_Channelx->GDMA_CTLx_L = ((GDMA_Channelx->GDMA_CTLx_L & (~LLI_TRANSFER)) | mode);
 }
 
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/

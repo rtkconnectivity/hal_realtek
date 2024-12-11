@@ -1,13 +1,21 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+**********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl_nvic.c
+* \brief    This file provides all the NVIC firmware functions.
+* \details
+* \author   Yuan Feng
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_nvic.h"
+#include "app_section.h"
 
 /*============================================================================*
  *                           Public Functions
@@ -19,6 +27,7 @@
   *         the configuration information for the specified NVIC peripheral.
   * \return None
   */
+RAM_FUNCTION
 void NVIC_Init(NVIC_InitTypeDef *NVIC_InitStruct)
 {
     /* Check the parameters */
