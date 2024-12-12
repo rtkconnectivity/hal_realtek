@@ -1,7 +1,13 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
+/**
+ *****************************************************************************************
+ *     Copyright(c) 2018, Realtek Semiconductor Corporation. All rights reserved.
+ *****************************************************************************************
+ * @file    fmc_platform.h
+ * @brief   Flexible memory controller (SPIC & PSRAMC) platform dependent implementation header file
+ * @author  Yao-Yu
+ * @date    2020-10-20
+ * @version v0.1
+ * ***************************************************************************************
  */
 
 #ifndef _FMC_PLATFORM_H
@@ -26,6 +32,9 @@
   * @brief
   * @{
   */
+#define SPIC0_ADDR            0x04000000
+#define SPIC0_SIZE            (64*1024*1024)
+
 #define FMC_MAIN0_ADDR                                      (SPIC0_ADDR)
 #define FMC_MAIN0_SIZE                                      (SPIC0_SIZE)
 
