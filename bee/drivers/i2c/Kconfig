@@ -1,13 +1,13 @@
 # Copyright (c) 2024 Realtek Semiconductor Corp.
 # SPDX-License-Identifier: Apache-2.0
-config REALTEK_I2C
-	bool "REALTEK MCU i2c driver"
+config REALTEK_BEE_I2C
+	bool "REALTEK Bee MCU i2c driver"
 	default y
-	depends on USE_HAL_REALTEK_I2C
+	depends on USE_HAL_REALTEK_BEE_I2C
 
-	select USE_HAL_REALTEK_RCC
-	select USE_HAL_REALTEK_PINMUX
-	select USE_HAL_REALTEK_NVIC
+	select USE_HAL_REALTEK_BEE_RCC
+	select USE_HAL_REALTEK_BEE_PINMUX
+	select USE_HAL_REALTEK_BEE_NVIC
 
 	help
-	  This option enables the i2c driver for REALTEK MCU.
+	  This option enables the i2c driver for REALTEK Bee MCU.

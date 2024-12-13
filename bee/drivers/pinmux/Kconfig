@@ -1,10 +1,10 @@
 # Copyright (c) 2024 Realtek Semiconductor Corp.
 # SPDX-License-Identifier: Apache-2.0
-config REALTEK_PINMUX
-	bool "REALTEK MCU pinmux driver"
+config REALTEK_BEE_PINMUX
+	bool "REALTEK Bee MCU pinmux driver"
 	default y
-	depends on USE_HAL_REALTEK_PINMUX
+	depends on USE_HAL_REALTEK_BEE_PINMUX
 	default n
 
 	help
-	  This option enables the pinmux driver for REALTEK MCU.
+	  This option enables the pinmux driver for REALTEK Bee MCU.

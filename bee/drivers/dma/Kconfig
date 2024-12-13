@@ -1,13 +1,13 @@
 # Copyright (c) 2024 Realtek Semiconductor Corp.
 # SPDX-License-Identifier: Apache-2.0
-config REALTEK_DMA
-	bool "REALTEK MCU dma driver"
+config REALTEK_BEE_DMA
+	bool "REALTEK Bee MCU dma driver"
 	default y
-	depends on USE_HAL_REALTEK_DMA
+	depends on USE_HAL_REALTEK_BEE_DMA
 
-	select USE_HAL_REALTEK_RCC
-	select USE_HAL_REALTEK_PINMUX
-	select USE_HAL_REALTEK_NVIC
+	select USE_HAL_REALTEK_BEE_RCC
+	select USE_HAL_REALTEK_BEE_PINMUX
+	select USE_HAL_REALTEK_BEE_NVIC
 
 	help
-	  This option enables the dma driver for REALTEK MCU.
+	  This option enables the dma driver for REALTEK Bee MCU.
