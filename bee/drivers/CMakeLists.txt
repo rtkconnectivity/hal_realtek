@@ -30,11 +30,7 @@ add_subdirectory_ifdef(CONFIG_REALTEK_BEE_AON_QDEC qdec)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_BEE_SPI spi)
 
-add_subdirectory_ifdef(CONFIG_REALTEK_BEE_USB usb)
-
 add_subdirectory_ifdef(CONFIG_REALTEK_BEE_BT bluetooth)
-
-add_subdirectory_ifdef(CONFIG_REALTEK_BEE_PPT ppt)
 
 if (CONFIG_REALTEK_BEE_CORE_WDT OR CONFIG_REALTEK_BEE_AON_WDT)
 add_subdirectory(wdt)
