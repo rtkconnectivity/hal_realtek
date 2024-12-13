@@ -4,6 +4,8 @@ config REALTEK_BEE_BT
 	bool "REALTEK Bee MCU bluetooth driver"
 	default y
 
+	depends on USE_HAL_REALTEK_BEE_HCI
+
 	help
 	  This option enables the bluetooth driver for REALTEK bee family of
 	  processors.
