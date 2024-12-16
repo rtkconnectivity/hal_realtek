@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_i2c.h
+* \brief    The header file of the peripheral I2C driver.
+* \details  This file provides all I2C firmware functions.
+* \author   yuzhuo_liu
+* \date     2023-10-17
+* \version  v1.0
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,15 +24,18 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "i2c/src/rtl87x2g/rtl_i2c_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "i2c/src/rtl87x3e/rtl_i2c_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "i2c/src/rtl8763d/rtl_i2c_def.h"
+#include "i2c/src/rtl87x3d/rtl_i2c_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "i2c/src/rtl87x2j/rtl_i2c_def.h"
 #endif
 
-/** \defgroup 87X2G_I2C         I2C
+/** \defgroup I2C         I2C
   * \brief
   * \{
   */
@@ -39,36 +49,21 @@ extern "C" {
   */
 
 /**
- * \brief       I2C Define
- *
+ * \defgroup    I2C_Clock_Speed I2C Clock Speed
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
-#if (CHIP_I2C_NUM == 3)
-#define IS_I2C_ALL_PERIPH(PERIPH) (((PERIPH) == I2C0) || \
-                                   ((PERIPH) == I2C1) || \
-                                   ((PERIPH) == I2C2))
-#elif (CHIP_I2C_NUM == 4)
-#define IS_I2C_ALL_PERIPH(PERIPH) (((PERIPH) == I2C0) || \
-                                   ((PERIPH) == I2C1) || \
-                                   ((PERIPH) == I2C2) || \
-                                   ((PERIPH) == I2C3))
-#endif
-
-/**
- * \brief       I2C Clock Speed
- *
- * \ingroup     I2C_Exported_Constants
- */
-
 #define IS_I2C_CLOCK_SPEED(SPEED) (((SPEED) >= 0x01) && ((SPEED) <= I2C_CLOCK_MAX_SPEED))
 
+/** End of I2C_Clock_Speed
+  * \}
+  */
+
 /**
- * \brief       I2C Device Mode
- *
+ * \defgroup    I2C_Device_Mode I2C Device Mode
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
 typedef enum
 {
     I2C_DeviveMode_Slave = 0x00,
@@ -77,12 +72,15 @@ typedef enum
 
 #define IS_I2C_DEVICE_MODE(MODE) (((MODE) == I2C_DeviveMode_Slave) || ((MODE) == I2C_DeviveMode_Master))
 
+/** End of I2C_Device_Mode
+  * \}
+  */
+
 /**
- * \brief       I2C Address Mode
- *
+ * \defgroup    I2C_Address_Mode I2C Address Mode
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
 typedef enum
 {
     I2C_AddressMode_7BIT = 0x00,
@@ -91,28 +89,37 @@ typedef enum
 
 #define IS_I2C_ADDRESS_MODE(ADDR) (((ADDR) == I2C_AddressMode_7BIT) || ((ADDR) == I2C_AddressMode_10BIT))
 
+/** End of I2C_Address_Mode
+  * \}
+  */
+
 /**
- * \brief       I2C Acknowledgement
- *
+ * \defgroup    I2C_Acknowledgement I2C Acknowledgement
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
 #define IS_I2C_ACKNOWLEDGEMENT(ACK) (((ACK) == ENABLE) || ((ACK) == DISABLE))
 
+/** End of I2C_Acknowledgement
+  * \}
+  */
+
 /**
- * \brief       I2C Send Stop
- *
+ * \defgroup    I2C_Send_Stop I2C Send Stop
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
 #define IS_I2C_STOP(CMD) (((CMD) == I2C_STOP_ENABLE) || ((CMD) == I2C_STOP_DISABLE))
 
+/** End of I2C_Send_Stop
+  * \}
+  */
+
 /**
- * \brief       I2C Send Command
- *
+ * \defgroup    I2C_Send_Command I2C Send Command
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
 typedef enum
 {
     I2C_WRITE_CMD = 0x00,
@@ -121,12 +128,15 @@ typedef enum
 
 #define IS_I2C_CMD(CMD) (((CMD) == I2C_WRITE_CMD) || ((CMD) == I2C_READ_CMD))
 
+/** End of I2C_Send_Command
+  * \}
+  */
+
 /**
- * \brief       I2C GDMA transfer requests
- *
+ * \defgroup    I2C_GDMA_transfer_requests I2C GDMA transfer requests
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
 typedef enum
 {
     I2C_GDMAReq_Rx = 0x01,
@@ -135,12 +145,15 @@ typedef enum
 
 #define IS_I2C_GDMAREQ(GDMAREQ) (((GDMAREQ) == I2C_GDMAReq_Rx) || ((GDMAREQ) == I2C_GDMAReq_Tx))
 
+/** End of I2C_GDMA_transfer_requests
+  * \}
+  */
+
 /**
- * \brief       I2C status.
- *
+ * \defgroup    I2C_Status I2C Status
+ * \{
  * \ingroup     I2C_Exported_Constants
  */
-
 typedef enum
 {
     I2C_Success,
@@ -153,12 +166,17 @@ typedef enum
     I2C_ERR_TIMEOUT
 } I2C_Status;
 
+/** End of I2C_Status
+  * \}
+  */
+
 /**
  * \defgroup    I2C_Interrupts I2C Interrupts
  * \{
  * \ingroup     I2C_Exported_Constants
  */
 
+#define I2C_INT_MST_ON_HOLD                     BIT13
 #define I2C_INT_GEN_CALL                        BIT11
 #define I2C_INT_START_DET                       BIT10
 #define I2C_INT_STOP_DET                        BIT9
@@ -172,15 +190,16 @@ typedef enum
 #define I2C_INT_RX_OVER                         BIT1
 #define I2C_INT_RX_UNDER                        BIT0
 
-/** End of I2C_Interrupts
-  * \}
-  */
 #define I2C_GET_INT(INT)    (((INT) == I2C_INT_GEN_CALL) || ((INT) == I2C_INT_START_DET) || \
                              ((INT) == I2C_INT_STOP_DET) || ((INT) == I2C_INT_ACTIVITY) || \
                              ((INT) == I2C_INT_RX_DONE)  || ((INT) == I2C_INT_TX_ABRT) || \
                              ((INT) == I2C_INT_RD_REQ)   || ((INT) == I2C_INT_TX_EMPTY) || \
                              ((INT) == I2C_INT_TX_OVER)  || ((INT) == I2C_INT_RX_FULL) || \
-                             ((INT) == I2C_INT_RX_OVER)  || ((INT) == I2C_INT_RX_UNDER))
+                             ((INT) == I2C_INT_RX_OVER)  || ((INT) == I2C_INT_RX_UNDER) || ((INT) == I2C_INT_MST_ON_HOLD))
+
+/** End of I2C_Interrupts
+  * \}
+  */
 
 /**
  * \defgroup    I2C_Flags I2C Flags
@@ -188,6 +207,10 @@ typedef enum
  * \ingroup     I2C_Exported_Constants
  */
 
+#define I2C_FLAG_SLV_HOLD_RX_FIFO_FULL          BIT10
+#define I2C_FLAG_SLV_HOLD_TX_FIFO_EMPTY         BIT9
+#define I2C_FLAG_MST_HOLD_RX_FIFO_FULL          BIT8
+#define I2C_FLAG_MST_HOLD_TX_FIFO_EMPTY         BIT7
 #define I2C_FLAG_SLV_ACTIVITY                   BIT6
 #define I2C_FLAG_MST_ACTIVITY                   BIT5
 #define I2C_FLAG_RFF                            BIT4
@@ -196,13 +219,16 @@ typedef enum
 #define I2C_FLAG_TFNF                           BIT1
 #define I2C_FLAG_ACTIVITY                       BIT0
 
-/** End of I2C_Flags
-  * \}
-  */
-#define IS_I2C_GET_FLAG(FLAG) (((FLAG) == I2C_FLAG_SLV_ACTIVITY) || ((FLAG) == I2C_FLAG_MST_ACTIVITY) || \
+#define IS_I2C_GET_FLAG(FLAG) (((FLAG) == I2C_FLAG_SLV_HOLD_RX_FIFO_FULL) || ((FLAG) == I2C_FLAG_SLV_HOLD_TX_FIFO_EMPTY) || \
+                               ((FLAG) == I2C_FLAG_MST_HOLD_RX_FIFO_FULL) || ((FLAG) == I2C_FLAG_MST_HOLD_TX_FIFO_EMPTY) || \
+                               ((FLAG) == I2C_FLAG_SLV_ACTIVITY) || ((FLAG) == I2C_FLAG_MST_ACTIVITY) || \
                                ((FLAG) == I2C_FLAG_RFF) || ((FLAG) == I2C_FLAG_RFNE) || \
                                ((FLAG) == I2C_FLAG_TFE) || ((FLAG) == I2C_FLAG_TFNF) || \
                                ((FLAG) == I2C_FLAG_ACTIVITY))
+
+/** End of I2C_Flags
+  * \}
+  */
 
 /**
  * \defgroup    I2C_Transmit_Abort_Source I2C Transmit Abort Source
@@ -227,9 +253,6 @@ typedef enum
 #define ABRT_10ADDR1_NOACK                      BIT1
 #define ABRT_7B_ADDR_NOACK                      BIT0
 
-/** End of I2C_Transmit_Abort_Source
-  * \}
-  */
 #define MS_ALL_ABORT                            (ARB_LOST | ABRT_MASTER_DIS | ABRT_TXDATA_NOACK |\
                                                  ABRT_10ADDR2_NOACK | ABRT_10ADDR1_NOACK | ABRT_7B_ADDR_NOACK)
 
@@ -250,6 +273,10 @@ typedef enum
                              ((EVENT) == ABRT_10ADDR1_NOACK) || \
                              ((EVENT) == ABRT_7B_ADDR_NOACK))
 
+/** End of I2C_Transmit_Abort_Source
+  * \}
+  */
+
 /**
  * \defgroup    I2C_Immediate_Number I2C Immediate Number
  * \{
@@ -262,6 +289,42 @@ typedef enum
 /** End of I2C_Immediate_Number
   * \}
   */
+
+#if (I2C_SUPPORT_RAP_FUNCTION == 1)
+/**
+ * \defgroup    I2C_Wrapper_Trans_Mode I2C Wrapper Trans Mode
+ * \{
+ * \ingroup     I2C_Exported_Constants
+ */
+
+typedef enum
+{
+    I2C_WRAPPER_TRANS_MODE_WRITE       = 0,
+    I2C_WRAPPER_TRANS_MODE_READ        = 1,
+    I2C_WRAPPER_TRANS_MODE_REPEAT_READ = 2,
+    I2C_WRAPPER_TRANS_MODE_DMA         = 3,
+} I2CWrapperTransMode_TypeDef;
+
+/** End of I2C_Wrapper_Trans_Mode
+  * \}
+  */
+
+/**
+ * \defgroup    I2C_Task I2C Task Number
+ * \{
+ * \ingroup     I2C_Exported_Constants
+ */
+
+typedef enum
+{
+    I2C_TASK_START = 0,
+} I2CTask_TypeDef;
+
+/** End of I2C_Task
+  * \}
+  */
+
+#endif
 
 /** End of I2C_Exported_Constants
   * \}
@@ -296,7 +359,7 @@ typedef struct
     uint16_t I2C_SlaveAddress;             /*!< Specifies the first device own address.
                                                 This parameter can be a 7-bit or 10-bit address. */
 
-    FunctionalState I2C_Ack;               /*!< Enables or disables the acknowledgement
+    FunctionalState I2C_Ack;               /*!< Enable or disable the acknowledgement
                                                 only in slave mode.
                                                 This parameter can be a value of ENABLE or DISABLE. */
 
@@ -319,6 +382,9 @@ typedef struct
 
     uint8_t  I2C_RxWaterlevel;             /*!< Specifies the DMA rx water level.
                                                 The best value is I2C Rx GDMA MSize. */
+
+    uint8_t  I2C_RisingTimeNs;            /*!< Specifies the I2C SDA/SCL rising time.
+                                                The unit is ns and must be an integer multiple of clock src period. */
 
 } I2C_InitTypeDef;
 
@@ -565,6 +631,7 @@ I2C_Status I2C_RepeatRead(I2C_TypeDef *I2Cx, uint8_t *pWriteBuf, uint16_t Writel
  *
  * \param[in] I2Cx: Select the I2C peripheral. \ref I2C_Declaration
  * \param[in] I2C_IT: This parameter can be one of the following values:
+ *            \arg I2C_INT_MST_ON_HOLD: Indicates whether a master is holding the bus.
  *            \arg I2C_INT_GEN_CALL: Set only when a General Call address is received and it is acknowledged.
  *            \arg I2C_INT_START_DET: Indicates whether a START or RESTART condition has occurred on the I2C
  *                 interface regardless of whether I2C is operating in slave or master mode.
@@ -777,6 +844,10 @@ void I2C_ClearAllINT(I2C_TypeDef *I2Cx);
  * \param[in] I2Cx: Select the I2C peripheral. \ref I2C_Declaration
  * \param[in] I2C_FLAG: Specifies the flag to check.
  *            This parameter can be one of the following values:
+ *            \arg I2C_FLAG_SLV_HOLD_RX_FIFO_FULL: The BUS Hold in Slave mode due to the Rx FIFO being Full and an additional byte being received.
+ *            \arg I2C_FLAG_SLV_HOLD_TX_FIFO_EMPTY: The BUS Hold in Slave mode for the Read request when the Tx FIFO is empty.
+ *            \arg I2C_FLAG_MST_HOLD_RX_FIFO_FULL: The BUS Hold in Master mode due to Rx FIFO is full and additional byte has been received.
+ *            \arg I2C_FLAG_MST_HOLD_TX_FIFO_EMPTY: The BUS hold when the master holds the bus because of the Tx FIFO being empty.
  *            \arg I2C_FLAG_SLV_ACTIVITY: Slave FSM activity status.
  *            \arg I2C_FLAG_MST_ACTIVITY: Master FSM activity status.
  *            \arg I2C_FLAG_RFF: Receive FIFO completely full.
@@ -841,6 +912,7 @@ FlagStatus I2C_CheckEvent(I2C_TypeDef *I2Cx, uint32_t I2C_EVENT);
  *
  * \param[in] I2Cx: Select the I2C peripheral. \ref I2C_Declaration
  * \param[in] I2C_IT: This parameter can be one of the following values:
+ *            \arg I2C_INT_MST_ON_HOLD: Indicates whether a master is holding the bus.
  *            \arg I2C_INT_GEN_CALL: Set only when a General Call address is received and it is acknowledged.
  *            \arg I2C_INT_START_DET: Indicates whether a START or RESTART condition has occurred on the I2C
  *                 interface regardless of whether DW_apb_i2c is operating in slave or master mode.
@@ -919,6 +991,69 @@ void I2C_GDMACmd(I2C_TypeDef *I2Cx, I2CGdmaTransferRequests_TypeDef I2C_GDMAReq,
  * \endcode
  */
 void I2C_SetClockSpeed(I2C_TypeDef *I2Cx, uint32_t I2C_ClockSpeed);
+
+/**
+ * \brief  I2C clock divider config.
+ *
+ * \param[in] I2Cx: Select the I2C peripheral. \ref I2C_Declaration
+ * \param[in] ClockDiv: Specifies the I2C clock divider.
+ *            This parameter can be one of the following values:
+ *            \arg I2C_CLOCK_DIVIDER_x: where x can refer to CLock Divider to select the specified clock divider
+ *
+ * \return None.
+ *
+ * <b>Example usage</b>
+ * \code{.c}
+ *
+ * void driver_i2c_init(void)
+ * {
+ *     I2C_ClkDivConfig(I2C0, I2C_CLOCK_DIVIDER_1);
+ * }
+ * \endcode
+ */
+void I2C_ClkDivConfig(I2C_TypeDef *I2Cx, I2CClockDiv_TypeDef ClockDiv);
+
+/**
+ * \brief  Get I2C clock divider.
+ *
+ * \param[in] I2Cx: Select the I2C peripheral. \ref I2C_Declaration
+ * \param[out] ClockSrc: specifies the clock source to gates its clock.
+ * \param[out] ClockDiv: Specifies the I2C clock divider.
+ *            This parameter can be one of the following values:
+ *            \arg I2C_CLOCK_DIVIDER_x: where x can refer to CLock Divider to select the specified clock divider
+ *
+ * \return The status of get clock.
+ */
+bool I2C_ClkGet(I2C_TypeDef *I2Cx, I2CClockSrc_TypeDef *ClockSrc, I2CClockDiv_TypeDef *ClockDiv);
+
+
+#if (I2C_SUPPORT_RAP_FUNCTION == 1)
+void I2C_WrapperModeCmd(I2C_TypeDef *I2Cx, FunctionalState NewState);
+
+bool I2C_WrapperTransModeSet(I2C_TypeDef *I2Cx, uint32_t mode);
+
+void I2C_WrapperWriteDataSet(I2C_TypeDef *I2Cx, uint8_t num, const uint8_t *buf);
+
+uint8_t I2C_WrapperGetTxFIFOLen(I2C_TypeDef *I2Cx);
+
+void I2C_WrapperTxFIFOClear(I2C_TypeDef *I2Cx);
+
+void I2C_WrapperReadNumSet(I2C_TypeDef *I2Cx, uint16_t num);
+
+uint8_t I2C_WrapperReceiveData(I2C_TypeDef *I2Cx);
+
+uint8_t I2C_WrapperGetRxFIFOLen(I2C_TypeDef *I2Cx);
+
+void I2C_WrapperTransStart(I2C_TypeDef *I2Cx);
+
+bool I2C_WrapperBusyCheck(I2C_TypeDef *I2Cx);
+
+void I2C_RAPModeCmd(I2C_TypeDef *I2Cx, FunctionalState NewState);
+
+void I2C_TaskTrigger(I2C_TypeDef *I2Cx, uint32_t Task);
+
+#endif
+
 
 /** End of I2C_Exported_Functions
   * \}

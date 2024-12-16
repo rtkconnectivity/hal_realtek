@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl_uart.c
+* \brief    This file provides all the UART firmware functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
@@ -22,40 +29,47 @@ void UART_DeInit(UART_TypeDef *UARTx)
 {
     assert_param(IS_UART_PERIPH(UARTx));
 
-    if (UARTx == UART0)
+    switch ((uint32_t)UARTx)
     {
+#ifdef UART0
+    case (uint32_t)UART0:
         RCC_PeriphClockCmd(APBPeriph_UART0, APBPeriph_UART0_CLOCK, DISABLE);
-    }
-    else if (UARTx == UART1)
-    {
-        RCC_PeriphClockCmd(APBPeriph_UART1, APBPeriph_UART1_CLOCK, DISABLE);
-    }
-    else if (UARTx == UART2)
-    {
-        RCC_PeriphClockCmd(APBPeriph_UART2, APBPeriph_UART2_CLOCK, DISABLE);
-    }
-    else if (UARTx == UART3)
-    {
-        RCC_PeriphClockCmd(APBPeriph_UART3, APBPeriph_UART3_CLOCK, DISABLE);
-    }
-#if (CHIP_UART_NUM >= 6)
-    else if (UARTx == UART4)
-    {
-        RCC_PeriphClockCmd(APBPeriph_UART4, APBPeriph_UART4_CLOCK, DISABLE);
-    }
-    else if (UARTx == UART5)
-    {
-        RCC_PeriphClockCmd(APBPeriph_UART5, APBPeriph_UART5_CLOCK, DISABLE);
-    }
-#if (CHIP_UART_NUM >= 7)
-    else if (UARTx == UART6)
-    {
-        RCC_PeriphClockCmd(APBPeriph_UART6, APBPeriph_UART6_CLOCK, DISABLE);
-    }
+        break;
 #endif
+#ifdef UART1
+    case (uint32_t)UART1:
+        RCC_PeriphClockCmd(APBPeriph_UART1, APBPeriph_UART1_CLOCK, DISABLE);
+        break;
+#endif
+#ifdef UART2
+    case (uint32_t)UART2:
+        RCC_PeriphClockCmd(APBPeriph_UART2, APBPeriph_UART2_CLOCK, DISABLE);
+        break;
+#endif
+#ifdef UART3
+    case (uint32_t)UART3:
+        RCC_PeriphClockCmd(APBPeriph_UART3, APBPeriph_UART3_CLOCK, DISABLE);
+        break;
+#endif
+#ifdef UART4
+    case (uint32_t)UART4:
+        RCC_PeriphClockCmd(APBPeriph_UART4, APBPeriph_UART4_CLOCK, DISABLE);
+        break;
+#endif
+#ifdef UART5
+    case (uint32_t)UART5:
+        RCC_PeriphClockCmd(APBPeriph_UART5, APBPeriph_UART5_CLOCK, DISABLE);
+        break;
+#endif
+#ifdef UART6
+    case (uint32_t)UART6:
+        RCC_PeriphClockCmd(APBPeriph_UART6, APBPeriph_UART6_CLOCK, DISABLE);
+        break;
 #endif
 
-    return;
+    default:
+        break;
+    }
 }
 
 /**
@@ -91,7 +105,9 @@ void UART_Init(UART_TypeDef *UARTx, UART_InitTypeDef *UART_InitStruct)
     /* Clear FIFO */
     UART_FCR_TypeDef uart_0x08 = {.d32 = 0x0};
     uart_0x08.b.clear_rxfifo = 0x1;
+#if UART_SUPPORT_CLEAR_TX_FIFO
     uart_0x08.b.clear_txfifo = 0x1;
+#endif
     UARTx->UART_IIR_FCR = uart_0x08.d32;
 
     /* Set baudrate, firstly set DLAB bit */
@@ -219,7 +235,7 @@ void UART_MaskINTConfig(UART_TypeDef *UARTx, uint32_t UART_INT_MASK, FunctionalS
 }
 
 /**
-  * \brief  Enables or disables the specified UART interrupts.
+  * \brief  Enable or disable the specified UART interrupts.
   * \param  UARTx: Select the UART peripheral. \ref UART_Declaration
   * \param  UART_INT: specifies the UART interrupts sources to be enabled or disabled.
   *         This parameter can be any combination of the following values:
@@ -586,6 +602,7 @@ uint16_t UART_GetIID(UART_TypeDef *UARTx)
     return (uint16_t)(UARTx->UART_IIR_FCR & (0x0000000E));
 }
 
+#if UART_SUPPORT_CLEAR_TX_FIFO
 /**
  * \brief   Clear Tx FIFO of the selected UART peripheral.
  * \param   UARTx: Select the UART peripheral. \ref UART_Declaration
@@ -603,6 +620,7 @@ void UART_ClearTxFIFO(UART_TypeDef *UARTx)
 
     return;
 }
+#endif
 
 /**
  * \brief   Clear Rx FIFO of the selected UART peripheral.

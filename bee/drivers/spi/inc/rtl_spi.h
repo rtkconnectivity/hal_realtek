@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_spi.h
+* \brief    The header file of the peripheral SPI driver.
+* \details  This file provides all SPI firmware functions.
+* \author   yuzhuo_liu
+* \date     2023-10-17
+* \version  v1.0
+* *******************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,18 +24,18 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "spi/src/rtl87x2g/rtl_spi_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "spi/src/rtl87x3e/rtl_spi_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "spi/src/rtl8763d/rtl_spi_def.h"
-#include "rcc/inc/rtl_rcc.h"
+#include "spi/src/rtl87x3d/rtl_spi_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "spi/src/rtl87x2j/rtl_spi_def.h"
 #endif
 
-/** \defgroup 87X2G_SPI         SPI
+/** \defgroup SPI         SPI
   * \brief
   * \{
   */
@@ -40,28 +47,21 @@ extern "C" {
   * \{
   */
 
-#if (CHIP_SPI_NUM == 3)
-#define IS_SPI_ALL_PERIPH(PERIPH) (((PERIPH) == SPI0) || \
-                                   ((PERIPH) == SPI1) || \
-                                   ((PERIPH) == SPI0_SLAVE))
-#elif (CHIP_SPI_NUM == 4)
-#define IS_SPI_ALL_PERIPH(PERIPH) (((PERIPH) == SPI0) || \
-                                   ((PERIPH) == SPI1) || \
-                                   ((PERIPH) == SPI2) || \
-                                   ((PERIPH) == SPI0_SLAVE))
-#elif (CHIP_SPI_NUM == 5)
-#define IS_SPI_ALL_PERIPH(PERIPH) (((PERIPH) == SPI0) || \
-                                   ((PERIPH) == SPI1) || \
-                                   ((PERIPH) == SPI2) || \
-                                   ((PERIPH) == SPI3) || \
-                                   ((PERIPH) == SPI0_SLAVE))
-#endif
+/**
+ * \defgroup    SPI_Clock_Speed SPI Clock Speed
+ * \{
+ * \ingroup     SPI_Exported_Constants
+ */
+#define IS_SPI_CLOCK_SPEED(SPEED) (((SPEED) >= 0x01) && \
+                                   ((SPEED) <= 40000000))
 
-#define IS_SPI_CLOCK_SPEED(SPEED) (((SPEED) >= 0x01) && ((SPEED) <= 40000000))
+/** End of SPI_Clock_Speed
+  * \}
+  */
 
 /**
- * \brief       SPI Data Direction
- *
+ * \defgroup    SPI_Data_Direction SPI Data Direction
+ * \{
  * \ingroup     SPI_Exported_Constants
  */
 typedef enum
@@ -71,14 +71,19 @@ typedef enum
     SPI_Direction_RxOnly     = 0x02,
     SPI_Direction_EEPROM     = 0x03,
 } SPIDataDirection_TypeDef;
+
 #define IS_SPI_DIRECTION_MODE(MODE) (((MODE) == SPI_Direction_FullDuplex) || \
                                      ((MODE) == SPI_Direction_RxOnly) || \
                                      ((MODE) == SPI_Direction_TxOnly) || \
                                      ((MODE) == SPI_Direction_EEPROM))
 
+/** End of SPI_Data_Direction
+  * \}
+  */
+
 /**
- * \brief       SPI Data Size
- *
+ * \defgroup    SPI_Data_Size SPI Data Size
+ * \{
  * \ingroup     SPI_Exported_Constants
  */
 typedef enum
@@ -113,6 +118,7 @@ typedef enum
     SPI_DataSize_31b = 0x1E,
     SPI_DataSize_32b = 0x1F,
 } SPIDataSize_TypeDef;
+
 #define IS_SPI_DATASIZE(DATASIZE) (((DATASIZE) == SPI_DataSize_4b)  || \
                                    ((DATASIZE) == SPI_DataSize_5b)  || \
                                    ((DATASIZE) == SPI_DataSize_6b)  || \
@@ -143,9 +149,13 @@ typedef enum
                                    ((DATASIZE) == SPI_DataSize_31b) || \
                                    ((DATASIZE) == SPI_DataSize_32b))
 
+/** End of SPI_Data_Size
+  * \}
+  */
+
 /**
- * \brief       SPI Clock Polarity
- *
+ * \defgroup    SPI_Clock_Polarity SPI Clock Polarity
+ * \{
  * \ingroup     SPI_Exported_Constants
  */
 typedef enum
@@ -153,12 +163,17 @@ typedef enum
     SPI_CPOL_Low = 0x00,
     SPI_CPOL_High = 0x01,
 } SPIClockPolarity_TypeDef;
+
 #define IS_SPI_CPOL(CPOL) (((CPOL) == SPI_CPOL_Low) || \
                            ((CPOL) == SPI_CPOL_High))
 
+/** End of SPI_Clock_Polarity
+  * \}
+  */
+
 /**
- * \brief       SPI Clock Phase
- *
+ * \defgroup    SPI_Clock_Phase SPI Clock Phase
+ * \{
  * \ingroup     SPI_Exported_Constants
  */
 typedef enum
@@ -166,8 +181,13 @@ typedef enum
     SPI_CPHA_1Edge = 0x00,
     SPI_CPHA_2Edge = 0x01,
 } SPIClockPhase_TypeDef;
+
 #define IS_SPI_CPHA(CPHA) (((CPHA) == SPI_CPHA_1Edge) || \
                            ((CPHA) == SPI_CPHA_2Edge))
+
+/** End of SPI_Clock_Phase
+  * \}
+  */
 
 /**
  * \defgroup    SPI_BaudRate_Prescaler_Value SPI BaudRate Prescaler Value
@@ -187,30 +207,27 @@ typedef enum
 #define SPI_BaudRatePrescaler_128    0x80
 #define SPI_BaudRatePrescaler_256    0x100
 
+#define IS_SPI_BAUDRATE_PRESCALER(PRESCALER) ((PRESCALER) <= 0xFFFF)
+
 /** End of SPI_BaudRate_Prescaler_Value
   * \}
   */
 
-#define IS_SPI_BAUDRATE_PRESCALER(PRESCALER) ((PRESCALER) <= 0xFFFF)
-
 /**
- * \brief       SPI Swap Enable
- *
+ * \defgroup    SPI_Swap_Enable SPI Swap Enable
+ * \{
  * \ingroup     SPI_Exported_Constants
  */
 #define IS_SPI_SWAPMODE(mode) (((mode) == DISABLE) || \
                                ((mode) == ENABLE))
 
-#if (SPI_SUPPORT_WRAP_MODE == 1)
-#define  SPI_0X200_CS_INV_EN                   BIT5
-#define  SPI_0X200_MOSI_DRV_LOW_EN             BIT4
-#define  SPI_0X200_MOSI_PULL_EN                BIT3
-#define  SPI_0X200_MST_TX_FIFO_EN              BIT1
-#endif
+/** End of SPI_Swap_Enable
+  * \}
+  */
 
 /**
- * \brief       SPI Frame Format
- *
+ * \defgroup    SPI_Frame_Format SPI Frame Format
+ * \{
  * \ingroup     SPI_Exported_Constants
  */
 typedef enum
@@ -220,14 +237,19 @@ typedef enum
     SPI_Frame_NS_MICROWIRE  = 0x02,
     SPI_Frame_Reserve       = 0x03,
 } SPIFrameFormat_TypeDef;
+
 #define IS_SPI_FRAME_FORMAT(FRAME) (((FRAME) == SPI_Frame_Motorola) || \
                                     ((FRAME) == SPI_Frame_TI_SSP) || \
                                     ((FRAME) == SPI_Frame_NS_MICROWIRE) || \
                                     ((FRAME) == SPI_Frame_Reserve))
 
+/** End of SPI_Frame_Format
+  * \}
+  */
+
 /**
- * \brief       SPI GDMA Transfer Request
- *
+ * \defgroup    SPI_GDMA_Transfer_Request SPI GDMA Transfer Request
+ * \{
  * \ingroup     SPI_Exported_Constants
  */
 typedef enum
@@ -235,8 +257,13 @@ typedef enum
     SPI_GDMAReq_Rx = 0x01,
     SPI_GDMAReq_Tx = 0x02,
 } SPIGdmaTransferRequests_TypeDef;
+
 #define IS_SPI_GDMAREQ(GDMAREQ) (((GDMAREQ)  == SPI_GDMAReq_Rx) || \
                                  ((GDMAREQ) == SPI_GDMAReq_Tx))
+
+/** End of SPI_GDMA_Transfer_Request
+  * \}
+  */
 
 /**
  * \defgroup    SPI_Flags SPI Flags
@@ -250,11 +277,24 @@ typedef enum
 #define SPI_FLAG_RFF                    BIT4
 #define SPI_FLAG_TXE                    BIT5
 #define SPI_FLAG_DCOL                   BIT6
+#if (SPI_SUPPORT_WRAP_MODE == 1)
+#define SPI_FLAG_WRAP_CS_EN             BIT8
+#define SPI_FLAG_WRAP_TFNF              BIT9
+#define SPI_FLAG_WRAP_TFE               BIT10
+#endif
 
-/** End of SPI_Flags
-  * \}
-  */
-
+#if (SPI_SUPPORT_WRAP_MODE == 1)
+#define IS_SPI_GET_FLAG(FLAG)   (((FLAG) == SPI_FLAG_DCOL) || \
+                                 ((FLAG) == SPI_FLAG_TXE) || \
+                                 ((FLAG) == SPI_FLAG_RFF) || \
+                                 ((FLAG) == SPI_FLAG_RFNE) || \
+                                 ((FLAG) == SPI_FLAG_TFE) || \
+                                 ((FLAG) == SPI_FLAG_TFNF) || \
+                                 ((FLAG) == SPI_FLAG_BUSY) || \
+                                 ((FLAG) == SPI_FLAG_WRAP_CS_EN) || \
+                                 ((FLAG) == SPI_FLAG_WRAP_TFNF) || \
+                                 ((FLAG) == SPI_FLAG_WRAP_TFE))
+#else
 #define IS_SPI_GET_FLAG(FLAG)   (((FLAG) == SPI_FLAG_DCOL) || \
                                  ((FLAG) == SPI_FLAG_TXE) || \
                                  ((FLAG) == SPI_FLAG_RFF) || \
@@ -262,6 +302,11 @@ typedef enum
                                  ((FLAG) == SPI_FLAG_TFE) || \
                                  ((FLAG) == SPI_FLAG_TFNF) || \
                                  ((FLAG) == SPI_FLAG_BUSY))
+#endif
+
+/** End of SPI_Flags
+  * \}
+  */
 
 /**
  * \defgroup    SPI_Interrupt SPI Interrupt
@@ -278,12 +323,10 @@ typedef enum
 #define SPI_INT_TUF                    BIT6  //only SLAVE
 #define SPI_INT_RIG                    BIT7  //only SLAVE
 #if (SPI_SUPPORT_WRAP_MODE == 1)
-#define SPI_INT_TXNDF_DONE             BIT10
+#define SPI_INT_WRAP_TXE               BIT8
+#define SPI_INT_WRAP_TXO               BIT9
+#define SPI_INT_WRAP_TXD               BIT10
 #endif
-
-/** End of SPI_Interrupt
-  * \}
-  */
 
 #if (SPI_SUPPORT_WRAP_MODE == 1)
 #define IS_SPI_CONFIG_IT(IT) (((IT) == SPI_INT_TXE) || \
@@ -295,7 +338,9 @@ typedef enum
                               ((IT) == SPI_INT_FAE) || \
                               ((IT) == SPI_INT_TUF) || \
                               ((IT) == SPI_INT_RIG) || \
-                              ((IT) == SPI_INT_TXNDF_DONE))
+                              ((IT) == SPI_INT_WRAP_TXE) || \
+                              ((IT) == SPI_INT_WRAP_TXO) || \
+                              ((IT) == SPI_INT_WRAP_TXD))
 #else
 #define IS_SPI_CONFIG_IT(IT) (((IT) == SPI_INT_TXE) || \
                               ((IT) == SPI_INT_TXO) || \
@@ -308,12 +353,17 @@ typedef enum
                               ((IT) == SPI_INT_RIG) )
 #endif
 
+/** End of SPI_Interrupt
+  * \}
+  */
 
 #if (SPI0_SUPPORT_MASTER_SLAVE == 1)
 
-/** @defgroup SPI_mode SPI Mode
-  * @{
-  */
+/**
+ * \defgroup    SPI_mode SPI Mode
+ * \{
+ * \ingroup     SPI_Exported_Constants
+ */
 typedef enum
 {
     SPI_Mode_Master = ((uint16_t)0x0104),
@@ -323,10 +373,28 @@ typedef enum
 #define IS_SPI_MODE(MODE) (((MODE) == SPI_Mode_Master) || \
                            ((MODE) == SPI_Mode_Slave))
 
-/** End of group SPI_mode
-  * @}
+/** End of SPI_mode
+  * \}
   */
 #endif
+
+/**
+ * \defgroup    SPI_TaskEvent SPI Task Event
+ * \{
+ * \ingroup     SPI_Exported_Constants
+ */
+#if (SPI_SUPPORT_RAP_FUNCTION == 1)
+typedef enum
+{
+    SPI_TASK_START  = 0,
+    SPI_EVENT_START = 1,
+    SPI_EVENT_END   = 2,
+} SPITaskEvent_TypeDef;
+#endif
+
+/** End of SPI_TaskEvent
+  * \}
+  */
 
 /** End of SPI_Exported_Constants
   * \}
@@ -347,36 +415,34 @@ typedef enum
  */
 typedef struct
 {
-    SPIDataDirection_TypeDef SPI_Direction;        /*!< Specifies the SPI unidirectional
+    SPIDataDirection_TypeDef SPI_Direction;    /*!< Specifies the SPI unidirectional
                                                     or bidirectional data mode. */
 #if (SPI_SUPPORT_WRAP_MODE == 1)
-    uint32_t SPI_RXNDF;                          /*!< Specifies the trigger condition in RxOnly or EEPROM mode.
-                                                    This parameter should be the value of the length of read data,
-                                                    from 1 to 65536. */
-
     uint32_t SPI_TXNDF;                        /*!< Specifies the trigger condition in TxOnly or FullDuplex mode.
                                                     This parameter should be the value of the length of read data,
                                                     from 1 to 65536. */
+
     FunctionalState SPI_CSHighActiveEn;        /*!< Specifies whether to enable CS high active.
                                                     This parameter can be a value of ENABLE or DISABLE. */
 
-    FunctionalState SPI_TXWaperModeEn;         /*!< Specifies the TX waper mode (TX NDF) enable.
+    FunctionalState SPI_WrapModeEn;            /*!< Specifies the TX waper mode (TX NDF) enable.
                                                     Only SPI1 have txndf mode.
                                                     ENABLE: Hardware won't automatically pull
                                                     SPI_CSN high when TX FIFO is empty.
                                                     DISABLE: SPI_CSN pull high when
                                                     TX data number = SPI_TXNDF+1.*/
 
-    FunctionalState SPI_TXWaperModeDmaEn;      /*!< Specifies the TX waper mode(TX NDF) DMA enable.*/
+    FunctionalState SPI_WrapModeDmaEn;         /*!< Specifies the TX waper mode(TX NDF) DMA enable.*/
 
     uint8_t  SPI_TxNdfWaterlevel;              /*!< Specifies the TX NDF DMA tx water level max number is 63. >*/
-#else
-    uint32_t SPI_NDF;                          /*!< Specifies the trigger condition in EEPROM mode.
-                                                    This parameter should be the value of the length of read data, from 1 to 65536. */
 #endif
 
+    uint32_t SPI_RXNDF;                        /*!< Specifies the trigger condition in RxOnly or EEPROM mode.
+                                                    This parameter should be the value of the length of read data,
+                                                    from 1 to 65536. */
+
 #if (SPI0_SUPPORT_MASTER_SLAVE == 1)
-    SPIMode_Typedef           SPI_Mode;
+    SPIMode_Typedef           SPI_Mode;        /*!< Specifies the SPI Mode. */
 #endif
 
     SPIDataSize_TypeDef SPI_DataSize;          /*!< Specifies the SPI data size. */
@@ -386,7 +452,7 @@ typedef struct
     SPIClockPhase_TypeDef SPI_CPHA;            /*!< Specifies clock active edge for bit capture. */
 
     SPIFrameFormat_TypeDef
-    SPI_FrameFormat;        /*!< Specifies which serial protocol transfers the data. */
+    SPI_FrameFormat;    /*!< Specifies which serial protocol transfers the data. */
 
     uint32_t SPI_BaudRatePrescaler;            /*!< Specifies the speed of SCK clock.
                                                     SPI Clock Speed = clk source/SPI_ClkDIV.
@@ -394,6 +460,7 @@ typedef struct
                                                     \note The communication clock is derived from the master clock.
                                                     The slave clock does not need to be set. */
 
+#if (SPI_SUPPORT_SWAP == 1)
     FunctionalState SPI_SwapTxBitEn;           /*!< Specifies whether to swap SPI Tx data bit.
                                                     This parameter can be a value of ENABLE or DISABLE. */
 
@@ -405,6 +472,7 @@ typedef struct
 
     FunctionalState SPI_SwapRxByteEn;          /*!< Specifies whether to swap SPI Rx data byte.
                                                     This parameter can be a value of ENABLE or DISABLE. */
+#endif
 
     FunctionalState SPI_ToggleEn;              /*!< Specifies whether to toggle when transfer done.
                                                     This parameter can be a value of ENABLE or DISABLE. */
@@ -527,7 +595,7 @@ void SPI_Init(SPI_TypeDef *SPIx, SPI_InitTypeDef *SPI_InitStruct);
 void SPI_StructInit(SPI_InitTypeDef *SPI_InitStruct);
 
 /**
- * \brief  Enables or disables the selected SPI peripheral.
+ * \brief  Enable or disable the selected SPI peripheral.
  *
  * \param[in] SPIx: Select the SPI peripheral. \ref SPI_Declaration
  * \param[in] NewState: New state of the SPIx peripheral.
@@ -584,7 +652,7 @@ void SPI_Cmd(SPI_TypeDef *SPIx, FunctionalState NewState);
 void SPI_SendBuffer(SPI_TypeDef *SPIx, uint8_t *pBuf, uint16_t len);
 
 /**
- * \brief  Transmits a number of halfWords through the SPIx peripheral.
+ * \brief  Transmit a number of halfword through the SPIx peripheral.
  *
  * \param[in] SPIx: Select the SPI peripheral. \ref SPI_Declaration
  * \param[in] pBuf: Halfwords to be transmitted.
@@ -828,9 +896,9 @@ void SPI_SetCSNumber(SPI_TypeDef *SPIx, uint8_t number);
  *            \arg SPI_INT_RXU: Receive FIFO Underflow Interrupt.
  *            \arg SPI_INT_TXO: Transmit FIFO Overflow Interrupt .
  *            \arg SPI_INT_TXE: Transmit FIFO Empty Interrupt.
- *            \arg SPI_INT_TXNDF_FIFO_EMPTY: TX NDF mode FIFO Transmit FIFO Empty Interrupt.
- *            \arg SPI_INT_TXNDF_FIFO_OV: TX NDF mode FIFO Overflow Interrupt.
- *            \arg SPI_INT_TXNDF_DONE: TX NDF mode transmit done Interrupt.
+ *            \arg SPI_INT_WRAP_TXE: TX NDF mode FIFO Transmit FIFO Empty Interrupt.
+ *            \arg SPI_INT_WRAP_TXO: TX NDF mode FIFO Overflow Interrupt.
+ *            \arg SPI_INT_WRAP_TXD: TX NDF mode transmit done Interrupt.
  *
  * \return The new state of SPI_IT (SET or RESET).
  *
@@ -877,7 +945,7 @@ ITStatus SPI_GetINTStatus(SPI_TypeDef *SPIx, uint32_t SPI_IT);
 FlagStatus SPI_GetFlagState(SPI_TypeDef *SPIx, uint16_t SPI_FLAG);
 
 /**
- * \brief   Enables or disables the SPIx GDMA interface.
+ * \brief   Enable or disable the SPIx GDMA interface.
  *
  * \param[in] SPIx: Select the SPI peripheral. \ref SPI_Declaration
  * \param[in] SPI_GDMAReq: Specifies the SPI GDMA transfer request to be enabled or disabled.
@@ -955,7 +1023,7 @@ void SPI_SetRxSampleDly(SPI_TypeDef *SPIx, uint32_t delay);
 #if (SPI_SUPPORT_WRAP_MODE == 1)
 
 /**
- * \brief   Enables or disables the specified SPI wrap mode start transfer.
+ * \brief   Enable or disable the specified SPI wrap mode start transfer.
  *
  * \param[in] SPIx: Select the SPI peripheral. \ref SPI_Declaration
  * \param[in] NewState: new state of the SPIx peripheral.
@@ -1042,6 +1110,92 @@ void SPI_PullMOSIEn(SPI_TypeDef *SPIx, FunctionalState NewState);
 
 #endif
 
+/**
+ * \brief     SPI clock divider config.
+ *
+ * \param[in] SPIx: Select the SPI peripheral. \ref SPI_Declaration
+ * \param[in] ClockDiv: Specifies the SPI clock divider.
+ *            This parameter can be one of the following values:
+ *            \arg CLOCK_DIV_x: where x can refer to CLock Divider to select the specified clock divider
+ *
+ * \return None.
+ *
+ * <b>Example usage</b>
+ * \code{.c}
+ *
+ * void driver_spi_init(void)
+ * {
+ *     RCC_SPIClkDivConfig(SPI0, CLOCK_DIV_1);
+ * }
+ * \endcode
+ */
+void SPI_ClkDivConfig(SPI_TypeDef *SPIx, SPIClockDiv_TypeDef ClockDiv);
+
+#if SPI_SUPPORT_CLOCK_SOURCE_CONFIG
+/**
+  * \brief  SPI clock config.
+  * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
+  * \param  ClockSrc: specifies the clock source to gates its clock.
+  * \param  ClockDiv: specifies the clock divide to gates its clock.
+  * \return None
+  */
+void SPI_ClkConfig(SPI_TypeDef *SPIx, SPIClockSrc_TypeDef ClockSrc,
+                   SPIClockDiv_TypeDef ClockDiv);
+
+/**
+  * \brief  Get SPI clock config.
+  * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
+  * \param  ClockSrc: specifies the clock source to gates its clock.
+  * \param  ClockDiv: specifies the clock divide to gates its clock.
+  * \return The status of get clock.
+  */
+bool SPI_ClkGet(SPI_TypeDef *SPIx, SPIClockSrc_TypeDef *ClockSrc, SPIClockDiv_TypeDef *ClockDiv);
+#endif
+
+#if SPI_SUPPORT_CLOCK_SOURCE_SWTICH
+/**
+ * rtl876x_rcc.h
+ *
+ * \brief  SPI clock source switch.
+ *
+ * \param[in] SPIx: Select the SPI peripheral. \ref SPI_Declaration
+ * \param[in] ClockSource: SPI clock source to switch.
+ *            This parameter can be one of the following values:
+ *            \arg SPI_CLOCK_SOURCE_40M: Select SPI clock source of 40MHz.
+ *            \arg SPI_CLOCK_SOURCE_PLL: Select SPI clock source of PLL.
+ *
+ * \return None.
+ *
+ * <b>Example usage</b>
+ * \code{.c}
+ *
+ * void driver_spi_init(void)
+ * {
+ *     SPI_ClkSourceSwitch(SPI0, SPI_CLOCK_SOURCE_40M);
+ * }
+ * \endcode
+ */
+extern void SPI_ClkSourceSwitch(SPI_TypeDef *SPIx, uint16_t ClockSource);
+#endif
+
+
+#if (SPI_SUPPORT_RAP_FUNCTION == 1)
+
+void SPI_RAPModeCmd(SPI_TypeDef *SPIx, FunctionalState NewState);
+
+void SPI_SetTaskCmdNum(SPI_TypeDef *SPIx, uint8_t num);
+
+void SPI_SetTaskWaitNum(SPI_TypeDef *SPIx, uint8_t num);
+
+void SPI_SetTaskTransferNum(SPI_TypeDef *SPIx, uint8_t num);
+
+void SPI_TaskTrigger(SPI_TypeDef *SPIx, uint32_t task);
+
+bool SPI_TaskEventStsCheck(SPI_TypeDef *SPIx, uint32_t te);
+
+void SPI_TaskEventStsClear(SPI_TypeDef *SPIx, uint32_t te);
+
+#endif
 /** End of SPI_Exported_Functions
   * \}
   */

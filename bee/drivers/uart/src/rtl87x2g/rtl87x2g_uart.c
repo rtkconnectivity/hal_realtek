@@ -1,27 +1,26 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_uart.c
+* \brief    This file provides all the UART firmware internal functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_uart.h"
 #include "rtl_rcc.h"
+#include "app_section.h"
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-/**
- * \brief   UART one wire config.
- * \param   UARTx: Select the UART peripheral. \ref UART_Declaration
- * \param   NewState: UART one wire config is set or not.
- *          This parameter can be one of the following values:
- *          \arg true: UART one wire config is set.
- *          \arg false: UART one wire config is unset.
- * \return  None.
- */
 void UART_OneWireConfig(UART_TypeDef *UARTx, FunctionalState NewState)
 {
     /* Check the parameters */
@@ -53,12 +52,94 @@ void UART_OneWireConfig(UART_TypeDef *UARTx, FunctionalState NewState)
     }
 }
 
-/**
-  * \brief  Store UART register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the UART peripheral.
-  * \param  StoreBuf: Store buffer to store UART register data.
-  * \return None.
-  */
+bool UART_ClkGet(UART_TypeDef *UARTx, UARTClockSrc_TypeDef *ClockSrc,
+                 UARTClockDiv_TypeDef *ClockDiv)
+{
+    *ClockSrc = UART_CLOCK_SRC_40M;
+    if (UARTx == UART0)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart0_div_en == 0) ? 0 :
+                    PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart0_div_sel;
+    }
+    else if (UARTx == UART1)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart1_div_en == 0) ? 0 :
+                    PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart1_div_sel;
+    }
+    else if (UARTx == UART2)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart2_div_en == 0) ? 0 :
+                    PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart2_div_sel;
+    }
+    else if (UARTx == UART3)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart3_div_en == 0) ? 0 :
+                    PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart3_div_sel;
+    }
+    else if (UARTx == UART4)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart4_div_en == 0) ? 0 :
+                    PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart4_div_sel;
+    }
+    else if (UARTx == UART5)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart5_div_en == 0) ? 0 :
+                    PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart5_div_sel;
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+void UART_ClkDivConfig(UART_TypeDef *UARTx, UARTClockDiv_TypeDef ClockDiv)
+{
+    assert_param(IS_UART_DIV(ClockDiv));
+
+    /* Config UART clock divider */
+    if (UARTx == UART0)
+    {
+        /* disable clock first */
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart0_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart0_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart0_div_en = 1;
+    }
+    else if (UARTx == UART1)
+    {
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart1_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart1_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart1_div_en = 1;
+    }
+    else if (UARTx == UART2)
+    {
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart2_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart2_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart2_div_en = 1;
+    }
+    else if (UARTx == UART3)
+    {
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart3_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart3_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_318.BITS_318.rtk_uart3_div_en = 1;
+    }
+    else if (UARTx == UART4)
+    {
+        PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart4_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart4_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart4_div_en = 1;
+    }
+    else if (UARTx == UART5)
+    {
+        PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart5_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart5_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_38C.BITS_38C.rtk_uart5_div_en = 1;
+    }
+    return;
+}
+
+
+RAM_FUNCTION
 void UART_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     UART_TypeDef *UARTx = (UART_TypeDef *)PeriReg;
@@ -115,12 +196,8 @@ void UART_DLPSEnter(void *PeriReg, void *StoreBuf)
     return;
 }
 
-/**
-  * \brief  Restore UART register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the UART peripheral.
-  * \param  StoreBuf: Restore buffer to restore UART register data.
-  * \return None
-  */
+
+RAM_FUNCTION
 void UART_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     UART_TypeDef *UARTx = (UART_TypeDef *)PeriReg;

@@ -1,22 +1,32 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_adc.c
+* \brief    This file provides all the ADC firmware internal functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_adc.h"
 #include "rtl_rcc.h"
-#include "rtl_aon_reg.h"
+#include "app_section.h"
 
 /*============================================================================*
  *                          Private Macros
  *============================================================================*/
-#define AUXADC_AON_REG0X1B94              ((AON_NS_REG0X_AUX_V09_TYPE *)0x40001B94UL)
-#define AUXADC_AON_REG0X1B90              ((AON_NS_REG0X_LDO_TYPE *)0x40001B90UL)
+#define AUXADC_AON_REG0X1B94                ((AON_NS_REG0X_AUX_V09_TYPE *)0x40001B94UL)
+#define AUXADC_AON_REG0X1B90                ((AON_NS_REG0X_LDO_TYPE *)0x40001B90UL)
+#define LPC_AON_AUXADC                      ((AON_NS_REG0X_SD_TYPE *)0x40001B98UL)
+#define PERI_ON_AUDIO_CLOCK_CTRL            *((volatile uint32_t *)PERIBLKCTRL_AUDIO_REG_BASE)
 
+extern void force_vddcore_1v2_for_auxadc(bool enable);
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -24,7 +34,7 @@ void ADC_SISet(void)
 {
     /*Added to stabilize the power supply!*/
     /* set to LDO mode */
-
+    force_vddcore_1v2_for_auxadc(true);
     AUXADC_AON_REG0X1B90->hw_pd = 0x0;
     AUXADC_AON_REG0X1B90->SELLDO = 0x1;
 }
@@ -35,16 +45,53 @@ void ADC_PowerOff(void)
 
     AUXADC_AON_REG0X1B94->pow = 0x0;
     AUXADC_AON_REG0X1B94->pow_ref = 0x0;
-    AUXADC_AON_REG0X1B90->anapar_pow_ad_2 = 0x0;
-    AUXADC_AON_REG0X1B90->anapar_pow_ad_1 = 0x0;
-    AUXADC_AON_REG0X1B90->hw_pd = 0x1;
+
+    uint32_t codec_clk_en = (PERI_ON_AUDIO_CLOCK_CTRL & BIT9) >> 9;
+
+    if (LPC_AON_AUXADC-> POW_SD_H != 0x1 && codec_clk_en != 1)
+    {
+        AUXADC_AON_REG0X1B90->anapar_pow_ad_2 = 0x0;
+        AUXADC_AON_REG0X1B90->anapar_pow_ad_1 = 0x0;
+        AUXADC_AON_REG0X1B90->hw_pd = 0x1;
+    }
+    force_vddcore_1v2_for_auxadc(false);
+
 }
 
-void ADC_DelayConfig(ADC_InitTypeDef *ADC_InitStruct)
+typedef enum
 {
-    ADC_InitStruct->ADC_RG2X0Dly       = ADC_RG2X_0_DELAY_10_US;
-    ADC_InitStruct->ADC_RG0X1Dly       = ADC_RG0X_1_DELAY_20_US;
-    ADC_InitStruct->ADC_RG0X0Dly       = ADC_RG0X_0_DELAY_30_US;
+    ADC_POW_AD1_DELAY_10_US,
+    ADC_POW_AD1_DELAY_20_US,
+    ADC_POW_AD1_DELAY_40_US,
+    ADC_POW_AD1_DELAY_80_US,
+} ADCPowAD1Delay_TypeDef;
+
+typedef enum
+{
+    ADC_POW_AD2_DELAY_20_US,
+    ADC_POW_AD2_DELAY_40_US,
+    ADC_POW_AD2_DELAY_80_US,
+    ADC_POW_AD2_DELAY_160_US,
+} ADCPowAD2Delay_TypeDef;
+
+typedef enum
+{
+    ADC_POW_REF_DELAY_30_US,
+    ADC_POW_REF_DELAY_60_US,
+    ADC_POW_REF_DELAY_120_US,
+    ADC_POW_REF_DELAY_240_US,
+} ADCPowRefDelay_TypeDef;
+
+
+void ADC_DelayConfig(ADC_TypeDef *ADCx)
+{
+    ADC_POW_DATA_DLY_CTRL_TypeDef adc_0x50 = {.d32 = ADCx->ADC_POW_DATA_DLY_CTRL};
+
+    adc_0x50.b.adc_reg0x_ldo_1_delay_sel = ADC_POW_AD1_DELAY_10_US;
+    adc_0x50.b.adc_reg0x_ldo_2_delay_sel = ADC_POW_AD2_DELAY_20_US;
+    adc_0x50.b.adc_reg0x_aux_v09_1_delay_sel = ADC_POW_REF_DELAY_30_US;
+
+    ADCx->ADC_POW_DATA_DLY_CTRL = adc_0x50.d32;
 }
 
 void ADC_ManualModeConfig(void)
@@ -69,6 +116,7 @@ void ADC_BypassRegConfig(uint8_t ChannelNum, FunctionalState NewState)
   * \param  StoreBuf: Store buffer to store ADC register data.
   * \return None.
   */
+RAM_FUNCTION
 void ADC_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     ADCStoreReg_TypeDef *store_buf = (ADCStoreReg_TypeDef *)StoreBuf;
@@ -110,6 +158,7 @@ void ADC_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore ADC register data.
   * \return None
   */
+RAM_FUNCTION
 void ADC_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     ADCStoreReg_TypeDef *store_buf = (ADCStoreReg_TypeDef *)StoreBuf;

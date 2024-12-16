@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_aon_wdt_def.h
+* \brief    AON WDT related definitions for RTL87x2G
+* \details
+* \author   renee
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_AON_WDT_DEF_H
 #define RTL_AON_WDT_DEF_H
@@ -57,7 +64,12 @@ typedef struct
 /*============================================================================*
  *                         AON WDT Declaration
  *============================================================================*/
-/** \defgroup 87X2G_AON_WDT      AON_WDT
+/** \defgroup AON_WDT         AON_WDT
+  * \brief
+  * \{
+  */
+
+/** \defgroup AON_WDT_Exported_Constants AON_WDT Exported Constants
   * \brief
   * \{
   */
@@ -70,6 +82,10 @@ typedef struct
 #define AON_WDT            ((AON_WDT_TypeDef *) AON_WDT_REG_BASE)
 
 /** End of AON_WDT_Declaration
+  * \}
+  */
+
+/** End of AON_WDT_Exported_Constants
   * \}
   */
 

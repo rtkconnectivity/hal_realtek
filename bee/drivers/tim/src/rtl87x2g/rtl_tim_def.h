@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+**********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* @file     rtl_tim_def.h
+* @brief    TIMER related definitions for RTL87x2G
+* @details
+* @author   grace_ysn
+* @date     2023.02.17
+* @version  v1.0.0
+*********************************************************************************************************
+*/
 
 #ifndef RTL_TIM_DEF_H
 #define RTL_TIM_DEF_H
@@ -17,6 +24,11 @@ extern "C" {
 /*============================================================================*
  *                          TIM Defines
  *============================================================================*/
+/** \defgroup TIM         TIM
+  * \brief
+  * \{
+  */
+
 /** \defgroup TIM_Exported_Constants TIM Exported Constants
   * \brief
   * \{
@@ -27,16 +39,21 @@ extern "C" {
  * \{
  * \ingroup  TIM_Exported_Constants
  */
-#define CHIP_TIM_NUM                                   (8)
-#define CHIP_PWM_DEAD_ZONE_NUM                         (2)
-#define TIM_SUPPORT_CLOCK_DEPEND                       (0)
-#define TIM_SUPPORT_EVENT_DURATION                     (0)
+
+#define CHIP_PWM_DEAD_ZONE_NUM         (2) //!< The chip supports 2 PWM deadzone.
+#define TIM_SUPPORT_CLOCK_DEPEND       (0) //!< The function is not supported.
+#define TIM_SUPPORT_EVENT_DURATION     (0) //!< The function is not supported.
+#define TIM_SUPPORT_SOURCECONFIG_API   (0) //!< The function is not supported.
 
 /** End of TIM_Defines
   * \}
   */
 
 /** End of TIM_Exported_Constants
+  * \}
+  */
+
+/** End of TIM
   * \}
   */
 
@@ -60,37 +77,47 @@ typedef struct
 /*============================================================================*
  *                         TIMER Declaration
  *============================================================================*/
-/** \defgroup 87X2G_TIM         TIM
+/** \defgroup TIM         TIM
+  * \brief
+  * \{
+  */
+
+/** \defgroup TIM_Exported_Constants TIM Exported Constants
   * \brief
   * \{
   */
 
 /** \defgroup TIM_Declaration TIM Declaration
-  * \brief
   * \{
+  * \ingroup  TIM_Exported_Constants
   */
-#define TIMER_0_REG_BASE                   (TIMER_REG_BASE + 0x0000)
-#define TIMER_1_REG_BASE                   (TIMER_REG_BASE + 0x0014)
-#define TIMER_2_REG_BASE                   (TIMER_REG_BASE + 0x0028)
-#define TIMER_3_REG_BASE                   (TIMER_REG_BASE + 0x003c)
-#define TIMER_4_REG_BASE                   (TIMER_REG_BASE + 0x0050)
-#define TIMER_5_REG_BASE                   (TIMER_REG_BASE + 0x0064)
-#define TIMER_6_REG_BASE                   (TIMER_REG_BASE + 0x0078)
-#define TIMER_7_REG_BASE                   (TIMER_REG_BASE + 0x008c)
+#define TIMER_0_REG_BASE          (TIMER_REG_BASE + 0x0000)
+#define TIMER_1_REG_BASE          (TIMER_REG_BASE + 0x0014)
+#define TIMER_2_REG_BASE          (TIMER_REG_BASE + 0x0028)
+#define TIMER_3_REG_BASE          (TIMER_REG_BASE + 0x003c)
+#define TIMER_4_REG_BASE          (TIMER_REG_BASE + 0x0050)
+#define TIMER_5_REG_BASE          (TIMER_REG_BASE + 0x0064)
+#define TIMER_6_REG_BASE          (TIMER_REG_BASE + 0x0078)
+#define TIMER_7_REG_BASE          (TIMER_REG_BASE + 0x008c)
 
-#define TIM0               ((TIM_TypeDef *) TIMER_0_REG_BASE)
-#define TIM1               ((TIM_TypeDef *) TIMER_1_REG_BASE)
-#define TIM2               ((TIM_TypeDef *) TIMER_2_REG_BASE)
-#define TIM3               ((TIM_TypeDef *) TIMER_3_REG_BASE)
-#define TIM4               ((TIM_TypeDef *) TIMER_4_REG_BASE)
-#define TIM5               ((TIM_TypeDef *) TIMER_5_REG_BASE)
-#define TIM6               ((TIM_TypeDef *) TIMER_6_REG_BASE)
-#define TIM7               ((TIM_TypeDef *) TIMER_7_REG_BASE)
+#define TIM0                      ((TIM_TypeDef *) TIMER_0_REG_BASE)
+#define TIM1                      ((TIM_TypeDef *) TIMER_1_REG_BASE)
+#define TIM2                      ((TIM_TypeDef *) TIMER_2_REG_BASE)
+#define TIM3                      ((TIM_TypeDef *) TIMER_3_REG_BASE)
+#define TIM4                      ((TIM_TypeDef *) TIMER_4_REG_BASE)
+#define TIM5                      ((TIM_TypeDef *) TIMER_5_REG_BASE)
+#define TIM6                      ((TIM_TypeDef *) TIMER_6_REG_BASE)
+#define TIM7                      ((TIM_TypeDef *) TIMER_7_REG_BASE)
 
-#define TIM0_REG_BASE                         TIMER_0_REG_BASE
-#define TIMER_A0_REG_BASE                     TIMER_0_REG_BASE
-#define TIMA_CH0                              TIM0
-#define TIMA_CH1                              TIM1
+#define IS_TIM_PERIPH(PERIPH)     (((PERIPH) == TIM0) || \
+                                   ((PERIPH) == TIM1) || \
+                                   ((PERIPH) == TIM2) || \
+                                   ((PERIPH) == TIM3) || \
+                                   ((PERIPH) == TIM4) || \
+                                   ((PERIPH) == TIM5) || \
+                                   ((PERIPH) == TIM6) || \
+                                   ((PERIPH) == TIM7))
+#define IS_TIM_ALL_PERIPH(PERIPH) (IS_TIM_PERIPH(PERIPH))
 
 /** End of TIM_Declaration
   * \}
@@ -105,14 +132,21 @@ typedef struct
 */
 
 /** \defgroup PWM_Declaration PWM Declaration
-  * \brief
   * \{
+  * \ingroup  TIM_Exported_Constants
   */
 
-#define PWM2               ((PWM_TypeDef *) 1)
-#define PWM3               ((PWM_TypeDef *) 0)
+#define PWM2                      ((PWM_TypeDef *) 1)
+#define PWM3                      ((PWM_TypeDef *) 0)
+
+#define IS_PWM_ALL_PERIPH(PERIPH) (((PERIPH) == PWM2)  || \
+                                   ((PERIPH) == PWM3))
 
 /** End of PWM_Declaration
+  * \}
+  */
+
+/** End of TIM_Exported_Constants
   * \}
   */
 
@@ -286,44 +320,53 @@ typedef union
     /* ================================================================================ */
     /* ================                   TIMER  Constants             ================ */
     /* ================================================================================ */
+    /** \defgroup TIM         TIM
+      * \brief
+      * \{
+      */
+
     /** \defgroup TIM_Exported_Constants TIM Exported Constants
       * \brief
       * \{
       */
 
     /**
-     * \brief       TIM Clock Source
-     *
+     * \defgroup    TIM_Clock_Source TIM Clock Source
+     * \{
      * \ingroup     TIM_Exported_Constants
      */
     typedef enum
 {
-    CK_40M_TIMER = 0x0,
-    CK_32K_TIMER = 0x1,
-    CK_PLL2_TIMER = 0x2,
-    CK_PLL1_TIMER = 0x3,
+    TIM_CLOCK_SRC_40M = 0x0,    //!< The TIM clock source is 40MHz.
+    TIM_CLOCK_SRC_32K = 0x1,    //!< The TIM clock source is 32KHz.
+    TIM_CLOCK_SRC_PLL1 = 0x2,   //!< The TIM clock source is PLL1.
+    TIM_CLOCK_SRC_PLL2 = 0x3,   //!< The TIM clock source is PLL2.
 } TIMClockSrc_TypeDef;
 
-#define IS_TIM_CLK_SOURCE(PERIPH)     (((PERIPH) == CK_40M_TIMER) || \
-                                       ((PERIPH) == CK_32K_TIMER) || \
-                                       ((PERIPH) == CK_PLL2_TIMER) || \
-                                       ((PERIPH) == CK_PLL1_TIMER))
+#define IS_TIM_CLK_SOURCE(PERIPH)     (((PERIPH) == TIM_CLOCK_SRC_40M ) || \
+                                       ((PERIPH) == TIM_CLOCK_SRC_32K ) || \
+                                       ((PERIPH) == TIM_CLOCK_SRC_PLL1) || \
+                                       ((PERIPH) == TIM_CLOCK_SRC_PLL2))
+
+/** End of TIM_Clock_Source
+  * \}
+  */
 
 /**
- * \brief       TIM Clock Divider
- *
+ * \defgroup    TIM_Clock_Divider TIM Clock Divider
+ * \{
  * \ingroup     TIM_Exported_Constants
  */
 typedef enum
 {
-    TIM_CLOCK_DIVIDER_1 = 0x0,
-    TIM_CLOCK_DIVIDER_2 = 0x1,
-    TIM_CLOCK_DIVIDER_4 = 0x2,
-    TIM_CLOCK_DIVIDER_8 = 0x3,
-    TIM_CLOCK_DIVIDER_16 = 0x4,
-    TIM_CLOCK_DIVIDER_32 = 0x5,
-    TIM_CLOCK_DIVIDER_40 = 0x6,
-    TIM_CLOCK_DIVIDER_64 = 0x7,
+    TIM_CLOCK_DIVIDER_1 = 0x0,     //!< The clock divider is 1.
+    TIM_CLOCK_DIVIDER_2 = 0x1,     //!< The clock divider is 2.
+    TIM_CLOCK_DIVIDER_4 = 0x2,     //!< The clock divider is 4.
+    TIM_CLOCK_DIVIDER_8 = 0x3,     //!< The clock divider is 8.
+    TIM_CLOCK_DIVIDER_16 = 0x4,    //!< The clock divider is 16.
+    TIM_CLOCK_DIVIDER_32 = 0x5,    //!< The clock divider is 32.
+    TIM_CLOCK_DIVIDER_40 = 0x6,    //!< The clock divider is 40.
+    TIM_CLOCK_DIVIDER_64 = 0x7,    //!< The clock divider is 64.
 } TIMClockDiv_TypeDef;
 
 #define IS_TIM_CLK_DIV(DIV) (((DIV) == TIM_CLOCK_DIVIDER_1) || \
@@ -335,45 +378,65 @@ typedef enum
                              ((DIV) == TIM_CLOCK_DIVIDER_40) || \
                              ((DIV) == TIM_CLOCK_DIVIDER_64))
 
+/** End of TIM_Clock_Divider
+  * \}
+  */
+
 /** End of TIM_Exported_Constants
+  * \}
+  */
+
+/** End of TIM
   * \}
   */
 
 /*============================================================================*
  *                          TIM TYPE/API Wrappers
  *============================================================================*/
+/** \defgroup TIM         TIM
+  * \brief
+  * \{
+  */
+
 /** \defgroup TIM_Exported_Constants TIM Exported Constants
   * \brief
   * \{
   */
 
 /**
-* \brief       To be compatible with the previous driver.
-* \defgroup    TIM_InitStruct_Wrapper TIM InitStruct Wrapper
+* \defgroup    TIM_Struct_Wrapper TIM Struct Wrapper
 * \{
 * \ingroup     TIM_Exported_Constants
 */
 
-#define TIM_ClockSrcDiv              TIM_SOURCE_DIV
-#define TIM_ClockSrcDiv_En           TIM_SOURCE_DIV_En
+#define TIM_ClockSrcDiv      TIM_SOURCE_DIV     //!< The macro is a wrapper for TIM_SOURCE_DIV.
+#define TIM_ClockSrcDiv_En   TIM_SOURCE_DIV_En  //!< The macro is a wrapper for TIM_SOURCE_DIV_En.
 
-/** End of TIM InitStruct Wrapper
+#define CK_40M_TIMER         TIM_CLOCK_SRC_40M  //!< The macro is a wrapper for TIM_CLOCK_SRC_40M.
+#define CK_32K_TIMER         TIM_CLOCK_SRC_32K  //!< The macro is a wrapper for TIM_CLOCK_SRC_32K.
+#define CK_PLL2_TIMER        TIM_CLOCK_SRC_PLL1 //!< The macro is a wrapper for TIM_CLOCK_SRC_PLL1.
+#define CK_PLL1_TIMER        TIM_CLOCK_SRC_PLL2 //!< The macro is a wrapper for TIM_CLOCK_SRC_PLL2.
+
+/** End of TIM_Struct_Wrapper
   * \}
   */
 
 /**
- * \brief       To be compatible with the previous driver.
  * \defgroup    TIM_API_Wrapper TIM API Wrapper
  * \{
  * \ingroup     TIM_Exported_Constants
  */
-#define TIM_GetStatus      TIM_GetOperationStatus
+#define TIM_GetStatus      TIM_GetOperationStatus //!< The macro is a wrapper for TIM_GetOperationStatus.
 
 /** End of TIM_API_Wrapper
   * \}
   */
 
 /** End of TIM_Exported_Constants
+  * \}
+  */
+
+/** End of TIM
   * \}
   */
 

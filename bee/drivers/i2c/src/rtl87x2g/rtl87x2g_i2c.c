@@ -1,14 +1,22 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_i2c.c
+* \brief    This file provides all the GPIO firmware internal functions.
+* \details
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_i2c.h"
 #include "rtl_rcc.h"
+#include "app_section.h"
 
 /*============================================================================*
  *                           Public Functions
@@ -37,12 +45,81 @@ uint8_t I2C_GetCompIndex(I2C_TypeDef *I2Cx)
     return compensate_index;
 }
 
+bool I2C_ClkGet(I2C_TypeDef *I2Cx, I2CClockSrc_TypeDef *ClockSrc, I2CClockDiv_TypeDef *ClockDiv)
+{
+    *ClockSrc = I2C_CLOCK_SRC_40M;
+    if (I2Cx == I2C0)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c0_div_en == 0) ? \
+                    0 : PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c0_div_sel;
+    }
+    else if (I2Cx == I2C1)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c1_div_en == 0) ? \
+                    0 : PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c1_div_sel;
+    }
+    else if (I2Cx == I2C2)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c2_div_en == 0) ? \
+                    0 : PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c2_div_sel;
+    }
+    else if (I2Cx == I2C3)
+    {
+        *ClockDiv = (PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c3_div_en == 0) ? \
+                    0 : PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c3_div_sel;
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+/**
+  * \brief  I2C clock divider config.
+  * \param  I2Cx: Select the I2C peripheral. \ref I2C_Declaration
+  * \param  ClockDiv: specifies the APB peripheral to gates its clock. \ref Clock_Divider
+  * \return None
+  */
+void I2C_ClkDivConfig(I2C_TypeDef *I2Cx, I2CClockDiv_TypeDef ClockDiv)
+{
+    assert_param(IS_I2C_DIV(ClockDiv));
+
+    /* Config I2C clock divider */
+    if (I2Cx == I2C0)
+    {
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c0_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c0_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c0_div_en = 1;
+    }
+    else if (I2Cx == I2C1)
+    {
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c1_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c1_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c1_div_en = 1;
+    }
+    else if (I2Cx == I2C2)
+    {
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c2_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c2_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c2_div_en = 1;
+    }
+    else if (I2Cx == I2C3)
+    {
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c3_div_en = 0;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c3_div_sel = ClockDiv;
+        PERIBLKCTRL_PERI_CLK->u_314.BITS_314.i2c3_div_en = 1;
+    }
+    return;
+}
+
 /**
   * \brief  Store I2C register values when system enter DLPS.
   * \param  PeriReg: Specifies to select the I2C peripheral.
   * \param  StoreBuf: Store buffer to store I2C register data.
   * \return None.
   */
+RAM_FUNCTION
 void I2C_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     I2C_TypeDef *I2Cx = (I2C_TypeDef *)PeriReg;
@@ -94,6 +171,7 @@ void I2C_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore I2C register data.
   * \return None
   */
+RAM_FUNCTION
 void I2C_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     I2C_TypeDef *I2Cx = (I2C_TypeDef *)PeriReg;

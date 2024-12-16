@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+**********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* @file     rtl_enhtim_def.h
+* @brief    ENH_TIM related definitions for RTL87x2G
+* @details
+* @author   Grace_yan
+* @date     2023.02.14
+* @version  v1.0.1
+*********************************************************************************************************
+*/
 #ifndef RTL_ENHTIM_DEF_H
 #define RTL_ENHTIM_DEF_H
 
@@ -17,6 +24,11 @@ extern "C" {
 /*============================================================================*
  *                          ENHTIM Defines
  *============================================================================*/
+/** \defgroup ENHTIM      ENHTIM
+  * \brief
+  * \{
+  */
+
 /** \defgroup ENHTIM_Exported_Constants ENHTIM Exported Constants
   * \brief
   * \{
@@ -34,6 +46,7 @@ extern "C" {
 #define ENHTIM_SUPPORT_PWM_SRC_SELECT                  (1)
 #define ENHTIM_SUPPORT_PWM_PHASE_SHIFT                 (1)
 #define ENHTIM_SUPPORT_ONESHOT_CMD                     (1)
+#define ENHTIM_SUPPORT_CLOCK_SOURCE_CONFIG             (1)
 
 /** End of ENHTIM_Defines
   * \}
@@ -43,6 +56,9 @@ extern "C" {
   * \}
   */
 
+/** End of ENHTIM
+  * \}
+  */
 /*============================================================================*
  *                         ENHTIM Registers Memory Map
  *============================================================================*/
@@ -89,25 +105,30 @@ typedef struct
 /*============================================================================*
  *                         ENHTIM Declaration
  *============================================================================*/
-/** \defgroup 87X2G_ENHTIM      ENHTIM
+/** \defgroup ENHTIM      ENHTIM
+  * \brief
+  * \{
+  */
+
+/** \defgroup ENHTIM_Exported_Constants ENHTIM Exported Constants
   * \brief
   * \{
   */
 
 /** \defgroup ENHTIM_Declaration ENHTIM Declaration
-  * \brief
   * \{
+  * \ingroup  ENHTIM_Exported_Constants
   */
-#define ENHANCED_TIMER0_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x0000)
-#define ENHANCED_TIMER1_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x0024)
-#define ENHANCED_TIMER2_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x0048)
-#define ENHANCED_TIMER3_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x006c)
-#define ENHTIM_SHARE_REG_BASE              (ENHANCED_TIMER_REG_BASE + 0x0120)
-#define ENHANCED_PWM0_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x0300)
-#define ENHANCED_PWM1_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x0304)
-#define ENHANCED_PWM2_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x0308)
-#define ENHANCED_PWM3_REG_BASE             (ENHANCED_TIMER_REG_BASE + 0x030C)
-#define REG_ENHTIMER_ONESHOT_CFG           (ENHANCED_TIMER_REG_BASE + 0x0320)
+#define ENHANCED_TIMER0_REG_BASE        (ENHANCED_TIMER_REG_BASE + 0x0000)
+#define ENHANCED_TIMER1_REG_BASE        (ENHANCED_TIMER_REG_BASE + 0x0024)
+#define ENHANCED_TIMER2_REG_BASE        (ENHANCED_TIMER_REG_BASE + 0x0048)
+#define ENHANCED_TIMER3_REG_BASE        (ENHANCED_TIMER_REG_BASE + 0x006c)
+#define ENHTIM_SHARE_REG_BASE           (ENHANCED_TIMER_REG_BASE + 0x0120)
+#define ENHANCED_PWM0_REG_BASE          (ENHANCED_TIMER_REG_BASE + 0x0300)
+#define ENHANCED_PWM1_REG_BASE          (ENHANCED_TIMER_REG_BASE + 0x0304)
+#define ENHANCED_PWM2_REG_BASE          (ENHANCED_TIMER_REG_BASE + 0x0308)
+#define ENHANCED_PWM3_REG_BASE          (ENHANCED_TIMER_REG_BASE + 0x030C)
+#define REG_ENHTIMER_ONESHOT_CFG        (ENHANCED_TIMER_REG_BASE + 0x0320)
 
 #define ENH_TIM0                        ((ENHTIM_TypeDef      *) ENHANCED_TIMER0_REG_BASE)
 #define ENH_TIM1                        ((ENHTIM_TypeDef      *) ENHANCED_TIMER1_REG_BASE)
@@ -119,7 +140,15 @@ typedef struct
 #define ENH_TIM2_PWM                    ((ENHPWM_TypeDef      *) ENHANCED_PWM2_REG_BASE)
 #define ENH_TIM3_PWM                    ((ENHPWM_TypeDef      *) ENHANCED_PWM3_REG_BASE)
 
+#define IS_ENHTIM_ALL_PERIPH(PERIPH)    (((PERIPH) == ENH_ENHTIM0) || \
+                                         ((PERIPH) == ENH_ENHTIM1) || \
+                                         ((PERIPH) == ENH_ENHTIM2) || \
+                                         ((PERIPH) == ENH_ENHTIM3))
 /** End of ENHTIM_Declaration
+  * \}
+  */
+
+/** End of ENHTIM_Exported_Constants
   * \}
   */
 
@@ -745,30 +774,78 @@ typedef union
     /*============================================================================*
      *                          ENHTIM Constants
      *============================================================================*/
+    /** \defgroup ENHTIM      ENHTIM
+      * \brief
+      * \{
+      */
+
     /** \defgroup ENHTIM_Exported_Constants ENHTIM Exported Constants
       * \brief
       * \{
       */
 
     /**
-     * \brief    ENHTIM_Clock_Source ENHTIM Clock Source
-     *
-     * \ingroup  ENHTIM_Exported_Types
+     * \defgroup  ENHTIM_Clock_Source ENHTIM Clock Source
+     * \{
+     * \ingroup   ENHTIM_Exported_Constants
      */
     typedef enum
 {
-    ENHTIM_SOURCE_CLOCK_40M = 0x00,
-    ENHTIM_SOURCE_CLOCK_PLL4 = 0x01,
-    ENHTIM_SOURCE_CLOCK_PLL2 = 0x03,
-    ENHTIM_SOURCE_CLOCK_PLL1 = 0x07,
+    ENHTIM_CLOCK_SOURCE_40M = 0x00,
+    ENHTIM_CLOCK_SOURCE_PLL1 = 0x01,
+    ENHTIM_CLOCK_SOURCE_PLL2 = 0x02,
+    ENHTIM_CLOCK_SOURCE_32K = 0x04,
 } ENHTIMClkSrc_TypdDef;
 
-#define IS_ENHTIM_CLK_SOURCE(src) (((src) == ENHTIM_SOURCE_CLOCK_40M) || \
-                                   ((src) == ENHTIM_SOURCE_CLOCK_PLL4)|| \\
-                                   ((src) == ENHTIM_SOURCE_CLOCK_PLL2)|| \\
-                                   ((src) == ENHTIM_SOURCE_CLOCK_PLL1))
+#define IS_ENHTIM_CLK_SOURCE(src) (((src) == ENHTIM_CLOCK_SOURCE_40M) || \
+                                   ((src) == ENHTIM_CLOCK_SOURCE_32K)|| \\
+                                   ((src) == ENHTIM_CLOCK_SOURCE_PLL2)|| \\
+                                   ((src) == ENHTIM_CLOCK_SOURCE_PLL1))
+
+/** End of ENHTIM_Clock_Source
+  * \}
+  */
 
 /** End of ENHTIM_Exported_Constants
+  * \}
+  */
+
+/** End of ENHTIM
+  * \}
+  */
+
+/*============================================================================*
+ *                          ENHTIM TYPE/API Wrappers
+ *============================================================================*/
+/** \defgroup ENHTIM         ENHTIM
+  * \brief
+  * \{
+  */
+
+/** \defgroup ENHTIM_Exported_Constants ENHTIM Exported Constants
+  * \brief
+  * \{
+  */
+
+/**
+ * \brief       To be compatible with the previous driver.
+ * \defgroup    ENHTIM_API_Wrapper ENHTIM API Wrapper
+ * \{
+ * \ingroup     ENHTIM_Exported_Constants
+ */
+#define ENHTIM_SOURCE_CLOCK_40M     ENHTIM_CLOCK_SOURCE_40M
+#define ENHTIM_SOURCE_CLOCK_PLL1    ENHTIM_CLOCK_SOURCE_PLL1
+#define ENHTIM_SOURCE_CLOCK_PLL2    ENHTIM_CLOCK_SOURCE_PLL2
+
+/** End of ENHTIM_API_Wrapper
+  * \}
+  */
+
+/** End of ENHTIM_Exported_Constants
+  * \}
+  */
+
+/** End of ENHTIM
   * \}
   */
 

@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_nvic_def.h
+* \brief    NVIC related definitions for RTL87X2G
+* \details
+* \author   renee
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_NVIC_DEF_H
 #define RTL_NVIC_DEF_H
@@ -20,49 +27,14 @@ extern "C" {
 /*============================================================================*
  *                         NVIC Defines
  *============================================================================*/
-/** \defgroup NVIC_Exported_Constants NVIC Exported Constants
-  * \brief
-  * \{
-  */
-
-/**
- * \defgroup NVIC_Defines NVIC Defines
- * \{
- * \ingroup  NVIC_Exported_Constants
- */
-
-/** End of NVIC_Defines
-  * \}
-  */
-
-/** End of NVIC_Exported_Constants
-  * \}
-  */
 
 /*============================================================================*
  *                         NVIC Private Defines
  *============================================================================*/
-#define FIRST_LEVEL_First_IRQn   System_IRQn
-#define FIRST_LEVEL_Last_IRQn    PF_RTC_IRQn
-
-#define Peripheral_First_IRQn    SPIC0_IRQn
-#define Peripheral_Last_IRQn     RSVD7_IRQn
-
-#define BTMAC_First_IRQn         Timer_A0_A1_IRQn
-#define BTMAC_Last_IRQn          RSVD6_IRQn
 
 /*============================================================================*
  *                         NVIC Constants
  *============================================================================*/
-
-/** \defgroup NVIC_Exported_Constants NVIC Exported Constants
-  * \brief
-  * \{
-  */
-
-/** End of NVIC_Exported_Constants
-  * \}
-  */
 
 #ifdef  __cplusplus
 }

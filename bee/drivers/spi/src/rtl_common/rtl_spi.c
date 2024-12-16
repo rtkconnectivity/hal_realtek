@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_spi.c
+* \brief    This file provides all the Spi firmware functions.
+* \details
+* \author   yuzhuo_liu
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
@@ -10,6 +17,17 @@
 #include "rtl_spi.h"
 #include "rtl_rcc.h"
 
+#if SPI0_SUPPORT_MASTER_SLAVE
+#define SPI_NOT_SLAVE(SPIx)          (!SPI_IN_SLAVE_MODE(SPIx))
+#define SPI_CONFIGURED_MASTER(mode)  (mode == SPI_Mode_Master)
+#else
+#define SPI_NOT_SLAVE(SPIx)          (SPIx != SPI0_SLAVE)
+#define SPI_CONFIGURED_MASTER(mode)  (1)
+#endif
+
+#if SPI0_SUPPORT_MASTER_SLAVE
+extern void SPI_ConfigMasterSlave(SPIMode_Typedef SPI_Mode);
+#endif
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -23,33 +41,37 @@ void SPI_DeInit(SPI_TypeDef *SPIx)
     /* Check the parameters */
     assert_param(IS_SPI_ALL_PERIPH(SPIx));
 
-    /*Disable SPI clock */
-    if (SPIx == SPI0)
+    switch ((uint32_t)SPIx)
     {
+#ifdef SPI0
+    case (uint32_t)SPI0:
         RCC_PeriphClockCmd(APBPeriph_SPI0, APBPeriph_SPI0_CLOCK, DISABLE);
-    }
+        break;
+#endif
 #ifdef SPI0_SLAVE
-    else if (SPIx == SPI0_SLAVE)
-    {
+    case (uint32_t)SPI0_SLAVE:
         RCC_PeriphClockCmd(APBPeriph_SPI0_SLAVE, APBPeriph_SPI0_SLAVE_CLOCK, DISABLE);
-    }
+        break;
 #endif
-    else if (SPIx == SPI1)
-    {
+#ifdef SPI1
+    case (uint32_t)SPI1:
         RCC_PeriphClockCmd(APBPeriph_SPI1, APBPeriph_SPI1_CLOCK, DISABLE);
-    }
-#if (CHIP_SPI_NUM >= 4)
-    else if (SPIx == SPI2)
-    {
+        break;
+#endif
+#ifdef SPI2
+    case (uint32_t)SPI2:
         RCC_PeriphClockCmd(APBPeriph_SPI2, APBPeriph_SPI2_CLOCK, DISABLE);
-    }
-#if (CHIP_SPI_NUM >= 5)
-    else if (SPIx == SPI3)
-    {
+        break;
+#endif
+#ifdef SPI3
+    case (uint32_t)SPI3:
         RCC_PeriphClockCmd(APBPeriph_SPI3, APBPeriph_SPI3_CLOCK, DISABLE);
+        break;
+#endif
+
+    default:
+        break;
     }
-#endif
-#endif
 }
 
 /**
@@ -77,17 +99,7 @@ void SPI_Init(SPI_TypeDef *SPIx, SPI_InitTypeDef *SPI_InitStruct)
     SPIx->SPI_SPIENR = spi_0x08.d32;
 
     /* Configure SPI Master mode if select SPI0, SPI1, SPI2 or SPI3 */
-#if (CHIP_SPI_NUM == 5)
-    if (SPIx == SPI0 || SPIx == SPI1 || SPIx == SPI2 || SPIx == SPI3)
-#elif (CHIP_SPI_NUM == 4)
-#if (SPI0_SUPPORT_HS == 1)
-    if (SPIx == SPI0 || SPIx == SPI1 || SPIx == SPI2 || SPIx == SPI0_HS)
-#else
-    if (SPIx == SPI0 || SPIx == SPI1 || SPIx == SPI2)
-#endif
-#elif (CHIP_SPI_NUM == 3)
-    if (SPIx == SPI0 || SPIx == SPI1)
-#endif
+    if (IS_SPIM_PERIPH(SPIx))
     {
 #if (SPI0_SUPPORT_MASTER_SLAVE == 1)
         if (SPIx == SPI0)
@@ -116,15 +128,18 @@ void SPI_Init(SPI_TypeDef *SPIx, SPI_InitTypeDef *SPI_InitStruct)
         spi_0x00.b.scph = SPI_InitStruct->SPI_CPHA;
         spi_0x00.b.scpol = SPI_InitStruct->SPI_CPOL;
         spi_0x00.b.tmod = SPI_InitStruct->SPI_Direction;
-        spi_0x00.b.dfs_32 = SPI_InitStruct->SPI_DataSize;
+        spi_0x00.b.SPI_DFS_BIT_FIELD = SPI_InitStruct->SPI_DataSize;
         spi_0x00.b.sste = SPI_InitStruct->SPI_ToggleEn;
+        SPIx->SPI_M_S_CTRL0 = spi_0x00.d32;
 #if (SPI0_SUPPORT_MASTER_SLAVE == 1)
-        if (SPI_Mode == SPI_Mode_Slave)
+        if (SPI_InitStruct->SPI_Mode == SPI_Mode_Slave)
         {
+            SPI_S_CTRL0_TypeDef spi_0x00 = {.d32 = SPIx->SPI_M_S_CTRL0};
             spi_0x00.b.slv_oe = 0;
+            spi_0x00.b.dfs = SPI_InitStruct->SPI_DataSize;
+            SPIx->SPI_M_S_CTRL0 = spi_0x00.d32;
         }
 #endif
-        SPIx->SPI_M_S_CTRL0 = spi_0x00.d32;
 
         /* Set master clock divider */
         SPI_M_BAUDR_TypeDef spi_0x14 = {.d32 = SPIx->SPI_M_BAUDR};
@@ -132,9 +147,7 @@ void SPI_Init(SPI_TypeDef *SPIx, SPI_InitTypeDef *SPI_InitStruct)
         SPIx->SPI_M_BAUDR = spi_0x14.d32;
 
         /* Enable slave Select function in master mode */
-#if (SPI0_SUPPORT_MASTER_SLAVE == 1)
-        if (SPI_Mode == SPI_Mode_Master)
-#endif
+        if (SPI_CONFIGURED_MASTER(SPI_InitStruct->SPI_Mode))
         {
             SPI_M_SER_TypeDef spi_0x10 = {.d32 = SPIx->SPI_M_SER};
             spi_0x10.b.ser = 1;
@@ -146,74 +159,66 @@ void SPI_Init(SPI_TypeDef *SPIx, SPI_InitTypeDef *SPI_InitStruct)
             (SPI_InitStruct->SPI_Direction == SPI_Direction_EEPROM))
         {
             SPI_M_CTRL1_TypeDef spi_0x04 = {.d32 = SPIx->SPI_M_CTRL1};
-#if (SPI_SUPPORT_WRAP_MODE == 1)
             if (SPI_InitStruct->SPI_RXNDF > 0)
             {
                 spi_0x04.b.ndf = SPI_InitStruct->SPI_RXNDF - 1;
             }
-#else
-            spi_0x04.b.ndf = SPI_InitStruct->SPI_NDF - 1;
-#endif
             SPIx->SPI_M_CTRL1 = spi_0x04.d32;
         }
 #if (SPI_SUPPORT_WRAP_MODE == 1)
-        else
+        else if ((SPI_InitStruct->SPI_Direction == SPI_Direction_TxOnly) || \
+                 (SPI_InitStruct->SPI_Direction == SPI_Direction_FullDuplex))
         {
-            if (SPIx == SPI1)
+            if (SPI_InitStruct->SPI_WrapModeEn)
             {
-                /* Config CS high active*/
+                SPIx->SPI_WRAP_CTRL = 0;
+
+                /* Wrapper mode enable */
                 SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-                spi_0x200.b.cs_inv_en = SPI_InitStruct->SPI_CSHighActiveEn;
-                SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
-
-                if (SPI_InitStruct->SPI_TXWaperModeEn)
+                SPI_WRAP_TXFTLR_TypeDef spi_0x204 = {.d32 = SPIx->SPI_WRAP_TXFTLR};
+                spi_0x200.b.wrap_ctrl_mode = 1;
+                if (SPI_InitStruct->SPI_TXNDF > 0)
                 {
-                    SPIx->SPI_WRAP_CTRL = 0;
+                    spi_0x200.b.mst_tx_ndf = SPI_InitStruct->SPI_TXNDF - 1;
+                }
+                spi_0x204.b.tx_fifo_tl = SPI_InitStruct->SPI_TxThresholdLevel;
 
-                    /*Wrapper mode enable*/
+                SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
+                SPIx->SPI_WRAP_TXFTLR = spi_0x204.d32;
 
-                    SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-                    SPI_WRAP_TXFTLR_TypeDef spi_0x204 = {.d32 = SPIx->SPI_WRAP_TXFTLR};
-                    spi_0x200.b.wrap_ctrl_mode = 1;
-                    if (SPI_InitStruct->SPI_TXNDF > 0)
-                    {
-                        spi_0x200.b.mst_tx_ndf = SPI_InitStruct->SPI_TXNDF - 1;
-                    }
-                    spi_0x204.b.tx_fifo_tl = SPI_InitStruct->SPI_TxThresholdLevel;
-
-                    SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
-                    SPIx->SPI_WRAP_TXFTLR = spi_0x204.d32;
-                    if (SPI_InitStruct->SPI_TXWaperModeDmaEn)
-                    {
-
-                        /*enable tx ndf dma */
-
-                        SPI_WRAP_DMACR_TypeDef spi_0x220 = {.d32 = SPIx->SPI_WRAP_DMACR};
-                        SPI_WRAP_DMATDLR_TypeDef spi_0x224 = {.d32 = SPIx->SPI_WRAP_DMATDLR};
-                        spi_0x220.b.tx_dma_en = 1;
-                        spi_0x224.b.dma_tx_dl = SPI_InitStruct->SPI_TxNdfWaterlevel;
-                        SPIx->SPI_WRAP_DMACR = spi_0x220.d32;
-                        SPIx->SPI_WRAP_DMATDLR = spi_0x224.d32;
-                    }
+                if (SPI_InitStruct->SPI_WrapModeDmaEn)
+                {
+                    /* enable tx ndf dma */
+                    SPI_WRAP_DMACR_TypeDef spi_0x220 = {.d32 = SPIx->SPI_WRAP_DMACR};
+                    SPI_WRAP_DMATDLR_TypeDef spi_0x224 = {.d32 = SPIx->SPI_WRAP_DMATDLR};
+                    spi_0x220.b.tx_dma_en = 1;
+                    spi_0x224.b.dma_tx_dl = SPI_InitStruct->SPI_TxNdfWaterlevel;
+                    SPIx->SPI_WRAP_DMACR = spi_0x220.d32;
+                    SPIx->SPI_WRAP_DMATDLR = spi_0x224.d32;
                 }
             }
         }
+
+        SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
+        spi_0x200.b.cs_inv_en = SPI_InitStruct->SPI_CSHighActiveEn;
+        SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
 #endif
     }
-#ifdef SPI0_SLAVE
+#if !SPI0_SUPPORT_MASTER_SLAVE
     /* Configure SPI Slave mode if select SPI0_SLAVE */
     else if (SPIx == SPI0_SLAVE)
     {
-
         /* Configure SPI slave mode parameters */
         SPI_S_CTRL0_TypeDef spi_0x00 = {.d32 = SPIx->SPI_M_S_CTRL0};
         spi_0x00.b.scph = SPI_InitStruct->SPI_CPHA;
         spi_0x00.b.scpol = SPI_InitStruct->SPI_CPOL;
         spi_0x00.b.dfs = SPI_InitStruct->SPI_DataSize;
+#if (SPI_SUPPORT_SWAP == 1)
         spi_0x00.b.tx_byte_swap = SPI_InitStruct->SPI_SwapTxByteEn;
         spi_0x00.b.tx_bit_swap = SPI_InitStruct->SPI_SwapTxBitEn;
         spi_0x00.b.rx_byte_swap = SPI_InitStruct->SPI_SwapRxByteEn;
         spi_0x00.b.rx_bit_swap = SPI_InitStruct->SPI_SwapRxBitEn;
+#endif
 
         /* Enable slave output */
         spi_0x00.b.slv_oe = 0;
@@ -268,15 +273,8 @@ void SPI_StructInit(SPI_InitTypeDef *SPI_InitStruct)
 {
     /* TX and RX Mode */
     SPI_InitStruct->SPI_Direction         = SPI_Direction_FullDuplex;
-#if (SPI_SUPPORT_WRAP_MODE == 1)
     /* Number of data to read in RX/EEPROM Mode */
-    SPI_InitStruct->SPI_RXNDF               = 1;
-    /* Number of data to read in TX/FullDuplex Mode */
-    SPI_InitStruct->SPI_TXNDF             = 1;
-#else
-    /* Number of data to read in RX/EEPROM Mode */
-    SPI_InitStruct->SPI_NDF               = 1;
-#endif
+    SPI_InitStruct->SPI_RXNDF              = 1;
     /* 8-bit serial data transfer */
     SPI_InitStruct->SPI_DataSize          = SPI_DataSize_8b;
     /* Inactive state of clock is high */
@@ -287,20 +285,27 @@ void SPI_StructInit(SPI_InitTypeDef *SPI_InitStruct)
     SPI_InitStruct->SPI_FrameFormat       = SPI_Frame_Motorola;
     /* Speed = SPI Clock source/ SPI_ClkDIV*/
     SPI_InitStruct->SPI_BaudRatePrescaler = 128;
+#if (SPI0_SUPPORT_MASTER_SLAVE == 1)
+    SPI_InitStruct->SPI_Mode = SPI_Mode_Master;
+#endif
+#if (SPI_SUPPORT_SWAP == 1)
     /* Reverse the rx bit or not */
     SPI_InitStruct->SPI_SwapTxBitEn       = DISABLE;
     SPI_InitStruct->SPI_SwapRxBitEn       = DISABLE;
     SPI_InitStruct->SPI_SwapTxByteEn      = DISABLE;
     SPI_InitStruct->SPI_SwapRxByteEn      = DISABLE;
+#endif
     /* Toggle CS line or not */
     SPI_InitStruct->SPI_ToggleEn          = DISABLE;
 #if (SPI_SUPPORT_WRAP_MODE == 1)
+    /* Number of data to read in TX/FullDuplex Mode */
+    SPI_InitStruct->SPI_TXNDF             = 1;
     /* Enable CS high active or not */
     SPI_InitStruct->SPI_CSHighActiveEn    = DISABLE;
     /* Disable tx ndf */
-    SPI_InitStruct->SPI_TXWaperModeEn     = DISABLE;
+    SPI_InitStruct->SPI_WrapModeEn     = DISABLE;
     /* Disable dma */
-    SPI_InitStruct->SPI_TXWaperModeDmaEn  = DISABLE;
+    SPI_InitStruct->SPI_WrapModeDmaEn  = DISABLE;
     /* SPI Tx waterlevel, should be less than fifo threshold.
        The best value is SPI FIFO Depth - GDMA Msize */
     SPI_InitStruct->SPI_TxNdfWaterlevel   =  SPI_TX_FIFO_SIZE - 1;
@@ -321,7 +326,7 @@ void SPI_StructInit(SPI_InitTypeDef *SPI_InitStruct)
 }
 
 /**
-  * \brief  Enables or disables the specified SPI peripheral.
+  * \brief  Enable or disable the specified SPI peripheral.
   * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
   * \param  NewState: New state of the SPIx peripheral.
   *         This parameter can be: ENABLE or DISABLE.
@@ -354,31 +359,27 @@ void SPI_SendBuffer(SPI_TypeDef *SPIx, uint8_t *pBuf, uint16_t len)
 
 #if (SPI_SUPPORT_WRAP_MODE == 1)
     SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-    if ((spi_0x200.b.wrap_ctrl_mode) && (SPIx != SPI0_SLAVE))
+    if (spi_0x200.b.wrap_ctrl_mode && SPI_NOT_SLAVE(SPIx))
     {
         for (i = 0; i < len; i++)
         {
-            SPIx->SPI_DR[0] = (*pBuf++);
             /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
             while (!(SPIx->SPI_WRAP_SR & SPI_FLAG_TFNF));
-        }
-    }
-    else
-    {
-#endif
-        for (i = 0; i < len; i++)
-        {
             SPIx->SPI_DR[0] = (*pBuf++);
-            /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
-            while (!(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
         }
-#if (SPI_SUPPORT_WRAP_MODE == 1)
+        return;
     }
 #endif
+    for (i = 0; i < len; i++)
+    {
+        /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
+        while (SPI_NOT_SLAVE(SPIx) && !(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
+        SPIx->SPI_DR[0] = (*pBuf++);
+    }
 }
 
 /**
-  * \brief  Transmits a number of halfWords through the SPIx peripheral.
+  * \brief  Transmits a number of halfwords through the SPIx peripheral.
   * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
   * \param  pBuf : Halfwords to be transmitted.
   * \param  len: Halfword length to be transmitted.
@@ -393,27 +394,23 @@ void SPI_SendHalfWord(SPI_TypeDef *SPIx, uint16_t *pBuf, uint16_t len)
 
 #if (SPI_SUPPORT_WRAP_MODE == 1)
     SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-    if (spi_0x200.b.wrap_ctrl_mode)
+    if (spi_0x200.b.wrap_ctrl_mode && SPI_NOT_SLAVE(SPIx))
     {
         for (i = 0; i < len; i++)
         {
-            SPIx->SPI_DR[0] = (*pBuf++);
             /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
             while (!(SPIx->SPI_WRAP_SR & SPI_FLAG_TFNF));
-        }
-    }
-    else
-    {
-#endif
-        for (i = 0; i < len; i++)
-        {
             SPIx->SPI_DR[0] = (*pBuf++);
-            /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
-            while (!(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
         }
-#if (SPI_SUPPORT_WRAP_MODE == 1)
+        return;
     }
 #endif
+    for (i = 0; i < len; i++)
+    {
+        /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
+        while (SPI_NOT_SLAVE(SPIx) && !(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
+        SPIx->SPI_DR[0] = (*pBuf++);
+    }
 }
 
 /**
@@ -432,27 +429,23 @@ void SPI_SendWord(SPI_TypeDef *SPIx, uint32_t *pBuf, uint16_t len)
 
 #if (SPI_SUPPORT_WRAP_MODE == 1)
     SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-    if (spi_0x200.b.wrap_ctrl_mode)
+    if (spi_0x200.b.wrap_ctrl_mode && SPI_NOT_SLAVE(SPIx))
     {
         for (i = 0; i < len; i++)
         {
-            SPIx->SPI_DR[0] = (*pBuf++);
             /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
             while (!(SPIx->SPI_WRAP_SR & SPI_FLAG_TFNF));
-        }
-    }
-    else
-    {
-#endif
-        for (i = 0; i < len; i++)
-        {
             SPIx->SPI_DR[0] = (*pBuf++);
-            /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
-            while (!(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
         }
-#if (SPI_SUPPORT_WRAP_MODE == 1)
+        return;
     }
 #endif
+    for (i = 0; i < len; i++)
+    {
+        /* Read TFNF bit status in SPI_SR register: SET is Tx FIFO is not full */
+        while (SPI_NOT_SLAVE(SPIx) && !(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
+        SPIx->SPI_DR[0] = (*pBuf++);
+    }
 }
 
 /**
@@ -467,9 +460,9 @@ void SPI_SendWord(SPI_TypeDef *SPIx, uint32_t *pBuf, uint16_t len)
   *         \arg SPI_INT_FAE: TX Frame Alignment Interrupt.
   *         \arg SPI_INT_TUF: Transmit FIFO Underflow Interrupt.
   *         \arg SPI_INT_RIG: Rising edge detect Interrupt.
-  *         \arg SPI_INT_TXNDF_FIFO_EMPTY: TX NDF mode FIFO Transmit FIFO Empty Interrupt.
-  *         \arg SPI_INT_TXNDF_FIFO_OV: TX NDF mode FIFO Overflow Interrupt.
-  *         \arg SPI_INT_TXNDF_DONE: TX NDF mode transmit done Interrupt.
+  *         \arg SPI_INT_WRAP_TXE: TX NDF mode FIFO Transmit FIFO Empty Interrupt.
+  *         \arg SPI_INT_WRAP_TXO: TX NDF mode FIFO Overflow Interrupt.
+  *         \arg SPI_INT_WRAP_TXD: TX NDF mode transmit done Interrupt.
   * \return None.
   */
 void SPI_ClearINTPendingBit(SPI_TypeDef *SPIx, uint16_t SPI_IT)
@@ -478,36 +471,42 @@ void SPI_ClearINTPendingBit(SPI_TypeDef *SPIx, uint16_t SPI_IT)
     assert_param(IS_SPI_ALL_PERIPH(SPIx));
     assert_param(IS_SPI_CONFIG_IT(SPI_IT));
 
-    switch (SPI_IT)
+    if (SPI_IT & SPI_INT_TXO)
     {
-    case SPI_INT_TXO:
         (void)SPIx->SPI_TXOICR;
-        break;
-    case SPI_INT_RXO:
-        (void)SPIx->SPI_RXOICR;
-        break;
-    case SPI_INT_RXU:
-        (void)SPIx->SPI_RXUICR;
-        break;
-    case SPI_INT_FAE:
-        (void)SPIx->SPI_M_S_MSTICR_FAEICR;
-        break;
-    case SPI_INT_TUF:
-        (void)SPIx->SPI_M_S_IDR_TXUICR;
-        break;
-    case SPI_INT_RIG:
-        (void)SPIx->SPI_M_S_VERSION_ID_SSRICR;
-        break;
-#if (SPI_SUPPORT_WRAP_MODE == 1)
-    case SPI_INT_TXNDF_DONE:
-    case SPI_INT_TXNDF_FIFO_OV:
-        (void)SPIx->SPI_WRAP_ICR;
-        break;
-#endif
-    default:
-        break;
     }
 
+    if (SPI_IT & SPI_INT_RXO)
+    {
+        (void)SPIx->SPI_RXOICR;
+    }
+
+    if (SPI_IT & SPI_INT_RXU)
+    {
+        (void)SPIx->SPI_RXUICR;
+    }
+
+    if (SPI_IT & SPI_INT_FAE)
+    {
+        (void)SPIx->SPI_M_S_MSTICR_FAEICR;
+    }
+
+    if (SPI_IT & SPI_INT_TUF)
+    {
+        (void)SPIx->SPI_M_S_IDR_TXUICR;
+    }
+
+    if (SPI_IT & SPI_INT_RIG)
+    {
+        (void)SPIx->SPI_M_S_VERSION_ID_SSRICR;
+    }
+
+#if (SPI_SUPPORT_WRAP_MODE == 1)
+    if (SPI_IT & (SPI_INT_WRAP_TXD | SPI_INT_WRAP_TXO))
+    {
+        (void)SPIx->SPI_WRAP_ICR;
+    }
+#endif
 }
 
 /**
@@ -523,19 +522,15 @@ void SPI_SendData(SPI_TypeDef *SPIx, uint32_t Data)
 
 #if (SPI_SUPPORT_WRAP_MODE == 1)
     SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-    if ((spi_0x200.b.wrap_ctrl_mode) && (SPIx != SPI0_SLAVE))
+    if (spi_0x200.b.wrap_ctrl_mode && SPI_NOT_SLAVE(SPIx))
     {
-        SPIx->SPI_DR[0] = Data;
         while (!(SPIx->SPI_WRAP_SR & SPI_FLAG_TFNF));
-    }
-    else
-    {
-#endif
         SPIx->SPI_DR[0] = Data;
-        while (!(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
-#if (SPI_SUPPORT_WRAP_MODE == 1)
+        return;
     }
 #endif
+    while (SPI_NOT_SLAVE(SPIx) && !(SPIx->SPI_M_S_SR & SPI_FLAG_TFNF));
+    SPIx->SPI_DR[0] = Data;
 }
 
 /**
@@ -660,7 +655,7 @@ void SPI_SetCSNumber(SPI_TypeDef *SPIx, uint8_t number)
   *         \arg SPI_INT_RXU: Receive FIFO Underflow Interrupt.
   *         \arg SPI_INT_TXO: Transmit FIFO Overflow Interrupt .
   *         \arg SPI_INT_TXE: Transmit FIFO Empty Interrupt.
-  *         \arg SPI_INT_TXNDF_DONE: TX NDF mode transmit done Interrupt.
+  *         \arg SPI_INT_WRAP_TXD: TX NDF mode transmit done Interrupt.
   * \return The new state of SPI_IT (SET or RESET).
   */
 ITStatus SPI_GetINTStatus(SPI_TypeDef *SPIx, uint32_t SPI_IT)
@@ -673,41 +668,30 @@ ITStatus SPI_GetINTStatus(SPI_TypeDef *SPIx, uint32_t SPI_IT)
 
 #if (SPI_SUPPORT_WRAP_MODE == 1)
     SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-    if ((SPI_IT & (BIT0 | BIT1 | BIT10)) && (spi_0x200.b.wrap_ctrl_mode))
+    if (SPI_IT & (SPI_INT_WRAP_TXE | SPI_INT_WRAP_TXO | SPI_INT_WRAP_TXD))
     {
-        if (SPI_IT & (BIT0 | BIT1))
+        if (spi_0x200.b.wrap_ctrl_mode)
         {
-            if (SPIx->SPI_WRAP_ISR & SPI_IT)
+            if (SPIx->SPI_WRAP_ISR & (SPI_IT >> 8))
             {
                 bit_status = SET;
             }
         }
-        else
-        {
-            if ((SPIx->SPI_WRAP_ISR & (SPI_IT >> 8)))
-            {
-                bit_status = SET;
-            }
-        }
+        return  bit_status;
     }
-    else
+#endif
+    /* Check the status of the specified SPI flag */
+    if ((SPIx->SPI_M_S_ISR & SPI_IT) != (uint32_t)RESET)
     {
-#endif
-        /* Check the status of the specified SPI flag */
-        if ((SPIx->SPI_M_S_ISR & SPI_IT) != (uint32_t)RESET)
-        {
-            bit_status = SET;
-        }
-#if (SPI_SUPPORT_WRAP_MODE == 1)
+        bit_status = SET;
     }
-#endif
 
     /* Return the SPI_IT status */
     return  bit_status;
 }
 
 /**
-  * \brief  Enables or disables the specified SPI interrupt source.
+  * \brief  Enable or disable the specified SPI interrupt source.
   * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
   * \param  SPI_IT: Specifies the SPI interrupt source to be enabled or disabled.
   *         This parameter can be one of the following values:
@@ -720,7 +704,7 @@ ITStatus SPI_GetINTStatus(SPI_TypeDef *SPIx, uint32_t SPI_IT)
   *         \arg SPI_INT_FAE: TX Frame Alignment interrupt.
   *         \arg SPI_INT_TUF: Transmit FIFO underflow interrupt.
   *         \arg SPI_INT_RIG: Rising edge detect interrupt.
-  *         \arg SPI_INT_TXNDF_DONE: TX NDF mode transmit done Interrupt.
+  *         \arg SPI_INT_WRAP_TXD: TX NDF mode transmit done Interrupt.
   * \param  NewState: New state of the specified SPI interrupt source.
   *         This parameter can be: ENABLE or DISABLE.
   * \return None
@@ -732,45 +716,30 @@ void SPI_INTConfig(SPI_TypeDef *SPIx, uint16_t SPI_IT, FunctionalState NewState)
     assert_param(IS_FUNCTIONAL_STATE(NewState));
     assert_param(IS_SPI_CONFIG_IT(SPI_IT));
 
-    if (NewState != DISABLE)
-    {
-        /* Enable the selected SPI interrupt */
 #if (SPI_SUPPORT_WRAP_MODE == 1)
-        SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-        if ((SPI_IT & (BIT0 | BIT1 | BIT10)) && (spi_0x200.b.wrap_ctrl_mode))
+    SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
+    if (SPI_IT & (SPI_INT_WRAP_TXE | SPI_INT_WRAP_TXO | SPI_INT_WRAP_TXD))
+    {
+        if (spi_0x200.b.wrap_ctrl_mode)
         {
-            if (SPI_IT & (BIT0 | BIT1))
-            {
-                SPIx->SPI_WRAP_IMR |= SPI_IT;
-            }
-            else
+            if (NewState != DISABLE)
             {
                 SPIx->SPI_WRAP_IMR |= (SPI_IT >> 8);
             }
+            else
+            {
+                SPIx->SPI_WRAP_IMR &= ~(SPI_IT >> 8);
+            }
         }
-#else
-        SPIx->SPI_M_S_IMR |= SPI_IT;
+    }
 #endif
+    if (NewState != DISABLE)
+    {
+        SPIx->SPI_M_S_IMR |= (SPI_IT & 0xff);
     }
     else
     {
-        /* Disable the selected SPI interrupt */
-#if (SPI_SUPPORT_WRAP_MODE == 1)
-        SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-        if ((SPI_IT & (BIT0 | BIT1 | BIT10)) && (spi_0x200.b.wrap_ctrl_mode))
-        {
-            if (SPI_IT & (BIT0 | BIT1))
-            {
-                SPIx->SPI_WRAP_IMR &= (uint16_t)~(SPI_IT);
-            }
-            else
-            {
-                SPIx->SPI_WRAP_IMR &= (uint16_t)~((SPI_IT >> 8));
-            }
-        }
-#else
-        SPIx->SPI_M_S_IMR &= (uint16_t)~(SPI_IT);
-#endif
+        SPIx->SPI_M_S_IMR &= ~(SPI_IT & 0xff);
     }
 }
 
@@ -801,32 +770,32 @@ FlagStatus SPI_GetFlagState(SPI_TypeDef *SPIx, uint16_t SPI_FLAG)
 
 #if (SPI_SUPPORT_WRAP_MODE == 1)
     SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
-    if ((SPI_FLAG & (BIT0 | BIT1 | BIT2)) && (spi_0x200.b.wrap_ctrl_mode))
+    if ((SPI_FLAG & (SPI_FLAG_WRAP_CS_EN | SPI_FLAG_WRAP_TFNF |
+                     SPI_FLAG_WRAP_TFE)))
     {
-        if ((SPIx->SPI_WRAP_SR & SPI_FLAG))
+        if ((spi_0x200.b.wrap_ctrl_mode))
         {
-            bitstatus = SET;
+            if (SPIx->SPI_WRAP_SR & (SPI_FLAG >> 8))
+            {
+                bitstatus = SET;
+            }
         }
-    }
-    else
-    {
-#endif
-        /* Check the status of the specified SPI flag */
-        if ((SPIx->SPI_M_S_SR & SPI_FLAG) != (uint8_t)RESET)
-        {
-            /* SPI_FLAG is set */
-            bitstatus = SET;
-        }
-#if (SPI_SUPPORT_WRAP_MODE == 1)
+        return  bitstatus;
     }
 #endif
+    /* Check the status of the specified SPI flag */
+    if ((SPIx->SPI_M_S_SR & SPI_FLAG) != (uint8_t)RESET)
+    {
+        /* SPI_FLAG is set */
+        bitstatus = SET;
+    }
 
     /* Return the SPI_FLAG status */
     return  bitstatus;
 }
 
 /**
-  * \brief  Enables or disables the SPIx GDMA interface.
+  * \brief  Enable or disable the SPIx GDMA interface.
   * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
   * \param  SPI_GDMAReq: Specifies the SPI GDMA transfer request to be enabled or disabled.
   *         This parameter can be one of the following values:
@@ -918,7 +887,7 @@ void SPI_SetRxSampleDly(SPI_TypeDef *SPIx, uint32_t delay)
 #if (SPI_SUPPORT_WRAP_MODE == 1)
 
 /**
-  * \brief  Enables or disables the specified SPI wrap mode start transfer.
+  * \brief  Enable or disable the specified SPI wrap mode start transfer.
   * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
   * \param  NewState: new state of the SPIx peripheral.
   *         This parameter can be: ENABLE or DISABLE.
@@ -930,15 +899,9 @@ void SPI_WrapModeStartTx(SPI_TypeDef *SPIx, FunctionalState NewState)
     assert_param(IS_SPI_ALL_PERIPH(SPIx));
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-    if (NewState != DISABLE)
-    {
-        /* Enable the selected SPI wrap mode start transfer. */
-        SPIx->SPI_WRAP_CTRL |= SPI_0X200_MST_TX_FIFO_EN;
-    }
-    else
-    {
-        SPIx->SPI_WRAP_CTRL &= ~SPI_0X200_MST_TX_FIFO_EN;
-    }
+    SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
+    spi_0x200.b.mst_tx_fifo_en = NewState;
+    SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
 }
 
 /**
@@ -956,14 +919,9 @@ void SPI_InverseCSActivePolarity(SPI_TypeDef *SPIx, FunctionalState NewState)
     assert_param(IS_SPI_ALL_PERIPH(SPIx));
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-    if (NewState != DISABLE)
-    {
-        SPIx->SPI_WRAP_CTRL |= SPI_0X200_CS_INV_EN;
-    }
-    else
-    {
-        SPIx->SPI_WRAP_CTRL &= ~SPI_0X200_CS_INV_EN;
-    }
+    SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
+    spi_0x200.b.cs_inv_en = NewState;
+    SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
 }
 
 /**
@@ -981,14 +939,9 @@ void SPI_DriveMOSILow(SPI_TypeDef *SPIx, FunctionalState NewState)
     assert_param(IS_SPI_ALL_PERIPH(SPIx));
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-    if (NewState != DISABLE)
-    {
-        SPIx->SPI_WRAP_CTRL |= SPI_0X200_MOSI_DRV_LOW_EN;
-    }
-    else
-    {
-        SPIx->SPI_WRAP_CTRL &= ~SPI_0X200_MOSI_DRV_LOW_EN;
-    }
+    SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
+    spi_0x200.b.mosi_drv_low_en = NewState;
+    SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
 }
 
 /**
@@ -1006,16 +959,81 @@ void SPI_PullMOSIEn(SPI_TypeDef *SPIx, FunctionalState NewState)
     assert_param(IS_SPI_ALL_PERIPH(SPIx));
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-    if (NewState != DISABLE)
-    {
-        SPIx->SPI_WRAP_CTRL |= SPI_0X200_MOSI_PULL_EN;
-    }
-    else
-    {
-        SPIx->SPI_WRAP_CTRL &= ~SPI_0X200_MOSI_PULL_EN;
-    }
+    SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
+    spi_0x200.b.mosi_pull_en = NewState;
+    SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
 }
 
+#endif
+
+#if (SPI_SUPPORT_RAP_FUNCTION == 1)
+void SPI_RAPModeCmd(SPI_TypeDef *SPIx, FunctionalState NewState)
+{
+    /* Check the parameters */
+    assert_param(IS_SPI_ALL_PERIPH(SPIx));
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
+
+    SPI_WRAP_CTRL_TypeDef spi_0x200 = {.d32 = SPIx->SPI_WRAP_CTRL};
+    spi_0x200.b.rap_ctrl_mode = NewState;
+    SPIx->SPI_WRAP_CTRL = spi_0x200.d32;
+}
+
+void SPI_SetTaskCmdNum(SPI_TypeDef *SPIx, uint8_t num)
+{
+    /* Check the parameters */
+    assert_param(IS_SPI_ALL_PERIPH(SPIx));
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
+
+    SPI_WRAP_TCMD_NUM_TypeDef spi_0x230 = {.d32 = SPIx->SPI_WRAP_TCMD_NUM};
+    spi_0x230.b.task_cmd_num = num;
+    SPIx->SPI_WRAP_TCMD_NUM = spi_0x230.d32;
+}
+
+void SPI_SetTaskWaitNum(SPI_TypeDef *SPIx, uint8_t num)
+{
+    /* Check the parameters */
+    assert_param(IS_SPI_ALL_PERIPH(SPIx));
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
+
+    SPI_WRAP_TWAIT_NUM_TypeDef spi_0x234 = {.d32 = SPIx->SPI_WRAP_TWAIT_NUM};
+    spi_0x234.b.task_wait_num = num;
+    SPIx->SPI_WRAP_TWAIT_NUM = spi_0x234.d32;
+}
+
+void SPI_SetTaskTransferNum(SPI_TypeDef *SPIx, uint8_t num)
+{
+    /* Check the parameters */
+    assert_param(IS_SPI_ALL_PERIPH(SPIx));
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
+
+    SPI_WRAP_TTRAN_NUM_TypeDef spi_0x238 = {.d32 = SPIx->SPI_WRAP_TTRAN_NUM};
+    spi_0x238.b.task_tran_num = num;
+    SPIx->SPI_WRAP_TTRAN_NUM = spi_0x238.d32;
+}
+
+void SPI_TaskTrigger(SPI_TypeDef *SPIx, uint32_t task)
+{
+    /* Check the parameters */
+    assert_param(IS_SPI_ALL_PERIPH(SPIx));
+
+    SPIx->SPI_WRAP_FW_ST |= BIT(task);
+}
+
+bool SPI_TaskEventStsCheck(SPI_TypeDef *SPIx, uint32_t te)
+{
+    /* Check the parameters */
+    assert_param(IS_SPI_ALL_PERIPH(SPIx));
+
+    return SPIx->SPI_WRAP_TASK_STS & BIT(te);
+}
+
+void SPI_TaskEventStsClear(SPI_TypeDef *SPIx, uint32_t te)
+{
+    /* Check the parameters */
+    assert_param(IS_SPI_ALL_PERIPH(SPIx));
+
+    SPIx->SPI_WRAP_TASK_STS |= BIT(te);
+}
 #endif
 
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/

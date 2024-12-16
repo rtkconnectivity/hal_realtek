@@ -1,14 +1,21 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+**********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl_enh_tim.c
+* \brief    This file provides all the Timer firmware functions.
+* \details
+* \author   Grace_yan
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include "rtl_rcc.h"
 #include "rtl_enh_tim.h"
+#include "rtl_rcc.h"
 
 /*============================================================================*
  *                          Private Functions
@@ -38,24 +45,30 @@ extern void ENHTIM_PWMDeadzoneConfig(uint32_t enhtim_id, \
 void ENHTIM_Init(ENHTIM_TypeDef *ENHTIMx, ENHTIM_InitTypeDef *ENHTIM_InitStruct)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);
 
     /* Clock source config */
-
     ENH_TIM_SHARE->ENHTIM_CONTROL &= ~BIT(enhtim_id);
     ENH_TIM_SHARE->ENHTIM_INT_CONTROL &= ~BIT(enhtim_id);
 
     /* Clock source config */
+    ENHTIM_ClkConfig(ENHTIMx,
+                     ENHTIM_InitStruct->ENHTIM_ClockSource,
+                     ENHTIM_InitStruct->ENHTIM_ClockDiv);
 
-    RCC_ENHTIMClkConfig(ENHTIMx,
-                        ENHTIM_InitStruct->ENHTIM_ClockSource,
-                        ENHTIM_InitStruct->ENHTIM_ClockDiv);
-
+#if ENHTIM_SUPPORT_ONESHOT_CMD
+    if (ENHTIM_InitStruct->ENHTIM_OneShotEn == ENABLE)
+    {
+        REG_ENHTIMER_ONESHOT |= BIT(enhtim_id);
+    }
+    else
+    {
+        REG_ENHTIMER_ONESHOT &= ~BIT(enhtim_id);
+    }
+#endif
     /* Config latch function. */
-
     ENHTIM_CONFIGURE_TypeDef enhtim_0x10 = {.d32 = ENHTIMx->ENHTIM_CONFIGURE};
     enhtim_0x10.b.Enhtimer_mode = 0x0;
     ENHTIMx->ENHTIM_CONFIGURE = enhtim_0x10.d32;
@@ -80,7 +93,6 @@ void ENHTIM_Init(ENHTIM_TypeDef *ENHTIMx, ENHTIM_InitTypeDef *ENHTIM_InitStruct)
     ENHTIMx->ENHTIM_CONFIGURE = enhtim_0x10.d32;
 
     /* Config latch trigger. */
-
 #if ENHTIM_SUPPORT_LATCH_CNT_0
     if (ENHTIM_InitStruct->ENHTIM_LatchCountEn[0] == ENABLE)
     {
@@ -101,7 +113,6 @@ void ENHTIM_Init(ENHTIM_TypeDef *ENHTIMx, ENHTIM_InitTypeDef *ENHTIM_InitStruct)
 #endif
 
     /* Config PWM mode. */
-
     if ((ENHTIM_InitStruct->ENHTIM_Mode == ENHTIM_MODE_PWM_AUTO) ||
         (ENHTIM_InitStruct->ENHTIM_Mode == ENHTIM_MODE_PWM_MANUAL))
     {
@@ -124,11 +135,9 @@ void ENHTIM_Init(ENHTIM_TypeDef *ENHTIMx, ENHTIM_InitTypeDef *ENHTIM_InitStruct)
     }
 
     /* Config PWM Deadzone */
-
     ENHTIM_PWMDeadzoneConfig(enhtim_id, ENHTIM_InitStruct);
 
     /* DMA function. */
-
     if (ENHTIM_InitStruct->ENHTIM_DmaEn != DISABLE)
     {
         enhtim_0x10.b.Enhtimer_dma_en = ENABLE;
@@ -138,7 +147,6 @@ void ENHTIM_Init(ENHTIM_TypeDef *ENHTIMx, ENHTIM_InitTypeDef *ENHTIM_InitStruct)
     }
 
     /* Clear the IT status */
-
     ENH_TIM_SHARE->ENHTIM_LACTH_FIFO_TH_STATUS |= BIT(enhtim_id);
     ENH_TIM_SHARE->ENHTIM_LATCH_CNT_FIFO_STATUS |= BIT(enhtim_id * 2);
     ENH_TIM_SHARE->ENHTIM_STATUS |= BIT(enhtim_id);
@@ -152,12 +160,15 @@ void ENHTIM_Init(ENHTIM_TypeDef *ENHTIMx, ENHTIM_InitTypeDef *ENHTIM_InitStruct)
   */
 void ENHTIM_StructInit(ENHTIM_InitTypeDef *ENHTIM_InitStruct)
 {
-    ENHTIM_InitStruct->ENHTIM_ClockSource           = ENHTIM_SOURCE_CLOCK_40M;
+    ENHTIM_InitStruct->ENHTIM_ClockSource           = ENHTIM_CLOCK_SOURCE_40M;
     ENHTIM_InitStruct->ENHTIM_ClockDiv_En           = DISABLE;
     ENHTIM_InitStruct->ENHTIM_ClockDiv              = ENHTIM_CLOCK_DIVIDER_1;
     ENHTIM_InitStruct->ENHTIM_Mode                  = ENHTIM_MODE_FreeRun;
     ENHTIM_InitStruct->ENHTIM_PWMOutputEn           = DISABLE;
     ENHTIM_InitStruct->ENHTIM_PWMStartPolarity      = ENHTIM_PWM_START_WITH_LOW;
+#if ENHTIM_SUPPORT_ONESHOT_CMD
+    ENHTIM_InitStruct->ENHTIM_OneShotEn             = DISABLE;
+#endif
 #if ENHTIM_SUPPORT_LATCH_CNT_0
     ENHTIM_InitStruct->ENHTIM_LatchCountEn[0]       = DISABLE;
     ENHTIM_InitStruct->ENHTIM_LatchCountTrigger[0]  = ENHTIM_LATCH_TRIGGER_RISING_EDGE;
@@ -171,6 +182,7 @@ void ENHTIM_StructInit(ENHTIM_InitTypeDef *ENHTIM_InitStruct)
     ENHTIM_InitStruct->ENHTIM_LatchCountTrigger[2]  = ENHTIM_LATCH_TRIGGER_RISING_EDGE;
 #endif
     ENHTIM_InitStruct->ENHTIM_LatchCountThd         = 3;
+    ENHTIM_InitStruct->ENHTIM_LatchTriggerPad       = P0_0;
     ENHTIM_InitStruct->ENHTIM_MaxCount              = 0xFFFFFFFE;//range 0x1~0xFFFFFFFE
     ENHTIM_InitStruct->ENHTIM_CCValue               = 0x0;
 
@@ -187,7 +199,7 @@ void ENHTIM_StructInit(ENHTIM_InitTypeDef *ENHTIM_InitStruct)
 }
 
 /**
-  * \brief  Enables or disables the specified ENHTIM peripheral.
+  * \brief  Enable or disable the specified ENHTIM peripheral.
   * \param  ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
   * \param  NewState: New state of the ENHTIMx peripheral.
   *         This parameter can be: ENABLE or DISABLE.
@@ -196,7 +208,6 @@ void ENHTIM_StructInit(ENHTIM_InitTypeDef *ENHTIM_InitStruct)
 void ENHTIM_Cmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
@@ -205,19 +216,17 @@ void ENHTIM_Cmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState)
     if (NewState != DISABLE)
     {
         /* Enable the TIM Counter */
-
         ENH_TIM_SHARE->ENHTIM_CONTROL |= BIT(enhtim_id);
     }
     else
     {
         /* Disable the TIM Counter */
-
         ENH_TIM_SHARE->ENHTIM_CONTROL &= ~(BIT(enhtim_id));
     }
 }
 
 /**
-  * \brief  Enables or disables the specified ENHTIM peripheral.
+  * \brief  Enable or disable the specified ENHTIM peripheral.
   * \param  ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
   * \param  NewState: New state of the ENHTIMx peripheral.
   *         This parameter can be: ENABLE or DISABLE.
@@ -227,7 +236,6 @@ void ENHTIM_Cmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState)
 void ENHTIM_OneShotCmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
     assert_param(IS_FUNCTIONAL_STATE(NewState));
 
@@ -236,36 +244,30 @@ void ENHTIM_OneShotCmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState)
     if (NewState != DISABLE)
     {
         /*oneshot_mode_en*/
-
         REG_ENHTIMER_ONESHOT |= BIT(enhtim_id);
 
         /* Enable the TIM Counter */
-
         ENH_TIM_SHARE->ENHTIM_CONTROL |= BIT(enhtim_id);
 
         /*oneshot_mode_go*/
-
         REG_ENHTIMER_ONESHOT |= BIT(enhtim_id + 8);
     }
     else
     {
         /*oneshot_mode_en*/
-
         REG_ENHTIMER_ONESHOT &= ~BIT(enhtim_id);
 
         /* Disable the TIM Counter */
-
         ENH_TIM_SHARE->ENHTIM_CONTROL &= ~(BIT(enhtim_id));
 
         /*oneshot_mode_en*/
-
         REG_ENHTIMER_ONESHOT &= ~BIT(enhtim_id + 8);
     }
 }
 #endif
 
 /**
-  * \brief  Enables or disables ENHTIMx interrupt.
+  * \brief  Enable or disable ENHTIMx interrupt.
   * \param  ENHTIMx: Select the ENHTIM peripheral. \ref ENHTIM_Declaration
   * \param  ENHTIM_INT: Specifies the ENHTIMx interrupt source which to be enabled or disabled.
   *         This parameter can be one of the following values:
@@ -279,7 +281,6 @@ void ENHTIM_OneShotCmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState)
 void ENHTIM_INTConfig(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT, FunctionalState NewState)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
     assert_param(IS_ENHTIM_INT(ENHTIM_INT));
     assert_param(IS_FUNCTIONAL_STATE(NewState));
@@ -289,7 +290,6 @@ void ENHTIM_INTConfig(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT, FunctionalSta
     if (NewState != DISABLE)
     {
         /* Enable the ENHTIM Interrupt */
-
         if (ENHTIM_INT == ENHTIM_INT_LATCH_CNT_FIFO_FULL)
         {
             ENH_TIM_SHARE->ENHTIM_LATCH_INT_CONTROL_0 |= BIT(8) << enhtim_id;
@@ -306,7 +306,6 @@ void ENHTIM_INTConfig(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT, FunctionalSta
     else
     {
         /* Disable the ENHTIM Interrupt */
-
         if (ENHTIM_INT == ENHTIM_INT_LATCH_CNT_FIFO_FULL)
         {
             ENH_TIM_SHARE->ENHTIM_LATCH_INT_CONTROL_0 &= ~(BIT(8) << enhtim_id);
@@ -334,14 +333,13 @@ ITStatus ENHTIM_GetLCFIFOStatus(ENHTIM_TypeDef *ENHTIMx)
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);
-    ITStatus itstatus = RESET;
 
     if (ENH_TIM_SHARE->ENHTIM_STATUS & ((BIT(8) << enhtim_id)))
     {
-        itstatus = SET;
+        return SET;
     }
 
-    return itstatus;
+    return RESET;
 }
 
 /**
@@ -354,7 +352,6 @@ ITStatus ENHTIM_GetLCFIFOStatus(ENHTIM_TypeDef *ENHTIMx)
 void ENHTIM_ReadLatchCountFIFO(ENHTIM_TypeDef *ENHTIMx, uint32_t *pBuf, uint8_t length)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     if ((pBuf == 0) || (length > 31))
@@ -382,7 +379,6 @@ void ENHTIM_ReadLatchCountFIFO(ENHTIM_TypeDef *ENHTIMx, uint32_t *pBuf, uint8_t 
 ITStatus ENHTIM_GetINTStatus(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
     assert_param(IS_ENHTIM_INT(INT));
 
@@ -423,13 +419,11 @@ ITStatus ENHTIM_GetINTStatus(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT)
 void ENHTIM_ClearINTPendingBit(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);
 
     /* Clear the IT */
-
     if (ENHTIM_INT == ENHTIM_INT_TIM)
     {
         ENH_TIM_SHARE->ENHTIM_STATUS |= BIT(enhtim_id);
@@ -457,6 +451,7 @@ void ENHTIM_ClearINTPendingBit(ENHTIM_TypeDef *ENHTIMx, uint8_t ENHTIM_INT)
 void ENHTIM_PWMChangeFreqAndDuty(ENHTIM_TypeDef *ENHTIMx, uint16_t enhtim_mode, uint32_t max_count,
                                  uint32_t high_count)
 {
+    /* Check the parameters */
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     ENHTIMx->ENHTIM_MAX_CNT = max_count;
@@ -478,6 +473,7 @@ void ENHTIM_PWMChangeFreqAndDuty(ENHTIM_TypeDef *ENHTIMx, uint16_t enhtim_mode, 
   */
 bool ENHTIM_GetToggleState(ENHTIM_TypeDef *ENHTIMx)
 {
+    /* Check the parameters */
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);
@@ -518,7 +514,6 @@ void ENHTIM_PhaseShiftCnt(ENHTIM_TypeDef *ENHTIMx, uint32_t PhaseShiftCnt)
 uint32_t ENHTIM_GetCurrentCount(ENHTIM_TypeDef *ENHTIMx)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     return ENHTIMx->ENHTIM_CUR_CNT;
@@ -533,7 +528,6 @@ uint32_t ENHTIM_GetCurrentCount(ENHTIM_TypeDef *ENHTIMx)
 void ENHTIM_SetMaxCount(ENHTIM_TypeDef *ENHTIMx, uint32_t count)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     ENHTIMx->ENHTIM_MAX_CNT = count & 0xFFFFFFFE;
@@ -549,7 +543,6 @@ void ENHTIM_SetMaxCount(ENHTIM_TypeDef *ENHTIMx, uint32_t count)
 void ENHTIM_SetCCValue(ENHTIM_TypeDef *ENHTIMx, uint32_t value)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     ENHTIMx->ENHTIM_CCR = value;
@@ -565,7 +558,6 @@ void ENHTIM_SetCCValue(ENHTIM_TypeDef *ENHTIMx, uint32_t value)
 void ENHTIM_WriteCCFIFO(ENHTIM_TypeDef *ENHTIMx, uint32_t value)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     ENHTIMx->ENHTIM_CCR_FIFO_ENTRY = value;
@@ -580,7 +572,6 @@ void ENHTIM_WriteCCFIFO(ENHTIM_TypeDef *ENHTIMx, uint32_t value)
 FlagStatus ENHTIM_GetFIFOFlagStatus(ENHTIM_TypeDef *ENHTIMx, uint32_t ENHTIM_FLAG)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_FIFO_FLAG(ENHTIM_FLAG));
 
     FlagStatus bitstatus = RESET;
@@ -617,10 +608,10 @@ void ENHTIM_LatchCountEnable(ENHTIM_TypeDef *ENHTIMx,
                              ENHTIMLatchCnt_TypeDef LatchCntIdx)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     ENHTIM_CONFIGURE_TypeDef ENHTIM_0x10 = {.d32 = ENHTIMx->ENHTIM_CONFIGURE};
+
     switch (LatchCntIdx)
     {
 #if ENHTIM_SUPPORT_LATCH_CNT_0
@@ -655,7 +646,6 @@ void ENHTIM_LatchCountDisable(ENHTIM_TypeDef *ENHTIMx,
                               ENHTIMLatchCnt_TypeDef LatchCntIdx)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     ENHTIM_CONFIGURE_TypeDef ENHTIM_0x10 = {.d32 = ENHTIMx->ENHTIM_CONFIGURE};
@@ -693,12 +683,9 @@ uint32_t ENHTIM_GetLatchCount(ENHTIM_TypeDef *ENHTIMx,
                               ENHTIMLatchCnt_TypeDef LatchCntIdx)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
-    uint32_t count = 0;
-    count = *(volatile uint32_t *)(&(ENHTIMx->ENHTIM_LATCH_CNT_0) + LatchCntIdx);
-    return count;
+    return *(volatile uint32_t *)(&(ENHTIMx->ENHTIM_LATCH_CNT_0) + LatchCntIdx);
 }
 
 /**
@@ -709,7 +696,6 @@ uint32_t ENHTIM_GetLatchCount(ENHTIM_TypeDef *ENHTIMx,
 uint8_t ENHTIM_GetLatchCountFIFOLength(ENHTIM_TypeDef *ENHTIMx)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);
@@ -726,7 +712,6 @@ uint8_t ENHTIM_GetLatchCountFIFOLength(ENHTIM_TypeDef *ENHTIMx)
 void ENHTIM_ClearFIFO(ENHTIM_TypeDef *ENHTIMx, uint8_t FIFO_CLR)
 {
     /* Check the parameters */
-
     assert_param(IS_ENHTIM_ALL_PERIPH(ENHTIMx));
 
     uint32_t enhtim_id = ENHTIM_GetTimerID(ENHTIMx);

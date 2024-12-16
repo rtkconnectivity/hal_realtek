@@ -1,24 +1,35 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_pinmux_def.h
+* \brief    Pinmux related definitions for RTL8762G
+* \details
+* \author   renee
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_PINMUX_DEF_H
 #define RTL_PINMUX_DEF_H
 
 #include "utils/rtl_utils.h"
 #include "address_map.h"
-#include "rtl_aon_reg.h"
+#include "aon_reg.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-
 /*============================================================================*
  *                          PINMUX Defines
  *============================================================================*/
+/** \defgroup PINMUX      PINMUX
+  * \brief
+  * \{
+  */
+
 /** \defgroup PINMUX_Exported_Constants PINMUX Exported Constants
   * \brief
   * \{
@@ -31,7 +42,7 @@ extern "C" {
  */
 #define PINMUX_SUPPORT_AON_CONFIG                      (1)
 #define PINMUX_SUPPORT_HS_CONFIG                       (1)
-#define PAD_DRIVING_CURRENT_LEVEL                      (2)
+#define PAD_DRIVING_CURRENT_LEVEL                      (4)
 #define PAD_SUPPORT_DEDICATE_CONFIG                    (1)
 #define PAD_SUPPORT_MULTI_CORE                         (0)
 #define PAD_SUPPORT_AON_WAKEUP                         (0)
@@ -41,6 +52,7 @@ extern "C" {
 #define PAD_SUPPORT_FUNCTION_CONFIG                    (0)
 #define PAD_SUPPORT_GET_POWER_GROUP                    (0)
 #define PAD_SUPPORT_GET_PIN_NAME                       (0)
+#define PAD_SUPPORT_GET_OUTPUT_CTRL                    (0)
 #define PAD_SUPPORT_ANALOG_MODE                        (0)
 #define PAD_SUPPORT_ADPATER_WAKEUP                     (0)
 #define PAD_SUPPORT_MFB_WAKEUP                         (0)
@@ -49,15 +61,85 @@ extern "C" {
   * \}
   */
 
+/** End of PINMUX_Exported_Constants
+  * \}
+  */
+
+/** End of PINMUX
+  * \}
+  */
+
 /*============================================================================*
- *                          PINMUX CONSTANS
+ *                         PINMUX Registers Memory Map
  *============================================================================*/
+/**
+ * \brief Pinmux Register
+ */
+
+typedef struct                      /*!< Pinmux Structure */
+{
+    __IO uint32_t CFG[21];          /*!<  */
+} PINMUX_TypeDef;
+
+/*============================================================================*
+ *                         PINMUX Declaration
+ *============================================================================*/
+/** \defgroup PINMUX      PINMUX
+  * \brief
+  * \{
+  */
+
+/** \defgroup PINMUX_Exported_Constants PINMUX Exported Constants
+  * \brief
+  * \{
+  */
+
+/**
+ * \defgroup PINMUX_Declaration PINMUX Declaration
+ * \{
+ * \ingroup  PINMUX_Exported_Constants
+ */
+#define PINMUX                  ((PINMUX_TypeDef *) PINMUX_REG_BASE)
+
+/** End of PINMUX_Declaration
+  * \}
+  */
+
+/** End of PINMUX_Exported_Constants
+  * \}
+  */
+
+/** End of PINMUX
+  * \}
+  */
+
+/*============================================================================*
+ *                         PINMUX Private Types
+ *============================================================================*/
+typedef struct
+{
+    uint32_t pinmux_reg[21];
+} PINMUXStoreReg_Typedef;
+
+/*============================================================================*
+ *                         PINMUX Constants
+ *============================================================================*/
+/** \defgroup PINMUX      PINMUX
+  * \brief
+  * \{
+  */
+
+/** \defgroup PINMUX_Exported_Constants PINMUX Exported Constants
+  * \brief
+  * \{
+  */
 
 /**
  * \defgroup    PIN_Function PIN Function
  * \{
  * \ingroup     PINMUX_Exported_Constants
  */
+
 #define IDLE_MODE                   0
 
 #define UART0_TX                    1
@@ -187,8 +269,8 @@ extern "C" {
 #define back_end_power_0            149
 #define card_int_n_sdhc_0           150
 
-#define A2C_TX                      155
-#define A2C_RX                      156
+#define CAN_TX                      155
+#define CAN_RX                      156
 
 #define LRC_SPORT1                  157
 #define BCLK_SPORT1                 158
@@ -281,11 +363,11 @@ extern "C" {
  * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-#define DISPLAY_CONTROLLER_HS     0x00000
-#define SPI0_HS                   0x0000F
-#define SDHC_HS                   0x10000
-#define SPIC2_HS                  0x15550
-#define ETHERNET_HS               0x1AAA0
+#define DISPLAY_CONTROLLER_HS_MUX     0x00000
+#define SPI0_HS_MUX                   0x0000F
+#define SDHC_HS_MUX                   0x10000
+#define SPIC2_HS_MUX                  0x15550
+#define ETHERNET_HS_MUX               0x1AAA0
 
 /** End of PAD_HS_Mux
   * \}
@@ -294,14 +376,15 @@ extern "C" {
 /*============================================================================*
  *                          PINMUX TYPE/API WRAPPERS
  *============================================================================*/
-
 /**
  * \defgroup PAD_Constant_Wrapper PAD_Constant_Wrapper
  * \{
  * \ingroup  PINMUX_Exported_Constants
  */
 #define PAD_DRIVING_CURRENT_4mA         LEVEL0
-#define PAD_DRIVING_CURRENT_8mA         LEVEL2
+#define PAD_DRIVING_CURRENT_8mA         LEVEL1
+#define PAD_DRIVING_CURRENT_12mA        LEVEL2
+#define PAD_DRIVING_CURRENT_16mA        LEVEL3
 
 /** End of PAD_Constant_Wrapper
   * \}
@@ -341,6 +424,10 @@ extern "C" {
   */
 
 /** End of PINMUX_Exported_Constants
+  * \}
+  */
+
+/** End of PINMUX
   * \}
   */
 

@@ -1,14 +1,27 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_gpio.c
+* \brief    This file provides all the GPIO firmware internal functions.
+* \details
+* \author
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_gpio.h"
 #include "rtl_rcc.h"
+#include "app_section.h"
+
+/*============================================================================*
+ *                        Private Defines
+ *============================================================================*/
+#define IS_PIN_NUM(NUM) ((NUM) <= (uint8_t)P10_2)
 
 /*============================================================================*
  *                           Public Functions
@@ -57,11 +70,7 @@ uint32_t GPIO_SwapDebPinBit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
     return temp_gpio_bit;
 }
 
-/**
-  * \brief  Get GPIO GROUP through the given pad.
-  * \param  Pin_num: Pin number to be configured. \ref Pin_Number
-  * \return GPIOx: Select the GPIO peripheral. \ref GPIO_Declaration
-  */
+
 GPIO_TypeDef *GPIO_GetPort(uint8_t Pin_num)
 {
     if (((Pin_num >= P0_0) && (Pin_num <= P3_2)) || ((Pin_num >= MICBIAS) && (Pin_num <= DACN)))
@@ -76,11 +85,6 @@ GPIO_TypeDef *GPIO_GetPort(uint8_t Pin_num)
 }
 
 
-/**
-  * \brief  Get the GPIO_Pin(GPIO0~GPIO31) through the given PAD num.
-  * \param  Pin_num: Pin number to be configured. \ref Pin_Number
-  * \return GPIOx(x is 0~31) value.
-  */
 uint32_t GPIO_GetPinBit(uint8_t Pin_num)
 {
     /* Check the parameters */
@@ -115,11 +119,6 @@ uint32_t GPIO_GetPinBit(uint8_t Pin_num)
 }
 
 
-/**
-  * \brief  Get GPIO value (GPIOA0 ~ GPIOB31) through the given pad.
-  * \param  Pin_num: Pin number to be configured. \ref Pin_Number
-  * \return GPIO value (GPIOA0 ~ GPIOB31).
-  */
 uint8_t GPIO_GetNum(uint8_t Pin_num)
 {
     /* Check the parameters */
@@ -148,13 +147,7 @@ uint8_t GPIO_GetNum(uint8_t Pin_num)
     return 0xFF;
 }
 
-/**
-  * \brief  Enable GPIO external debounce clock.
-  * \param  GPIOx: Select the GPIO peripheral. \ref GPIO_Declaration
-  * \param  GPIO_Pin: GPIO_Pin can be 0 to 31.
-  * \param  NewState: Disable or enable gpio debounce clock.
-  * \return None.
-  */
+
 void GPIO_ExtDebCmd(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, FunctionalState NewState)
 {
     uint32_t GPIO_Pin_Swap = GPIO_SwapDebPinBit(GPIOx, GPIO_Pin);
@@ -165,23 +158,6 @@ void GPIO_ExtDebCmd(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, FunctionalState NewS
     if (NewState == DISABLE)
     {
         GPIOx_DEB->GPIO_DEB_FUN_CTL &= (~GPIO_Pin_Swap);
-
-        for (uint8_t i = 0; i < 8; i++)
-        {
-            if ((GPIO_Pin_Swap & ((uint32_t)0x0F << i * 4)) != 0)
-            {
-                GPIO_DEB_CLK_CTL_TypeDef gpio_deb = {.d32 = GPIOx_DEB->GPIO_DEB_CLK_CTL[i / 2]};
-                if (i % 2)
-                {
-                    gpio_deb.b.GPIO_G_H_DEB_CNT_EN = DISABLE;
-                }
-                else
-                {
-                    gpio_deb.b.GPIO_G_L_DEB_CNT_EN = DISABLE;
-                }
-                GPIOx_DEB->GPIO_DEB_CLK_CTL[i / 2] = gpio_deb.d32;
-            }
-        }
     }
     else
     {
@@ -207,15 +183,7 @@ void GPIO_ExtDebCmd(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, FunctionalState NewS
     }
 }
 
-/**
-  * \brief  Set GPIO debounce parameters.
-  * \param  GPIOx: Select the GPIO peripheral. \ref GPIO_Declaration
-  * \param  GPIO_Pin: GPIO_Pin can be 0 to 31.
-  * \param  GPIO_DebounceClkSource: select debounce count clk source, can be S11 or 32KHz.
-  * \param  GPIO_DebounceClkDiv: divider selection.
-  * \param  GPIO_DebounceCntLimit: debounce time can be calculated by count limit.
-  * \return None.
-  */
+
 void GPIO_ExtDebUpdate(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin,
                        GPIODebounceSrc_TypeDef GPIO_DebounceClkSource,
                        GPIODebounceDiv_TypeDef GPIO_DebounceClkDiv,
@@ -252,76 +220,20 @@ void GPIO_ExtDebUpdate(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin,
     }
 }
 
-/**
-  * \brief  Configure Debounce enable register for GPIO_Init.
-  * \param  GPIOx: Select the GPIO peripheral. \ref GPIO_Declaration
-  * \param  GPIO_InitStruct: pointer to a GPIO_InitTypeDef structure that
-  *         contains the configuration information for the specified GPIO peripheral.
-  * \return None.
-  */
-void GPIO_ExtDebInInit(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_InitStruct)
+void GPIO_ExtPolarity(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, GPIOITPolarity_TypeDef Int_Polarity)
 {
-    uint32_t GPIO_Pin_Swap = GPIO_SwapDebPinBit(GPIOx, GPIO_InitStruct->GPIO_Pin);
-
-    /* Configure Debounce enable register */
-    GPIO_Debounce_TypeDef *GPIOx_DEB = GPIOx == GPIOA ? GPIOA_DEB : GPIOB_DEB;
-
-    if (GPIO_InitStruct->GPIO_ITDebounce == GPIO_INT_DEBOUNCE_DISABLE)
+    if (Int_Polarity == GPIO_INT_POLARITY_ACTIVE_LOW)
     {
-        GPIOx_DEB->GPIO_DEB_FUN_CTL &= (~GPIO_Pin_Swap);
-        for (uint8_t i = 0; i < 8; i++)
-        {
-            if ((GPIO_Pin_Swap & ((uint32_t)0x0F << i * 4)) != 0)
-            {
-                GPIO_DEB_CLK_CTL_TypeDef gpio_deb = {.d32 = GPIOx_DEB->GPIO_DEB_CLK_CTL[i / 2]};
-                if (i % 2)
-                {
-                    gpio_deb.b.GPIO_G_H_DEB_CNT_EN = DISABLE;
-                }
-                else
-                {
-                    gpio_deb.b.GPIO_G_L_DEB_CNT_EN = DISABLE;
-                }
-                GPIOx_DEB->GPIO_DEB_CLK_CTL[i / 2] = gpio_deb.d32;
-            }
-        }
+        GPIOx->GPIO_EXT_DEB_POL_CTL &= (~GPIO_Pin);
     }
     else
     {
-        for (uint8_t i = 0; i < 8; i++)
-        {
-            if ((GPIO_Pin_Swap & ((uint32_t)0x0F << i * 4)) != 0)
-            {
-                GPIOx_DEB->GPIO_DEB_FUN_CTL &= (~((uint32_t)0x0F << i * 4));
-                GPIOx_DEB->GPIO_DEB_FUN_CTL |= GPIO_Pin_Swap;
-
-                GPIO_DEB_CLK_CTL_TypeDef gpio_deb = {.d32 = GPIOx_DEB->GPIO_DEB_CLK_CTL[i / 2]};
-                if (i % 2)
-                {
-                    gpio_deb.b.GPIO_G_H_CNT_LIMIT = GPIO_InitStruct->GPIO_DebounceCntLimit & 0xFF;
-                    gpio_deb.b.GPIO_G_H_DEB_CLK_SEL = GPIO_InitStruct->GPIO_DebounceClkSource;
-                    gpio_deb.b.GPIO_G_H_DEB_CLK_DIV = GPIO_InitStruct->GPIO_DebounceClkDiv;
-                    gpio_deb.b.GPIO_G_H_DEB_CNT_EN = ENABLE;
-                }
-                else
-                {
-                    gpio_deb.b.GPIO_G_L_CNT_LIMIT = GPIO_InitStruct->GPIO_DebounceCntLimit & 0xFF;
-                    gpio_deb.b.GPIO_G_L_DEB_CLK_SEL = GPIO_InitStruct->GPIO_DebounceClkSource;
-                    gpio_deb.b.GPIO_G_L_DEB_CLK_DIV = GPIO_InitStruct->GPIO_DebounceClkDiv;
-                    gpio_deb.b.GPIO_G_L_DEB_CNT_EN = ENABLE;
-                }
-                GPIOx_DEB->GPIO_DEB_CLK_CTL[i / 2] = gpio_deb.d32;
-            }
-        }
+        GPIOx->GPIO_EXT_DEB_POL_CTL = GPIOx->GPIO_EXT_DEB_POL_CTL & (~GPIO_Pin) | GPIO_Pin;
     }
 }
 
-/**
-  * \brief  Store GPIO register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the GPIO peripheral.
-  * \param  StoreBuf: Store buffer to store GPIO register data.
-  * \return None.
-  */
+
+RAM_FUNCTION
 void GPIO_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     GPIO_TypeDef *GPIOx = (GPIO_TypeDef *)PeriReg;
@@ -355,12 +267,8 @@ void GPIO_DLPSEnter(void *PeriReg, void *StoreBuf)
     return;
 }
 
-/**
-  * \brief  Restore GPIO register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the GPIO peripheral.
-  * \param  StoreBuf: Restore buffer to restore GPIO register data.
-  * \return None
-  */
+
+RAM_FUNCTION
 void GPIO_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     GPIO_TypeDef *GPIOx = (GPIO_TypeDef *)PeriReg;

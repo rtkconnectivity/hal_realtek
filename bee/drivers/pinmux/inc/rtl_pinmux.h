@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_pinmux.h
+* \brief    The header file of PAD and PINMUX driver.
+* \details  This file provides all PAD and PINMUX firmware functions.
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0.0
+* *******************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,6 +24,7 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "pinmux/src/rtl87x2g/rtl_pinmux_def.h"
 #include "pinmux/src/rtl87x2g/pin_def.h"
@@ -24,48 +32,22 @@ extern "C" {
 #include "pinmux/src/rtl87x3e/rtl_pinmux_def.h"
 #include "pinmux/src/rtl87x3e/pin_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "pinmux/src/rtl8763d/rtl_pinmux_def.h"
-#include "pinmux/src/rtl8763d/pin_def.h"
+#include "pinmux/src/rtl87x3d/rtl_pinmux_def.h"
+#include "pinmux/src/rtl87x3d/pin_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "pinmux/src/rtl87x2j/rtl_pinmux_def.h"
+#include "pinmux/src/rtl87x2j/pin_def.h"
 #endif
 
-/*============================================================================*
- *                         PINMUX Registers Memory Map
- *============================================================================*/
-/**
- * \brief Pinmux Register
- */
-
-typedef struct                      /*!< Pinmux Structure */
-{
-    __IO uint32_t CFG[45];          /*!<  */
-} PINMUX_TypeDef;
-
-/*============================================================================*
- *                         PINMUX Declaration
- *============================================================================*/
-#define PINMUX                  ((PINMUX_TypeDef *) PINMUX_REG_BASE)
-#if PAD_SUPPORT_MULTI_CORE
-#define PINMUX_CODEC            ((PINMUX_TypeDef *) PINMUX_CODEC_REG_BASE)
-#define PINMUX_M0               ((PINMUX_TypeDef *) PINMUX_M0_REG_BASE)
-#endif
-
-/** \defgroup 87X2G_PINMUX      PINMUX
+/** \defgroup PINMUX      PINMUX
   * \brief
   * \{
   */
+
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** \defgroup PINMUX_Exported_Macros PINMUX Exported Macros
-  * \brief
-  * \{
-  */
 
-#define MAX_PIN_REG_NUM         (TOTAL_PIN_NUM / 4 + 1) /* pinmux Register number: 21 */
-
-/** End of PINMUX_Exported_Macros
-  * \}
-  */
 /*============================================================================*
  *                         Constants
  *============================================================================*/
@@ -75,48 +57,55 @@ typedef struct                      /*!< Pinmux Structure */
   */
 
 /**
- * \brief       PAD Power Mode
- *
+ * \defgroup    PAD_Power_Mode PAD Power Mode
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_NOT_PWRON,
     PAD_IS_PWRON = 1
 } PADPowerMode_TypeDef;
 
+/** End of PAD_Power_Mode
+  * \}
+  */
+
 /**
- * \brief       PAD Output Config
- *
+ * \defgroup    PAD_Output_Config PAD Output Config
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_OUT_DISABLE,
     PAD_OUT_ENABLE
 } PADOutputMode_TypeDef;
 
+/** End of PAD_Output_Config
+  * \}
+  */
+
 /**
- * \brief       PAD Output Value
- *
+ * \defgroup    PAD_Output_Value PAD Output Value
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_OUT_LOW,
     PAD_OUT_HIGH
 } PADOutputValue_TypeDef;
 
+/** End of PAD_Output_Value
+  * \}
+  */
 
 /**
- * \brief       PAD Pull Mode
- *
+ * \defgroup    PAD_Pull_Mode PAD Pull Mode
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_PULL_DOWN,
@@ -124,21 +113,28 @@ typedef enum
     PAD_PULL_NONE,
 } PADPullMode_TypeDef;
 
+/** End of PAD_Pull_Mode
+  * \}
+  */
+
 /**
- * \brief       PAD Pull Strength Mode
- *
+ * \defgroup    PAD_Pull_Strength_Mode PAD Pull Strength Mode
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_PULL_WEAK,
     PAD_PULL_STRONG,
 } PADPullStrengthMode_TypeDef;
 
+/** End of PAD_Pull_Strength_Mode
+  * \}
+  */
+
 /**
- * \brief       PAD Driving Current Value
- *
+ * \defgroup    PAD_Driving_Current_Value PAD Driving Current Value
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
 typedef enum
@@ -151,50 +147,60 @@ typedef enum
 #endif
 } PADDrivingCurrent_TypeDef;
 
+/** End of PAD_Driving_Current_Value
+  * \}
+  */
 
 /**
- * \brief       PAD WakeUp Debounce enable
- *
+ * \defgroup    PAD_WakeUp_Debounce PAD WakeUp Debounce
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_WAKEUP_DEB_DISABLE,
     PAD_WAKEUP_DEB_ENABLE
 } PADWakeupDebCmd_TypeDef;
 
+/** End of PAD_WakeUp_Debounce
+  * \}
+  */
 
 /**
- * \brief       PAD WakeUp Enable
- *
+ * \defgroup    PAD_WakeUp PAD WakeUp
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_WAKEUP_DISABLE,
     PAD_WAKEUP_ENABLE
 } PADWakeupCmd_TypeDef;
 
+/** End of PAD_WakeUp
+  * \}
+  */
+
 /**
- * \brief       PAD Short Pulse WakeUp EN
- *
+ * \defgroup    PAD_Short_Pulse_WakeUp PAD Short Pulse WakeUp
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_SHORT_PULSE_WAKEUP_DISABLE,
     PAD_SHORT_PULSE_WAKEUP_ENABLE
 } PADSPWakeupCmd_TypeDef;
 
+/** End of PAD_Short_Pulse_WakeUp
+  * \}
+  */
+
 /**
- * \brief       PAD WakeUp Polarity
- *
+ * \defgroup    PAD_WakeUp_Polarity PAD WakeUp Polarity
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_WAKEUP_POL_HIGH,
@@ -202,12 +208,15 @@ typedef enum
     PAD_WAKEUP_NONE
 } PADWakeupPolarity_TypeDef;
 
+/** End of PAD_WakeUp_Polarity
+  * \}
+  */
+
 /**
- * \brief       PAD Debounce freq KHz
- *
+ * \defgroup    PAD_Debounce_Frequency PAD Debounce Frequency
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_DEB_FREQ_32KHz,
@@ -219,12 +228,15 @@ typedef enum
     PAD_DEB_FREQ_500Hz = 63,
 } PADWakeupDebFreq_TypeDef;
 
+/** End of PAD_Debounce_Frequency
+  * \}
+  */
+
 /**
- * \brief       PAD Mode
- *
+ * \defgroup    PAD_Mode PAD_Mode
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum
 {
     PAD_SW_MODE,
@@ -233,13 +245,24 @@ typedef enum
     PAD_V2_V4_PINMUX_MODE,  //Vcore2&4
     PAD_V3_PINMUX_MODE,     //Vcore3
     PAD_PINMUX_MODE = PAD_V2_V4_PINMUX_MODE,
+#elif PAD_SUPPORT_PON_DOMAIN
+    PAD_PON_MODE,
+    PAD_PINMUX_MODE,
 #else
     PAD_PINMUX_MODE,
 #endif
 } PADMode_TypeDef;
 
+/** End of PAD_Mode
+  * \}
+  */
 
 #if PAD_SUPPORT_SLEEP_LED
+/**
+ * \defgroup    Sleep_LED_Pin Sleep LED Pin
+ * \{
+ * \ingroup     PINMUX_Exported_Constants
+ */
 typedef enum _SLEEP_LED_PIN
 {
     SLEEP_LED_ADC_0,
@@ -253,15 +276,18 @@ typedef enum _SLEEP_LED_PIN
     SLEEP_LED_P2_1,
     SLEEP_LED_P2_2,
 } SLEEP_LED_PIN;
+
+/** End of Sleep_LED_Pin
+  * \}
+  */
 #endif
 
 #if PAD_SUPPORT_FUNCTION_CONFIG
 /**
- * \brief       PAD Function Config
- *
+ * \defgroup    PAD_Function_Config PAD Function Config
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
-
 typedef enum _PAD_FUNCTION_CONFIG_VALUE
 {
     AON_GPIO,
@@ -274,13 +300,16 @@ typedef enum _PAD_FUNCTION_CONFIG_VALUE
     EXTRN_LDO2_POW_LDO,
     PAD_FUNC_MAX,
 } PAD_FUNCTION_CONFIG_VAL;
+
+/** End of PAD_Function_Config
+  * \}
+  */
 #endif
 
 #if PAD_SUPPORT_GET_POWER_GROUP
-
 /**
- * \brief       PAD_POWER_GROUP Pad Power Supply Volt
- *
+ * \defgroup    PAD_Power_Group PAD Power Group
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
 typedef enum _PIN_POWER_GROUP
@@ -295,13 +324,15 @@ typedef enum _PIN_POWER_GROUP
     GROUP_ADC          = 7,
 } T_PIN_POWER_GROUP;
 
+/** End of PAD_Power_Group
+  * \}
+  */
 #endif
 
 #if PAD_SUPPORT_ANALOG_MODE
-
 /**
- * \brief       ANA_MODE Pad analog/digital mode for CODEC hybrid IO
- *
+ * \defgroup    Pad_ANA_Mode Pad ANA Mode
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
 typedef enum _ANA_MODE
@@ -310,13 +341,16 @@ typedef enum _ANA_MODE
     PAD_DIGITAL_MODE,
 } ANA_MODE;
 
+/** End of Pad_ANA_Mode
+  * \}
+  */
 #endif
 
 #if (PAD_SUPPORT_ADPATER_WAKEUP | PAD_SUPPORT_MFB_WAKEUP)
 
 /**
- * \brief       WAKEUP_ENABLE_MODE PAD WAKE UP ENABLE SET
- *
+ * \defgroup    WakeUp_EN_Mode WakeUp EN Mode
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
 typedef enum _WAKEUP_EN_MODE
@@ -326,9 +360,13 @@ typedef enum _WAKEUP_EN_MODE
     MFB_MODE
 } WAKEUP_EN_MODE;
 
+/** End of WakeUp_EN_Mode
+  * \}
+  */
+
 /**
- * \brief       WAKEUP_POLARITY WAKE UP POLARITY
- *
+ * \defgroup    WakeUp_Polarity WakeUp Polarity
+ * \{
  * \ingroup     PINMUX_Exported_Constants
  */
 typedef enum _WAKEUP_POL
@@ -336,34 +374,36 @@ typedef enum _WAKEUP_POL
     POL_HIGH,
     POL_LOW,
 } WAKEUP_POL;
+
+/** End of WakeUp_Polarity
+  * \}
+  */
+#endif
+
+#if PAD_SUPPORT_GET_OUTPUT_CTRL
+/**
+ * \defgroup    PAD_AON_Status PAD AON Status
+ * \{
+ * \ingroup     PINMUX_Exported_Constants
+ */
+typedef enum _PAD_AON_Status
+{
+    PAD_AON_OUTPUT_LOW,
+    PAD_AON_OUTPUT_HIGH,
+    PAD_AON_OUTPUT_DISABLE,
+    PAD_AON_PINMUX_ON,
+    PAD_AON_PIN_ERR
+} PAD_AON_Status;
+
+/** End of PAD_AON_Status
+  * \}
+  */
 #endif
 
 /** End of PINMUX_Exported_Constants
   * \}
   */
 
-/*============================================================================*
- *                         Types
- *============================================================================*/
-/**
-  * \defgroup    PINMUX_Private_Types PINMUX Private Types
-  * \brief
-  * \{
-  */
-
-/**
- * \brief       PINMUX DLPS store reg structure definition.
- *
- * \ingroup     PINMUX_Private_Types
- */
-typedef struct
-{
-    uint32_t pinmux_reg[MAX_PIN_REG_NUM];
-} PINMUXStoreReg_Typedef;
-
-/** End of PINMUX_Private_Types
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
@@ -676,7 +716,7 @@ void Pad_Config(uint8_t                 Pin_Num,
  * \endcode
  */
 extern void Pad_ConfigExt(uint8_t Pin_Num,
-                          PADMode_Typedef AON_PAD_Mode,
+                          PADMode_TypeDef AON_PAD_Mode,
                           PADPowerMode_TypeDef AON_PAD_PwrOn,
                           PADPullMode_TypeDef AON_PAD_Pull,
                           PADOutputMode_TypeDef AON_PAD_E,
@@ -726,6 +766,11 @@ void Pad_Dedicated_Config(uint8_t Pin_Num, FunctionalState Status);
  * \endcode
  */
 extern void Pad_AllConfigDefault(void);
+#endif
+
+#if PAD_SUPPORT_WAKEUP_MULTI_GROUP
+bool System_WakeUpDebounceMultiGroupEnable(uint8_t Pin_Num);
+bool System_WakeUpDebounceMultiGroupDisable(uint8_t Pin_Num);
 #endif
 
 /**
@@ -815,7 +860,7 @@ uint8_t System_WakeUpInterruptValue(uint8_t Pin_Num);
  * \brief  Enable or disable wake-up debounce function.
  *
  * \param[in]  Pin_Num: Pin number to be configured. \ref Pin_Number.
- *         \note: Pin_Num is invalid parameter for rtl87x2g series
+ * \note  Pin_Num is invalid parameter for rtl87x2g series
  *                so that any pin can be filled in.
  *
  * \param  PADWakeupCmd_TypeDef: wake-up system enable or disable
@@ -847,11 +892,11 @@ uint8_t System_WakeUpInterruptValue(uint8_t Pin_Num);
 void System_WakeUpDebounceCmd(uint8_t Pin_Num, PADWakeupCmd_TypeDef Status);
 
 /**
- * \brief   Config wak-up system debounce time.
+ * \brief   Config wake up system debounce time.
  *
  * \param[in]  Pin_Num: Pin number to be configured. \ref Pin_Number.
- *             \note: Pin_Num is invalid parameter for rtl87x2g series
- *                    so that any pin can be filled in.
+ * \note  Pin_Num is invalid parameter for rtl87x2g series
+ *        so that any pin can be filled in.
  *
  * \param[in] time: Debounce time.
  *
@@ -869,10 +914,32 @@ void System_WakeUpDebounceCmd(uint8_t Pin_Num, PADWakeupCmd_TypeDef Status);
 void System_WakeUpDebounceTime(uint8_t Pin_Num, uint8_t time_ms);
 
 /**
+ * \brief   Config wake up system debounce time.
+ *
+ * \param[in]  Pin_Num: Pin number to be configured. \ref Pin_Number.
+ * \note  Pin_Num is invalid parameter for rtl87x2g series
+ *        so that any pin can be filled in.
+ *
+ * \param[in] time: Debounce time.
+ *
+ * \return None.
+ *
+ * <b>Example usage</b>
+ * \code{.c}
+ *
+ * void board_xxx_init(void)
+ * {
+ *     System_WakeUpDebounceTimeUs(1000);
+ * }
+ * \endcode
+ */
+void System_WakeUpDebounceTimeUs(uint8_t Pin_Num, uint8_t time_us);
+
+/**
  * \brief  Get debounce wake up status.
  *
  * \param[in]  Pin_Num: Pin number to be configured. \ref Pin_Number.
- *             \note: Pin_Num is invalid parameter for rtl87x2g series
+ * \note  Pin_Num is invalid parameter for rtl87x2g series
  *                    so that any pin can be filled in.
  *
  * \return Debounce wakeup status
@@ -891,12 +958,11 @@ void System_WakeUpDebounceTime(uint8_t Pin_Num, uint8_t time_ms);
 uint8_t System_WakeupDebounceStatus(uint8_t Pin_Num);
 
 /**
- * \brief  Clear debounce wake up status.
- * \note:  Call this API will clear the debunce wakeup status bit.
+ * \brief  Clear debounce wake up status. Call this API will clear the debunce wakeup status bit.
  *
  * \param[in]  Pin number to be configured. \ref Pin_Number.
- *             \note: Pin_Num is invalid parameter for rtl87x2g series
- *                    so that any pin can be filled in.
+ * \note  Pin_Num is invalid parameter for rtl87x2g series
+ *        so that any pin can be filled in.
  *
  * \return None
  *
@@ -1097,7 +1163,7 @@ void Pad_SetPullStrength(uint8_t Pin_Num, PADPullStrengthMode_TypeDef PAD_Pull_S
 void Pad_PowerCmd(uint8_t Pin_Num, PADPowerMode_TypeDef PWR_Mode);
 
 /**
- * \brief     Clear the interrupt pendign bit of the specified pin
+ * \brief     Clear the interrupt pending bit of the specified pin
  *
  * \param[in] Pin_Num: Pin number to be configured. \ref Pin_Number.
  *
@@ -1200,6 +1266,7 @@ uint32_t get_aon_wakeup_int(void);
 void clear_aon_wakeup_int(void);
 #endif
 
+#if PAD_SUPPORT_GET_OUTPUT_CTRL
 /**
  * rtl876x_pinmux.h
  *
@@ -1226,6 +1293,7 @@ void clear_aon_wakeup_int(void);
  * \endcode
  */
 uint8_t Pad_GetOutputCtrl(uint8_t Pin_Num);
+#endif
 
 #if PAD_SUPPORT_GET_POWER_GROUP
 /**

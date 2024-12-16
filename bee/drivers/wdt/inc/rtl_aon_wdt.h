@@ -1,8 +1,14 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * \file    rtl_aon_wdt.h
+  * \brief   This file provides api of aon watch dog timer.
+  * \author  renee
+  * \date    2023-11-16
+  * \version v1.0
+  * *************************************************************************************
+  */
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,16 +23,13 @@ extern "C" {
 /*============================================================================*
  *                               Header Files
 *============================================================================*/
+#include "utils/rtl_utils.h"
 #include "wdt/inc/rtl_wdt.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "wdt/src/rtl87x2g/rtl_aon_wdt_def.h"
-#elif defined (CONFIG_SOC_SERIES_RTL87X3E)
-#include "wdt/src/rtl87x3e/rtl_aon_wdt_def.h"
-#elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "wdt/src/rtl8763d/rtl_aon_wdt_def.h"
 #endif
 
-/** \defgroup 87X2G_AON_WDT         AON_WDT
+/** \defgroup AON_WDT         AON_WDT
   * \brief
   * \{
   */

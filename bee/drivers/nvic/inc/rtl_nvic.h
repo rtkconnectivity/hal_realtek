@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_nvic.h
+* \brief    The header file of NVIC driver.
+* \details  This file provides all the NVIC firmware functions.
+* \author
+* \date
+* \version
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,11 +24,16 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "nvic/src/rtl87x2g/rtl_nvic_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "nvic/src/rtl87x2j/rtl_nvic_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL87X3D)
+#include "nvic/src/rtl87x3d/rtl_nvic_def.h"
 #endif
 
-/** \defgroup 87X2G_NVIC        NVIC
+/** \defgroup NVIC        NVIC
   * \brief
   * \{
   */
@@ -41,12 +53,11 @@ extern "C" {
 
 typedef struct
 {
-    IRQn_Type NVIC_IRQChannel;              /*!< Specifies the IRQ channel to be enabled or disabled.
-                                                    This parameter can be a value of \ref IRQn_Type in rtl876x.h. */
+    int NVIC_IRQChannel;                    /*!< Specifies the IRQ channel.
+                                                 This parameter can be a value of \ref IRQn_Type and \ref GPIO_IRQn. */
     uint32_t NVIC_IRQChannelPriority;       /*!< Specifies the priority for the IRQ channel.
-                                                    This parameter can be a value between 0 and x as described in the table.*/
-    FunctionalState
-    NVIC_IRQChannelCmd;     /*!< Enable or disable the IRQ channel defined in NVIC_IRQChannel.*/
+                                                 This parameter can be a value between 0 and x as described in the table.*/
+    FunctionalState NVIC_IRQChannelCmd;     /*!< Specifies the IRQ channel to be enabled or disabled.*/
 } NVIC_InitTypeDef;
 
 /** End of NVIC_Exported_Types

@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_gpio.h
+* \brief    The header file of the peripheral GPIO driver.
+* \details  This file provides all GPIO firmware functions.
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,22 +24,22 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "gpio/src/rtl87x2g/rtl_gpio_def.h"
 #include "pinmux/src/rtl87x2g/pin_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "gpio/src/rtl87x3e/rtl_gpio_def.h"
 #include "pinmux/src/rtl87x3e/pin_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "gpio/src/rtl8763d/rtl_gpio_def.h"
-#include "pinmux/src/rtl8763d/pin_def.h"
-#include "rcc/inc/rtl_rcc.h"
+#include "gpio/src/rtl87x3d/rtl_gpio_def.h"
+#include "pinmux/src/rtl87x3d/pin_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "gpio/src/rtl87x2j/rtl_gpio_def.h"
+#include "pinmux/src/rtl87x2j/pin_def.h"
 #endif
 
-/** \defgroup 87X2G_GPIO        GPIO
+/** \defgroup GPIO        GPIO
   * \brief
   * \{
   */
@@ -50,6 +57,7 @@ extern "C" {
  * \{
  * \ingroup     GPIO_Exported_Constants
  */
+#ifdef GPIOA
 #define GPIOA0   0
 #define GPIOA1   1
 #define GPIOA2   2
@@ -82,7 +90,8 @@ extern "C" {
 #define GPIOA29  29
 #define GPIOA30  30
 #define GPIOA31  31
-
+#endif
+#ifdef GPIOB
 #define GPIOB0   32
 #define GPIOB1   33
 #define GPIOB2   34
@@ -115,8 +124,8 @@ extern "C" {
 #define GPIOB29  61
 #define GPIOB30  62
 #define GPIOB31  63
-
-#if (CHIP_GPIO_NUMBER > 64)
+#endif
+#ifdef GPIOC
 #define GPIOC0   64
 #define GPIOC1   65
 #define GPIOC2   66
@@ -149,7 +158,8 @@ extern "C" {
 #define GPIOC29  93
 #define GPIOC30  94
 #define GPIOC31  95
-
+#endif
+#ifdef GPIOD
 #define GPIOD0   96
 #define GPIOD1   97
 #define GPIOD2   98
@@ -193,90 +203,83 @@ extern "C" {
  * \{
  * \ingroup     GPIO_Exported_Constants
  */
-#define GPIO_Pin_0                 BIT0   /*!< Pin 0 selected   */
-#define GPIO_Pin_1                 BIT1   /*!< Pin 1 selected   */
-#define GPIO_Pin_2                 BIT2   /*!< Pin 2 selected   */
-#define GPIO_Pin_3                 BIT3   /*!< Pin 3 selected   */
-#define GPIO_Pin_4                 BIT4   /*!< Pin 4 selected   */
-#define GPIO_Pin_5                 BIT5   /*!< Pin 5 selected   */
-#define GPIO_Pin_6                 BIT6   /*!< Pin 6 selected   */
-#define GPIO_Pin_7                 BIT7   /*!< Pin 7 selected   */
-#define GPIO_Pin_8                 BIT8   /*!< Pin 8 selected   */
-#define GPIO_Pin_9                 BIT9   /*!< Pin 9 selected   */
-#define GPIO_Pin_10                BIT10  /*!< Pin 10 selected  */
-#define GPIO_Pin_11                BIT11  /*!< Pin 11 selected  */
-#define GPIO_Pin_12                BIT12  /*!< Pin 12 selected  */
-#define GPIO_Pin_13                BIT13  /*!< Pin 13 selected  */
-#define GPIO_Pin_14                BIT14  /*!< Pin 14 selected  */
-#define GPIO_Pin_15                BIT15  /*!< Pin 15 selected  */
-#define GPIO_Pin_16                BIT16  /*!< Pin 16 selected  */
-#define GPIO_Pin_17                BIT17  /*!< Pin 17 selected  */
-#define GPIO_Pin_18                BIT18  /*!< Pin 18 selected  */
-#define GPIO_Pin_19                BIT19  /*!< Pin 19 selected  */
-#define GPIO_Pin_20                BIT20  /*!< Pin 20 selected  */
-#define GPIO_Pin_21                BIT21  /*!< Pin 21 selected  */
-#define GPIO_Pin_22                BIT22  /*!< Pin 22 selected  */
-#define GPIO_Pin_23                BIT23  /*!< Pin 23 selected  */
-#define GPIO_Pin_24                BIT24  /*!< Pin 24 selected  */
-#define GPIO_Pin_25                BIT25  /*!< Pin 25 selected  */
-#define GPIO_Pin_26                BIT26  /*!< Pin 26 selected  */
-#define GPIO_Pin_27                BIT27  /*!< Pin 27 selected  */
-#define GPIO_Pin_28                BIT28  /*!< Pin 28 selected  */
-#define GPIO_Pin_29                BIT29  /*!< Pin 29 selected  */
-#define GPIO_Pin_30                BIT30  /*!< Pin 30 selected  */
-#define GPIO_Pin_31                BIT31  /*!< Pin 31 selected  */
+#define GPIO_Pin_0                 (BIT0)   /*!< Pin 0 selected   */
+#define GPIO_Pin_1                 (BIT1)   /*!< Pin 1 selected   */
+#define GPIO_Pin_2                 (BIT2)   /*!< Pin 2 selected   */
+#define GPIO_Pin_3                 (BIT3)   /*!< Pin 3 selected   */
+#define GPIO_Pin_4                 (BIT4)   /*!< Pin 4 selected   */
+#define GPIO_Pin_5                 (BIT5)   /*!< Pin 5 selected   */
+#define GPIO_Pin_6                 (BIT6)   /*!< Pin 6 selected   */
+#define GPIO_Pin_7                 (BIT7)   /*!< Pin 7 selected   */
+#define GPIO_Pin_8                 (BIT8)   /*!< Pin 8 selected   */
+#define GPIO_Pin_9                 (BIT9)   /*!< Pin 9 selected   */
+#define GPIO_Pin_10                (BIT10)  /*!< Pin 10 selected  */
+#define GPIO_Pin_11                (BIT11)  /*!< Pin 11 selected  */
+#define GPIO_Pin_12                (BIT12)  /*!< Pin 12 selected  */
+#define GPIO_Pin_13                (BIT13)  /*!< Pin 13 selected  */
+#define GPIO_Pin_14                (BIT14)  /*!< Pin 14 selected  */
+#define GPIO_Pin_15                (BIT15)  /*!< Pin 15 selected  */
+#define GPIO_Pin_16                (BIT16)  /*!< Pin 16 selected  */
+#define GPIO_Pin_17                (BIT17)  /*!< Pin 17 selected  */
+#define GPIO_Pin_18                (BIT18)  /*!< Pin 18 selected  */
+#define GPIO_Pin_19                (BIT19)  /*!< Pin 19 selected  */
+#define GPIO_Pin_20                (BIT20)  /*!< Pin 20 selected  */
+#define GPIO_Pin_21                (BIT21)  /*!< Pin 21 selected  */
+#define GPIO_Pin_22                (BIT22)  /*!< Pin 22 selected  */
+#define GPIO_Pin_23                (BIT23)  /*!< Pin 23 selected  */
+#define GPIO_Pin_24                (BIT24)  /*!< Pin 24 selected  */
+#define GPIO_Pin_25                (BIT25)  /*!< Pin 25 selected  */
+#define GPIO_Pin_26                (BIT26)  /*!< Pin 26 selected  */
+#define GPIO_Pin_27                (BIT27)  /*!< Pin 27 selected  */
+#define GPIO_Pin_28                (BIT28)  /*!< Pin 28 selected  */
+#define GPIO_Pin_29                (BIT29)  /*!< Pin 29 selected  */
+#define GPIO_Pin_30                (BIT30)  /*!< Pin 30 selected  */
+#define GPIO_Pin_31                (BIT31)  /*!< Pin 31 selected  */
 #define GPIO_Pin_All               ((uint32_t)0xFFFFFFFF)  /*!< All pins selected */
+
+#define IS_GET_GPIO_PIN(PIN)       (((PIN) == GPIO_Pin_0) || \
+                                    ((PIN) == GPIO_Pin_1) || \
+                                    ((PIN) == GPIO_Pin_2) || \
+                                    ((PIN) == GPIO_Pin_3) || \
+                                    ((PIN) == GPIO_Pin_4) || \
+                                    ((PIN) == GPIO_Pin_5) || \
+                                    ((PIN) == GPIO_Pin_6) || \
+                                    ((PIN) == GPIO_Pin_7) || \
+                                    ((PIN) == GPIO_Pin_8) || \
+                                    ((PIN) == GPIO_Pin_9) || \
+                                    ((PIN) == GPIO_Pin_10) || \
+                                    ((PIN) == GPIO_Pin_11) || \
+                                    ((PIN) == GPIO_Pin_12) || \
+                                    ((PIN) == GPIO_Pin_13) || \
+                                    ((PIN) == GPIO_Pin_14) || \
+                                    ((PIN) == GPIO_Pin_15) || \
+                                    ((PIN) == GPIO_Pin_16) || \
+                                    ((PIN) == GPIO_Pin_17) || \
+                                    ((PIN) == GPIO_Pin_18) || \
+                                    ((PIN) == GPIO_Pin_19) || \
+                                    ((PIN) == GPIO_Pin_20) || \
+                                    ((PIN) == GPIO_Pin_21) || \
+                                    ((PIN) == GPIO_Pin_22) || \
+                                    ((PIN) == GPIO_Pin_23) || \
+                                    ((PIN) == GPIO_Pin_24) || \
+                                    ((PIN) == GPIO_Pin_25) || \
+                                    ((PIN) == GPIO_Pin_26) || \
+                                    ((PIN) == GPIO_Pin_27) || \
+                                    ((PIN) == GPIO_Pin_28) || \
+                                    ((PIN) == GPIO_Pin_29) || \
+                                    ((PIN) == GPIO_Pin_30) || \
+                                    ((PIN) == GPIO_Pin_31) || \
+                                    ((PIN) == GPIO_Pin_All))
+
+#define IS_GPIO_PIN(PIN)          ((PIN) != (uint32_t)0x00)
 
 /** End of GPIO_Pins_Define
   * \}
   */
 
-#if (CHIP_GPIO_NUMBER > 64)
-#define IS_PIN_NUM(NUM) ((NUM) <= (uint8_t)P20_7)
-#else
-#define IS_PIN_NUM(NUM) ((NUM) <= (uint8_t)P10_2)
-#endif
-
-#define IS_GPIO_PIN(PIN) ((PIN) != (uint32_t)0x00)
-
-#define IS_GET_GPIO_PIN(PIN) (((PIN) == GPIO_Pin_0) || \
-                              ((PIN) == GPIO_Pin_1) || \
-                              ((PIN) == GPIO_Pin_2) || \
-                              ((PIN) == GPIO_Pin_3) || \
-                              ((PIN) == GPIO_Pin_4) || \
-                              ((PIN) == GPIO_Pin_5) || \
-                              ((PIN) == GPIO_Pin_6) || \
-                              ((PIN) == GPIO_Pin_7) || \
-                              ((PIN) == GPIO_Pin_8) || \
-                              ((PIN) == GPIO_Pin_9) || \
-                              ((PIN) == GPIO_Pin_10) || \
-                              ((PIN) == GPIO_Pin_11) || \
-                              ((PIN) == GPIO_Pin_12) || \
-                              ((PIN) == GPIO_Pin_13) || \
-                              ((PIN) == GPIO_Pin_14) || \
-                              ((PIN) == GPIO_Pin_15) || \
-                              ((PIN) == GPIO_Pin_16) || \
-                              ((PIN) == GPIO_Pin_17) || \
-                              ((PIN) == GPIO_Pin_18) || \
-                              ((PIN) == GPIO_Pin_19) || \
-                              ((PIN) == GPIO_Pin_20) || \
-                              ((PIN) == GPIO_Pin_21) || \
-                              ((PIN) == GPIO_Pin_22) || \
-                              ((PIN) == GPIO_Pin_23) || \
-                              ((PIN) == GPIO_Pin_24) || \
-                              ((PIN) == GPIO_Pin_25) || \
-                              ((PIN) == GPIO_Pin_26) || \
-                              ((PIN) == GPIO_Pin_27) || \
-                              ((PIN) == GPIO_Pin_28) || \
-                              ((PIN) == GPIO_Pin_29) || \
-                              ((PIN) == GPIO_Pin_30) || \
-                              ((PIN) == GPIO_Pin_31) || \
-                              ((PIN) == GPIO_Pin_All))
-
-
 /**
- * \brief       Bit_SET and Bit_RESET enumeration
- *
+ * \defgroup    GPIO_Bit_Action GPIO Bit Action
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
@@ -287,9 +290,13 @@ typedef enum
 
 #define IS_GPIO_BIT_ACTION(ACTION) (((ACTION) == Bit_RESET) || ((ACTION) == Bit_SET))
 
+/** End of GPIO_Bit_Action
+  * \}
+  */
+
 /**
- * \brief       GPIO direction enumeration.
- *
+ * \defgroup    GPIO_Direction GPIO Direction
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
@@ -300,9 +307,13 @@ typedef enum
 
 #define IS_GPIO_DIR(DIR) (((DIR) == GPIO_DIR_IN) || ((DIR) == GPIO_DIR_OUT))
 
+/** End of GPIO_Direction
+  * \}
+  */
+
 /**
- * \brief       GPIO output mode enumeration.
- *
+ * \defgroup    GPIO_Output_Mode GPIO Output Mode
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
@@ -312,6 +323,10 @@ typedef enum
 } GPIOOutputMode_TypeDef;
 
 #define IS_GPIO_OUTPUT_MODE(MODE) (((MODE) == GPIO_OUTPUT_PUSHPULL)|| ((MODE) == GPIO_OUTPUT_OPENDRAIN))
+
+/** End of GPIO_Output_Mode
+  * \}
+  */
 
 #if (GPIO_SUPPORT_SET_CONTROL_MODE == 1)
 /**
@@ -330,22 +345,29 @@ typedef enum
 #endif
 
 /**
- * \brief       Setting interrupt trigger type.
- *
+ * \defgroup    GPIO_Interrupt_Trigger GPIO Interrupt Trigger
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
 {
-    GPIO_INT_TRIGGER_LEVEL = 0x0, /**< This interrupt is level trigger. */
-    GPIO_INT_TRIGGER_EDGE  = 0x1, /**< This interrupt is edge trigger. */
+    GPIO_INT_TRIGGER_LEVEL = 0x0,     /**< This interrupt is level trigger. */
+    GPIO_INT_TRIGGER_EDGE  = 0x1,     /**< This interrupt is edge trigger. */
+#if GPIO_SUPPORT_INT_BOTHEDGE
+    GPIO_INT_TRIGGER_BOTH_EDGE = 0x2, /**< This interrupt is both edge trigger. */
+#endif
 } GPIOITTrigger_TypeDef;
 
 #define IS_GPIOIT_TRIGGER_TYPE(TYPE) (((TYPE) == GPIO_INT_TRIGGER_LEVEL) || \
                                       ((TYPE) == GPIO_INT_TRIGGER_EDGE))
 
+/** End of GPIO_Interrupt_Trigger
+  * \}
+  */
+
 /**
- * \brief       Setting interrupt polarity mode.
- *
+ * \defgroup    GPIO_Interrupt_Polarity GPIO Interrupt Polarity
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
@@ -357,9 +379,13 @@ typedef enum
 #define IS_GPIOIT_POLARITY_TYPE(TYPE) (((TYPE) == GPIO_INT_POLARITY_ACTIVE_LOW) || \
                                        ((TYPE) == GPIO_INT_POLARITY_ACTIVE_HIGH))
 
+/** End of GPIO_Interrupt_Polarity
+  * \}
+  */
+
 /**
- * \brief       Enable/Disable interrupt debounce.
- *
+ * \defgroup    GPIO_Interrupt_Debounce GPIO Interrupt Debounce
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
@@ -371,46 +397,50 @@ typedef enum
 #define IS_GPIOIT_DEBOUNCE_TYPE(TYPE) (((TYPE) == GPIO_INT_DEBOUNCE_DISABLE) || \
                                        ((TYPE) == GPIO_INT_DEBOUNCE_ENABLE))
 
+/** End of GPIO_Interrupt_Debounce
+  * \}
+  */
 
+#if (GPIO_SUPPORT_RAP_FUNCTION == 1)
 /**
- * \brief       Setting debounce source.
- *
+ * \defgroup    GPIO_Qactive_Force GPIO Qactive Force
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
 {
-    GPIO_DEBOUNCE_32K = 0x0, /**< 32KHz. */
-    GPIO_DEBOUNCE_S11 = 0x1, /**< S11_clk. */
-} GPIODebounceSrc_TypeDef;
+    GPIO_QACTIVE_PCLK_FORCE     = 0x0,
+    GPIO_QACTIVE_PCLKINTR_FORCE = 0x1,
+    GPIO_QACTIVE_CLK32K_FORCE   = 0x2,
+} GPIOQactiveForce_TypeDef;
 
-#define IS_GPIO_DEBOUNCE_SRC_TYPE(TYPE) (((TYPE) == GPIO_DEBOUNCE_32K) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_S11))
+/** End of GPIO_Qactive_Force
+  * \}
+  */
 
 /**
- * \brief       Setting debounce divide.
- *
+ * \defgroup    GPIO_Task GPIO Task
+ * \{
  * \ingroup     GPIO_Exported_Constants
  */
 typedef enum
 {
-    GPIO_DEBOUNCE_DIVIDER_1  = 0x0, /**< debounce divide 1. */
-    GPIO_DEBOUNCE_DIVIDER_2  = 0x1, /**< debounce divide 2. */
-    GPIO_DEBOUNCE_DIVIDER_4  = 0x2, /**< debounce divide 4. */
-    GPIO_DEBOUNCE_DIVIDER_8  = 0x3, /**< debounce divide 8. */
-    GPIO_DEBOUNCE_DIVIDER_16 = 0x4, /**< debounce divide 16. */
-    GPIO_DEBOUNCE_DIVIDER_32 = 0x5, /**< debounce divide 32. */
-    GPIO_DEBOUNCE_DIVIDER_40 = 0x6, /**< debounce divide 40. */
-    GPIO_DEBOUNCE_DIVIDER_64 = 0x7, /**< debounce divide 64. */
-} GPIODebounceDiv_TypeDef;
+    GPIO_TASK_DRSET = 0,
+    GPIO_TASK_DRCLR = 1,
+    GPIO_TASK_DRTOGGLE = 2,
+    GPIO_TASK_POLSET = 3,
+    GPIO_TASK_POLCLR = 4,
+    GPIO_TASK_POLTOGGLE = 5,
+    GPIO_TASK_DDRSET = 6,
+    GPIO_TASK_DDRCLR = 7,
+} GPIOTask_TypeDef;
 
-#define IS_GPIO_DEBOUNCE_DIV_TYPE(TYPE) (((TYPE) == GPIO_DEBOUNCE_DIVIDER_1) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_2) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_4) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_8) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_16) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_32) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_40) || \
-                                         ((TYPE) == GPIO_DEBOUNCE_DIVIDER_64) || \)
+/** End of GPIO_Task
+  * \}
+  */
+
+
+#endif
 
 /** End of GPIO_Exported_Constants
   * \}
@@ -1050,6 +1080,16 @@ FlagStatus GPIO_GetPadStatus(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin);
  */
 void GPIO_SetPolarity(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin,
                       GPIOITPolarity_TypeDef int_type);
+
+#if (GPIO_SUPPORT_RAP_FUNCTION == 1)
+
+void GPIO_RAPQactiveCtrl(GPIO_TypeDef *GPIOx, uint32_t Qactive, FunctionalState NewState);
+
+void GPIO_RAPModeCmd(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, FunctionalState NewState);
+
+void GPIO_TaskTrigger(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, uint32_t Task);
+
+#endif
 
 /** End of GPIO_Exported_Functions
   * \}

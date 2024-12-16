@@ -1,14 +1,22 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_rtc_def.h
+* \brief    RTC Registers Structures Section
+* \details
+* \author   grace_yan
+* \date     2023-02-14
+* \version  v2.1.0
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_RTC_DEF_H
 #define RTL_RTC_DEF_H
 
 #include "utils/rtl_utils.h"
 #include "address_map.h"
+#include "aon_reg.h"
 #include "armv81mml_setting.h"
 
 #ifdef  __cplusplus
@@ -19,6 +27,11 @@ extern "C" {
 /*============================================================================*
  *                          RTC Defines
  *============================================================================*/
+/** \defgroup RTC         RTC
+  * \brief
+  * \{
+  */
+
 /** \defgroup RTC_Exported_Constants RTC Exported Constants
   * \brief
   * \{
@@ -29,8 +42,9 @@ extern "C" {
  * \{
  * \ingroup  RTC_Exported_Constants
  */
-#define RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL             (0)
+#define RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL             (1)
 #define RTC_SUPPORT_PRE_COMP_OVF_TICK_WAKE_UP          (1)
+#define RTC_SUPPORT_COMPARE_GUARDTIME                  (1)
 
 /** End of RTC_Defines
   * \}
@@ -40,6 +54,9 @@ extern "C" {
   * \}
   */
 
+/** End of RTC
+  * \}
+  */
 
 /*============================================================================*
  *                         RTC Registers Memory Map
@@ -61,7 +78,7 @@ typedef struct
     __I  uint32_t RTC_CNT0;                 /*!< 0X30 */
     __IO uint32_t RTC_PRESCALE_CNT0;        /*!< 0X34 */
     __IO uint32_t RTC_PRESCALE_CMP0;        /*!< 0X38 */
-    __IO uint32_t RTC_BACKUP_REG;           /*!< 0X3C */
+    __IO uint32_t RTC_BACKUP;               /*!< 0X3C */
     __I  uint32_t RTC_RTL_VERSION0;         /*!< 0X40 */
 } RTC_TypeDef;
 
@@ -425,7 +442,7 @@ typedef union
             {
                 uint32_t rtc_backup: 32;
             } b;
-        } RTC_BACKUP_REG_TypeDef;
+        } RTC_BACKUP_TypeDef;
 
 
 
@@ -441,6 +458,48 @@ typedef union
                 const uint32_t rtc_rtl_version: 32;
             } b;
         } RTC_RTL_VERSION0_TypeDef;
+
+
+    /*============================================================================*
+     *                          RTC Constants
+     *============================================================================*/
+    /** \defgroup RTC        RTC
+      * \brief
+      * \{
+      */
+
+    /** \defgroup RTC_Exported_Constants RTC Exported Constants
+      * \brief
+      * \{
+      */
+
+    /**
+     * \defgroup    RTC_IN_PAD_Select RTC IN PAD Select
+     * \{
+     * \ingroup     RTC_Exported_Constants
+     */
+    typedef enum
+{
+    PAD_RTC_IN_DISABLE,
+    PAD_32KXI_RTC_IN,
+    PAD_P2_4_RTC_IN,
+    RTC_IN_SEL_DEFAULT = PAD_RTC_IN_DISABLE,
+} RTCInSel_TypeDef;
+
+#define RTC_ALL_IN_SEL         (PAD_RTC_IN_DISABLE | PAD_32KXI_RTC_IN | \
+                                PAD_P2_4_RTC_IN | RTC_IN_SEL_DEFAULT)
+
+/** End of RTC_IN_PAD_Select
+  * \}
+  */
+
+/** End of RTC_Exported_Constants
+  * \}
+  */
+
+/** End of RTC
+  * \}
+  */
 
 
 #ifdef  __cplusplus

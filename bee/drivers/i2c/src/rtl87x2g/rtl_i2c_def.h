@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_i2c_def.h
+* \brief    I2C related definitions for RTL87x2G
+* \details
+* \author
+* \date     2023-11-16
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_I2C_DEF_H
 #define RTL_I2C_DEF_H
@@ -17,6 +24,11 @@ extern "C" {
 /*============================================================================*
  *                          I2C Defines
  *============================================================================*/
+/** \defgroup I2C         I2C
+  * \brief
+  * \{
+  */
+
 /** \defgroup I2C_Exported_Constants I2C Exported Constants
   * \brief
   * \{
@@ -27,16 +39,18 @@ extern "C" {
  * \{
  * \ingroup  I2C_Exported_Constants
  */
-#define CHIP_I2C_NUM                                   (4)
 #define I2C_TX_FIFO_SIZE                               (24)
 #define I2C_RX_FIFO_SIZE                               (24)
 #define I2C_CLOCK_MAX_SPEED                            (1000000)
-
 /** End of I2C_Defines
   * \}
   */
 
 /** End of I2C_Exported_Constants
+  * \}
+  */
+
+/** End of I2C
   * \}
   */
 
@@ -90,14 +104,19 @@ typedef struct
 /*============================================================================*
  *                         I2C Declaration
  *============================================================================*/
-/** \defgroup 87X2G_I2C      I2C
+/** \defgroup I2C         I2C
+  * \brief
+  * \{
+  */
+
+/** \defgroup I2C_Exported_Constants I2C Exported Constants
   * \brief
   * \{
   */
 
 /** \defgroup I2C_Declaration I2C Declaration
-  * \brief
   * \{
+  * \ingroup  I2C_Exported_Constants
   */
 
 #define I2C0               ((I2C_TypeDef *) I2C0_REG_BASE)
@@ -105,7 +124,16 @@ typedef struct
 #define I2C2               ((I2C_TypeDef *) I2C2_REG_BASE)
 #define I2C3               ((I2C_TypeDef *) I2C3_REG_BASE)
 
+#define IS_I2C_ALL_PERIPH(PERIPH) (((PERIPH) == I2C0) || \
+                                   ((PERIPH) == I2C1) || \
+                                   ((PERIPH) == I2C2) || \
+                                   ((PERIPH) == I2C3))
+
 /** End of I2C_Declaration
+  * \}
+  */
+
+/** End of I2C_Exported_Constants
   * \}
   */
 
@@ -935,6 +963,64 @@ typedef union
             } b;
         } IC_FS_SPKLEN_TypeDef;
 
+    /* ================================================================================ */
+    /* ================                   I2C  Constants               ================ */
+    /* ================================================================================ */
+    /** \defgroup I2C         I2C
+      * \brief
+      * \{
+      */
+
+    /** \defgroup I2C_Exported_Constants I2C Exported Constants
+      * \brief
+      * \{
+      */
+
+    /**
+     * \defgroup    I2C_Clock_Source I2C Clock Source
+     * \{
+     * \ingroup     I2C_Exported_Constants
+     */
+    typedef enum
+{
+    I2C_CLOCK_SRC_40M,
+} I2CClockSrc_TypeDef;
+
+#define IS_I2C_CLK_SOURCE(PERIPH)     ((PERIPH) == I2C_CLOCK_SRC_40M)
+
+/** End of I2C_Clock_Source
+  * \}
+  */
+
+/**
+ * \defgroup    I2C_Clock_Divider I2C Clock Divider
+ * \{
+ * \ingroup     I2C_Exported_Constants
+ */
+typedef enum
+{
+    I2C_CLOCK_DIVIDER_1 = 0x0,
+    I2C_CLOCK_DIVIDER_2 = 0x1,
+    I2C_CLOCK_DIVIDER_4 = 0x2,
+    I2C_CLOCK_DIVIDER_8 = 0x3,
+    I2C_CLOCK_DIVIDER_16 = 0x4,
+    I2C_CLOCK_DIVIDER_32 = 0x5,
+    I2C_CLOCK_DIVIDER_40 = 0x6,
+    I2C_CLOCK_DIVIDER_64 = 0x7,
+} I2CClockDiv_TypeDef;
+
+#define IS_I2C_CLK_DIV(DIV) (((DIV) == I2C_CLOCK_DIVIDER_1) || \
+                             ((DIV) == I2C_CLOCK_DIVIDER_2) || \
+                             ((DIV) == I2C_CLOCK_DIVIDER_4) || \
+                             ((DIV) == I2C_CLOCK_DIVIDER_8) || \
+                             ((DIV) == I2C_CLOCK_DIVIDER_16) || \
+                             ((DIV) == I2C_CLOCK_DIVIDER_32) || \
+                             ((DIV) == I2C_CLOCK_DIVIDER_40) || \
+                             ((DIV) == I2C_CLOCK_DIVIDER_64))
+
+/** End of I2C_Clock_Divider
+  * \}
+  */
 
 #ifdef  __cplusplus
 }

@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_uart.h
+* \brief    The header file of the peripheral UART driver.
+* \details  This file provides all UART firmware functions.
+* \author   Bert
+* \date     2024-05-08
+* \version  v0.1
+* *******************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,18 +24,18 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "uart/src/rtl87x2g/rtl_uart_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "uart/src/rtl87x3e/rtl_uart_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "uart/src/rtl8763d/rtl_uart_def.h"
-#include "rcc/inc/rtl_rcc.h"
+#include "uart/src/rtl87x3d/rtl_uart_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "uart/src/rtl87x2j/rtl_uart_def.h"
 #endif
 
-/** \defgroup 87X2G_UART        UART
+/** \defgroup UART        UART
   * \brief
   * \{
   */
@@ -41,53 +48,27 @@ extern "C" {
   */
 
 /**
- * \brief       UART Define
- *
+ * \defgroup    UART_FIFO_Size UART FIFO Size
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-#if (CHIP_UART_NUM == 3)
-#define IS_UART_PERIPH(PERIPH) (((PERIPH) == UART0) || \
-                                ((PERIPH) == UART1) || \
-                                ((PERIPH) == UART2))
-#elif (CHIP_UART_NUM == 4)
-#define IS_UART_PERIPH(PERIPH) (((PERIPH) == UART0) || \
-                                ((PERIPH) == UART1) || \
-                                ((PERIPH) == UART2) || \
-                                ((PERIPH) == UART3))
-#elif (CHIP_UART_NUM == 6)
-#define IS_UART_PERIPH(PERIPH) (((PERIPH) == UART0) || \
-                                ((PERIPH) == UART1) || \
-                                ((PERIPH) == UART2) || \
-                                ((PERIPH) == UART3) || \
-                                ((PERIPH) == UART4) || \
-                                ((PERIPH) == UART5))
-#elif (CHIP_UART_NUM == 7)
-#define IS_UART_PERIPH(PERIPH) (((PERIPH) == UART0) || \
-                                ((PERIPH) == UART1) || \
-                                ((PERIPH) == UART2) || \
-                                ((PERIPH) == UART3) || \
-                                ((PERIPH) == UART4) || \
-                                ((PERIPH) == UART5) || \
-                                ((PERIPH) == UART6))
-#endif
-
-/**
- * \brief       UART FIFO SIZE
- *
- * \ingroup     UART_Exported_Constants
- */
-
 #define UART_TX_FIFO_SIZE           16
 #define UART_RX_FIFO_SIZE           32
 
+/** End of UART_FIFO_Size
+  * \}
+  */
+
 /**
- * \brief       UART Baudrate
- *
+ * \defgroup    UART_Baudrate UART Baudrate
+ * \{
  * \ingroup     UART_Exported_Constants
  */
 typedef enum
 {
     UART_BAUD_RATE_1200,
+    UART_BAUD_RATE_4800,
+    UART_BAUD_RATE_7200,
     UART_BAUD_RATE_9600,
     UART_BAUD_RATE_14400,
     UART_BAUD_RATE_19200,
@@ -110,15 +91,17 @@ typedef enum
     UART_BAUD_RATE_2000000,
     UART_BAUD_RATE_3000000,
     UART_BAUD_RATE_4000000,
-    UART_BAUD_RATE_6000000
 } UARTBaudrate_TypeDef;
 
+/** End of UART_Baudrate
+  * \}
+  */
+
 /**
- * \brief       UART Parity
- *
+ * \defgroup    UART_Parity UART Parity
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-
 typedef enum
 {
     UART_PARITY_NO_PARTY = 0x0,
@@ -130,12 +113,15 @@ typedef enum
                                 ((PARITY) == UART_PARITY_ODD) || \
                                 ((PARITY) == UART_PARITY_EVEN))
 
+/** End of UART_Parity
+  * \}
+  */
+
 /**
- * \brief       UART Stop Bits
- *
+ * \defgroup    UART_Stop_Bits UART Stop Bits
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-
 typedef enum
 {
     UART_STOP_BITS_1 = 0x0,
@@ -145,12 +131,15 @@ typedef enum
 #define IS_UART_STOPBITS(STOP) (((STOP) == UART_STOP_BITS_1) || \
                                 ((STOP) == UART_STOP_BITS_2))
 
+/** End of UART_Stop_Bits
+  * \}
+  */
+
 /**
- * \brief       UART Word Length
- *
+ * \defgroup    UART_Word_Length UART Word Length
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-
 typedef enum
 {
     UART_WORD_LENGTH_7BIT = 0x0,
@@ -160,12 +149,15 @@ typedef enum
 #define IS_UART_WORD_LENGTH(LEN) ((((LEN)) == UART_WORD_LENGTH_7BIT) || \
                                   (((LEN)) == UART_WORD_LENGTH_8BIT))
 
+/** End of UART_Word_Length
+  * \}
+  */
+
 /**
- * \brief       UART Hardware Flow Control
- *
+ * \defgroup    UART_Hardware_Flow_Control UART Hardware Flow Control
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-
 typedef enum
 {
     UART_HW_FLOW_CTRL_DISABLE = 0x0,
@@ -175,12 +167,15 @@ typedef enum
 #define IS_UART_AUTO_FLOW_CTRL(CTRL) (((CTRL) == UART_HW_FLOW_CTRL_ENABLE) || \
                                       ((CTRL) == UART_HW_FLOW_CTRL_DISABLE))
 
+/** End of UART_Hardware_Flow_Control
+  * \}
+  */
+
 /**
- * \brief       UART DMA
- *
+ * \defgroup    UART_DMA UART DMA
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-
 typedef enum
 {
     UART_DMA_DISABLE = 0x0,
@@ -190,12 +185,15 @@ typedef enum
 #define IS_UART_DMA_CFG(CFG) (((CFG) == UART_DMA_ENABLE) || \
                               ((CFG) == UART_DMA_DISABLE))
 
+/** End of UART_DMA
+  * \}
+  */
+
 /**
- * \brief       UART Rx Idle Time
- *
+ * \defgroup    UART_Rx_Idle_Time UART Rx Idle Time
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-
 typedef enum
 {
     UART_RX_IDLE_1BYTE = 0x0,
@@ -218,12 +216,15 @@ typedef enum
 
 #define IS_UART_IDLE_TIME(TIME) ((TIME) <= 0x0F)
 
+/** End of UART_Rx_Idle_Time
+  * \}
+  */
+
 /**
- * \brief       UART Rx FIFO Trigger Level
- *
+ * \defgroup    UART_Rx_FIFO_Trigger_Level UART Rx FIFO Trigger Level
+ * \{
  * \ingroup     UART_Exported_Constants
  */
-
 typedef enum
 {
     UART_RX_FIFO_TRIGGER_LEVEL_1BYTE = 0x1,
@@ -233,6 +234,29 @@ typedef enum
 } UARTRxFifoTriggerLevel_TypeDef;
 
 #define IS_UART_RX_FIFO_TRIGGER_LEVEL(BYTES) ((BYTES) <= 29)
+
+/** End of UART_Rx_FIFO_Trigger_Level
+  * \}
+  */
+
+#if (UART_SUPPORT_RAP_FUNCTION == 1)
+/**
+ * \defgroup    UART_Qactive_Force UART Qactive Force
+ * \{
+ * \ingroup     UART_Exported_Constants
+ */
+typedef enum
+{
+    UART_QACTIVE_SCLK_FORCE = 0x0,
+    UART_QACTIVE_PCLK_FORCE = 0x1,
+    UART_QACTIVE_PCLK_ICG   = 0x2,
+} UARTQactiveForce_TypeDef;
+
+/** End of UART_Qactive_Force
+  * \}
+  */
+
+#endif
 
 /**
  * \defgroup    UART_Interrupts UART Interrupts
@@ -252,10 +276,6 @@ typedef enum
 //#define UART_INT_RX_BREAK               BIT6
 #define UART_INT_RX_IDLE                BIT7
 
-/** End of UART_Interrupts
-  * \}
-  */
-
 #define IS_UART_INT(INT) ((((INT) & 0xFFFFFF80) == 0x00) && ((INT) != 0x00))
 
 #define IS_UART_GET_INT(INT) ((INT) & (UART_INT_RD_AVA | \
@@ -267,12 +287,15 @@ typedef enum
                                        UART_INT_RX_BREAK | \
                                        UART_INT_RX_IDLE))
 
+/** End of UART_Interrupts
+  * \}
+  */
+
 /**
  * \defgroup    UART_Interrupt_Identifier UART Interrupt Identifier
  * \{
  * \ingroup     UART_Exported_Constants
  */
-
 #define UART_INT_PENDING                ((uint16_t)(0x01 << 0))
 #define UART_INT_ID_LINE_STATUS         ((uint16_t)(0x03 << 1))
 #define UART_INT_ID_RX_LEVEL_REACH      ((uint16_t)(0x02 << 1))
@@ -280,15 +303,15 @@ typedef enum
 #define UART_INT_ID_TX_FIFO_EMPTY       ((uint16_t)(0x01 << 1))
 //#define UART_INT_ID_MODEM_STATUS        ((uint16_t)(0x00 << 1))
 
-/** End of UART_Interrupt_Identifier
-  * \}
-  */
-
 #define IS_UART_INT_ID(ID) (((ID) == UART_INT_ID_LINE_STATUS) || \
                             ((ID) == UART_INT_ID_RX_LEVEL_REACH) || \
                             ((ID) == UART_INT_ID_RX_DATA_TIMEOUT) || \
                             ((ID) == UART_INT_ID_TX_FIFO_EMPTY) || \
                             ((ID) == UART_INT_ID_MODEM_STATUS))
+
+/** End of UART_Interrupt_Identifier
+  * \}
+  */
 
 /**
  * \defgroup    UART_Flag UART Flag
@@ -312,10 +335,6 @@ typedef enum
 #define UART_FLAG_TX_THD                BIT11
 #endif
 
-/** End of UART_Flag
-  * \}
-  */
-
 #define IS_UART_GET_FLAG(FLAG) (((FLAG) == UART_FLAG_RX_DATA_RDY) || \
                                 ((FLAG) == UART_FLAG_RX_OVERRUN) || \
                                 ((FLAG) == UART_FLAG_PARTY_ERR) || \
@@ -325,6 +344,10 @@ typedef enum
                                 ((FLAG) == UART_FLAG_THR_TSR_EMPTY) || \
                                 ((FLAG) == UART_FLAG_RX_FIFO_ERR) || \
                                 ((FLAG) == UART_FLAG_RX_IDLE))
+
+/** End of UART_Flag
+  * \}
+  */
 
 /**
  * \defgroup    UART_Interrupts_Mask UART Interrupts Mask
@@ -344,10 +367,6 @@ typedef enum
 #define UART_INT_MASK_TX_THD            BIT7
 #endif
 
-/** End of UART_Interrupts_Mask
-  * \}
-  */
-
 #define IS_UART_INT_MASK(INT) ((INT) & (UART_INT_MASK_RD_AVA | \
                                         UART_INT_MASK_TX_FIFO_EMPTY | \
                                         UART_INT_MASK_RX_LINE_STS | \
@@ -357,12 +376,15 @@ typedef enum
                                         UART_INT_MASK_TX_DONE | \
                                         UART_INT_MASK_TX_THD))
 
+/** End of UART_Interrupts_Mask
+  * \}
+  */
+
 /**
  * \defgroup    UART_TRx_Fifo_Clear_Bits UART TRx Fifo Clear Bits
  * \{
  * \ingroup     UART_Exported_Constants
  */
-
 #define FCR_CLEAR_RX_FIFO_Set           ((uint32_t)(1 << 1))
 #define FCR_CLEAR_RX_FIFO_Reset         ((uint32_t)~(1 << 1))
 #define FCR_CLEAR_TX_FIFO_Set           ((uint32_t)(1 << 2))
@@ -545,7 +567,7 @@ void UART_StructInit(UART_InitTypeDef *UART_InitStruct);
 void UART_MaskINTConfig(UART_TypeDef *UARTx, uint32_t UART_INT_MASK,
                         FunctionalState NewState);
 /**
- * \brief   Enables or disables the specified UART interrupts.
+ * \brief   Enable or disable the specified UART interrupts.
  *
  * \param[in] UARTx: Select the UART peripheral. \ref UART_Declaration
  * \param[in] UART_IT: Specified the UART interrupt source that to be enabled or disabled.
@@ -1002,6 +1024,7 @@ uint8_t UART_ReceiveHalfWord(UART_TypeDef *UARTx);
  */
 uint16_t UART_GetIID(UART_TypeDef *UARTx);
 
+#if UART_SUPPORT_CLEAR_TX_FIFO
 /**
  * \brief   Clear Tx FIFO of the selected UART peripheral.
  *
@@ -1019,6 +1042,7 @@ uint16_t UART_GetIID(UART_TypeDef *UARTx);
  * \endcode
  */
 void UART_ClearTxFIFO(UART_TypeDef *UARTx);
+#endif
 
 /**
  * \brief   Clear Rx FIFO of the selected UART peripheral.
@@ -1137,6 +1161,47 @@ void UART_RxDmaCmd(UART_TypeDef *UARTx, FunctionalState NewState);
  */
 void UART_OneWireConfig(UART_TypeDef *UARTx, FunctionalState NewState);
 
+/**
+ * \brief  UART clock divider config.
+ *
+ * \param[in] UARTx: Select the UART peripheral. \ref UART_Declaration
+ * \param[in] ClockDiv: Specifies the UART clock divider.
+ *            This parameter can be one of the following values:
+ *            \arg UART_CLOCK_DIVIDER_x: where x can refer to CLock Divider to select the specified clock divider
+ *
+ * \return None.
+ *
+ * <b>Example usage</b>
+ * \code{.c}
+ *
+ * void driver_i2c_init(void)
+ * {
+ *     RCC_UARTClkDivConfig(UART0, UART_CLOCK_DIVIDER_1);
+ * }
+ * \endcode
+ */
+void UART_ClkDivConfig(UART_TypeDef *UARTx, UARTClockDiv_TypeDef ClockDiv);
+
+/**
+ * \brief  Get UART clock divider config.
+ *
+ * \param[in] UARTx: Select the UART peripheral. \ref UART_Declaration
+ * \param[out] ClockSrc: specifies the UART clock source.
+ * \param[out] ClockDiv: Specifies the UART clock divider.
+ *            This parameter can be one of the following values:
+ *            \arg UART_CLOCK_DIVIDER_x: where x can refer to CLock Divider to select the specified clock divider
+ *
+ * \return The status of get clock.
+ */
+bool UART_ClkGet(UART_TypeDef *UARTx, UARTClockSrc_TypeDef *ClockSrc,
+                 UARTClockDiv_TypeDef *ClockDiv);
+
+#if (UART_SUPPORT_RAP_FUNCTION == 1)
+
+void UART_RAPQactiveCtrl(UART_TypeDef *UARTx, uint32_t Qactive, FunctionalState NewState);
+
+#endif
+
 /** End of UART_Exported_Functions
   * \}
   */
@@ -1153,4 +1218,3 @@ void UART_OneWireConfig(UART_TypeDef *UARTx, FunctionalState NewState);
 
 
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor *****END OF FILE****/
-

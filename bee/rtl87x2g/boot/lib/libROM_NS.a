@@ -283,6 +283,7 @@ pmu_apply_voltage_tune = 0x0013d938 ;
 pmu_pm_exit = 0x0013d968 ;
 pmu_power_on_sequence_restart = 0x0013d96c ;
 pmu_set_usb_power_domain = 0x0013d978 ;
+pmu_auto_switch_map_force_base_level = 0x0013d944 ;
 power_manager_master_init = 0x0013da24 ;
 power_manager_master_initiate_wakeup = 0x0013da30 ;
 power_manager_slave_inact_action_handler = 0x0013db38 ;

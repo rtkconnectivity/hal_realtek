@@ -1,14 +1,22 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl87x2g_tim.c
+* \brief    This file provides all the TIMER firmware internal functions.
+* \details
+* \author   Bert
+* \date     2024-08-01
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_tim.h"
 #include "rtl_rcc.h"
+#include "app_section.h"
 
 /*============================================================================*
  *                           Public Functions
@@ -19,6 +27,105 @@ uint32_t TIM_GetTimerID(TIM_TypeDef *TIMx)
     uint32_t timerid = (tempreg - TIMER_REG_BASE) / 20;
 
     return timerid;
+}
+
+bool TIM_ClkGet(TIM_TypeDef *TIMx, TIMClockSrc_TypeDef *ClockSrc, TIMClockDiv_TypeDef *ClockDiv)
+{
+    uint32_t tempreg = (uint32_t)TIMx;
+    uint32_t timerid = (tempreg - TIMER_REG_BASE) / 20;
+    uint32_t tim_id_odd = timerid % 2;
+    uint32_t tim_id_temp = timerid / 2;
+
+    if (timerid < 2)
+    {
+        *ClockSrc = TIM_CLOCK_SRC_40M;
+        *ClockDiv = ((TIMER_CLK_SOURCE_REG_328 >> ((timerid * 16) + 3)) & BIT0) == 0 ? 0 :
+                    ((TIMER_CLK_SOURCE_REG_328 >> (timerid * 16)) & 0x7);
+    }
+    else if ((timerid >= 2) && (timerid < 8))
+    {
+        uint32_t temp_addr_value = *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp);
+
+        if (((temp_addr_value >> (4 + 16 * tim_id_odd)) & BIT0) == 1)
+        {
+            *ClockSrc = TIM_CLOCK_SRC_PLL1;
+        }
+        else if (((temp_addr_value >> (12 + 16 * tim_id_odd)) & BIT0) == 1)
+        {
+            *ClockSrc = TIM_CLOCK_SRC_PLL2;
+        }
+        else
+        {
+            *ClockSrc = (temp_addr_value >> (13 + 16 * tim_id_odd) & BIT0);
+        }
+        *ClockDiv = (((temp_addr_value >> ((16 * tim_id_odd) + 3)) & BIT0) == 0) ? 0 :
+                    ((temp_addr_value >> (16 * tim_id_odd)) & 0x7);
+    }
+    else
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void TIM_ClkConfig(TIM_TypeDef *TIMx, TIMClockSrc_TypeDef ClockSrc, TIMClockDiv_TypeDef ClockDiv)
+{
+    /* Select clock source which can be system clock or 40 MHz  or pll*/
+    uint32_t tempreg = (uint32_t)TIMx;
+    uint32_t timerid = (tempreg - TIMER_REG_BASE) / 20;
+    uint32_t tim_id_odd = timerid % 2;
+    uint32_t tim_id_temp = timerid / 2;
+    uint8_t ClockDivEn = ClockDiv == 0 ? DISABLE : ENABLE;
+
+    /*div the clock source,actually it need enable TIM_SOURCE_CLOCK_DIV_EN*/
+    if (timerid < 2)
+    {
+        /*set TIM clock src*/
+        if (ClockDivEn != DISABLE)
+        {
+            TIMER_CLK_SOURCE_REG_328 |= (0x1 << (3 + (timerid * 16)));
+            TIMER_CLK_SOURCE_REG_328 &= ~(0x7 << (timerid * 16));
+            TIMER_CLK_SOURCE_REG_328 |= ((ClockDiv) << (timerid * 16));
+        }
+        else
+        {
+            TIMER_CLK_SOURCE_REG_328 &= ~(0x1 << (3 + (timerid * 16)));
+        }
+    }
+    else if ((timerid >= 2) && (timerid < 8))
+    {
+        /*set TIM clock src*/
+        if (ClockSrc == TIM_CLOCK_SRC_PLL1)
+        {
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) |= ((BIT0) << (4 + 16 * tim_id_odd));
+        }
+        else if (ClockSrc == TIM_CLOCK_SRC_PLL2)
+        {
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) &= ~(BIT0 << (4 + (tim_id_odd * 16)));
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) |= ((BIT0) << (12 + 16 * tim_id_odd));
+        }
+        else
+        {
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) &= ~(BIT0 << (4 + (tim_id_odd * 16)));
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) &= ~(BIT0 << (12 + (tim_id_odd * 16)));
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) &= ~(BIT0 << (13 + (tim_id_odd * 16)));
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) |= (ClockSrc << (13 + 16 * tim_id_odd));
+        }
+
+        /*Clear TIM Clock DIV */
+        *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) &= ~(0xF << 16 * tim_id_odd);
+        if ((ClockDivEn != DISABLE))
+        {
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) |= BIT3 << 16 * tim_id_odd;
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) |= (ClockDiv << 16 * tim_id_odd);
+        }
+        else
+        {
+            *((uint32_t *)(&(TIMER_CLK_SOURCE_REG_328)) + tim_id_temp) &= ~(BIT3 << 16 * tim_id_odd);
+        }
+
+    }
 }
 
 void TIM_SetHighLoadCount(TIM_TypeDef *TIMx, uint32_t TIM_PWM_High_Count)
@@ -79,18 +186,6 @@ void TIM_PWMDeadzoneConfig(TIM_TypeDef *TIMx,
     }
 }
 
-/**
- * \brief  PWM complementary output emergency stop.
- *         PWM_P emergency stop level state is configured by PWM_Stop_State_P,
- *         PWM_N emergency stop level state is configured by PWM_Stop_State_N.
- * \param  PWMx: Select the PWM peripheral. \ref PWM_Declaration
- * \param  NewState: New state of complementary output.
- *         \arg DISABLE: Resume PWM complementary output.
- *         \arg ENABLE: PWM complementary output emergency stop.
- * \return None.
- * \note   To use this function, need to configure the corresponding timer.
- *         PWM2 ->> TIM2, PWM3 ->> TIM3.
- */
 void TIM_PWMComplOutputEMCmd(PWM_TypeDef *PWMx, FunctionalState NewState)
 {
     /* Check the parameters. */
@@ -124,17 +219,6 @@ void TIM_PWMComplOutputEMCmd(PWM_TypeDef *PWMx, FunctionalState NewState)
     }
 }
 
-/**
- * \brief  Enable or disable bypass dead zone function of PWM complementary output.
- *         After enabling, PWM_P = ~PWM_N.
- * \param  PWMx: Select the PWM peripheral. \ref PWM_Declaration
- * \param  NewState: New state of the PWMx peripheral.
- *         \arg DISABLE: Disable bypass dead zone function.
- *         \arg ENABLE: Enable bypass dead zone function.
- * \return None.
- * \note   To use this function, need to configure the corresponding timer.
- *         PWM2 ->> TIM2, PWM3 ->> TIM3.
- */
 void TIM_PWMDZBypassCmd(PWM_TypeDef *PWMx, FunctionalState NewState)
 {
     /* Check the parameters. */
@@ -168,16 +252,6 @@ void TIM_PWMDZBypassCmd(PWM_TypeDef *PWMx, FunctionalState NewState)
     }
 }
 
-/**
- * \brief  Change the PWM dead zone clock source.
- * \param  PWMx: Select the PWM peripheral. \ref PWM_Declaration
- * \param  PWM_Deazone_ClockSrc: New state of the PWMx peripheral.
- *         \arg PWM_CK_5M_TIMER: Use 5M clock source.
- *         \arg PWM_CK_32K_TIMER: Use 32k clock source.
- * \return None.
- * \note   To use this function, need to configure the corresponding timer.
- *         PWM2 ->> TIM2, PWM3 ->> TIM3.
- */
 void TIM_PWMChangeDZClockSrc(PWM_TypeDef *PWMx, PWMDZClockSrc_TypeDef PWM_Deazone_ClockSrc)
 {
     /* Check the parameters. */
@@ -211,12 +285,7 @@ void TIM_PWMChangeDZClockSrc(PWM_TypeDef *PWMx, PWMDZClockSrc_TypeDef PWM_Deazon
     }
 }
 
-/**
-  * \brief  Store TIM register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the TIM peripheral.
-  * \param  StoreBuf: Store buffer to store TIM register data.
-  * \return None.
-  */
+RAM_FUNCTION
 void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     TIMStoreReg_Typedef *store_buf = (TIMStoreReg_Typedef *)StoreBuf;
@@ -263,12 +332,7 @@ void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
     store_buf->tim_reg[28] = PERIBLKCTRL_PERI_CLK->u_33C.REG_TIMER_PWM_WRAP_1_CFG;
 }
 
-/**
-  * \brief  Restore TIM register values when system enter DLPS.
-  * \param  PeriReg: Specifies to select the TIM peripheral.
-  * \param  StoreBuf: Restore buffer to restore TIM register data.
-  * \return None
-  */
+RAM_FUNCTION
 void TIM_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     TIMStoreReg_Typedef *store_buf = (TIMStoreReg_Typedef *)StoreBuf;
@@ -315,5 +379,5 @@ void TIM_DLPSExit(void *PeriReg, void *StoreBuf)
     PERIBLKCTRL_PERI_CLK->u_33C.REG_TIMER_PWM_WRAP_1_CFG = store_buf->tim_reg[28];
 }
 
-/******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/
+/******************* (C) COPYRIGHT 2024 Realtek Semiconductor Corporation *****END OF FILE****/
 

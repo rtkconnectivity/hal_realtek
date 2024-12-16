@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_gdma.h
+* \brief    The header file of the peripheral GDMA driver.
+* \details  This file provides all GDMA firmware functions.
+* \author   Bert
+* \date     2023-10-17
+* \version  v1.0
+* *******************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,18 +24,18 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "dma/src/rtl87x2g/rtl_gdma_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "dma/src/rtl87x3e/rtl_gdma_def.h"
-#include "rcc/inc/rtl_rcc.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "dma/src/rtl87x63d/rtl_gdma_def.h"
-#include "rcc/inc/rtl_rcc.h"
+#include "dma/src/rtl87x3d/rtl_gdma_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "dma/src/rtl87x2j/rtl_gdma_def.h"
 #endif
 
-/** \defgroup 87X2G_GDMA        GDMA
+/** \defgroup GDMA        GDMA
   * \brief
   * \{
   */
@@ -46,199 +53,60 @@ extern "C" {
  * \{
  * \ingroup     GDMA_Exported_Constants
  */
-#if (CHIP_GDMA_CHANNEL_NUM == 9)
-#define IS_GDMA_ChannelNum(NUM) ((NUM) < 9)
-#elif (CHIP_GDMA_CHANNEL_NUM == 10)
-#define IS_GDMA_ChannelNum(NUM) ((NUM) < 10)
-#elif (CHIP_GDMA_CHANNEL_NUM == 24)
-#define IS_GDMA_ChannelNum(NUM) ((NUM) < 24)
-#elif (CHIP_GDMA_CHANNEL_NUM == 27)
-#define IS_GDMA_ChannelNum(NUM) ((NUM) < 27)
+
+#define GDMA_CH_NUM0             (0)
+#define GDMA_CH_NUM1             (1)
+#define GDMA_CH_NUM2             (2)
+#define GDMA_CH_NUM3             (3)
+#define GDMA_CH_NUM4             (4)
+#define GDMA_CH_NUM5             (5)
+#if (CHIP_GDMA_CHANNEL_NUM >= 9)
+#define GDMA_CH_NUM6             (6)
+#define GDMA_CH_NUM7             (7)
+#define GDMA_CH_NUM8             (8)
+#endif
+#if (CHIP_GDMA_CHANNEL_NUM >= 10)
+#define GDMA_CH_NUM9             (9)
+#endif
+#if (CHIP_GDMA_CHANNEL_NUM >= 12)
+#define GDMA_CH_NUM10            (10)
+#define GDMA_CH_NUM11            (11)
+#endif
+#if (CHIP_GDMA_CHANNEL_NUM >= 24)
+#define GDMA_CH_NUM12            (12)
+#define GDMA_CH_NUM13            (13)
+#define GDMA_CH_NUM14            (14)
+#define GDMA_CH_NUM15            (15)
+#define GDMA_CH_NUM16            (16)
+#define GDMA_CH_NUM17            (17)
+#define GDMA_CH_NUM18            (18)
+#define GDMA_CH_NUM19            (19)
+#define GDMA_CH_NUM20            (20)
+#define GDMA_CH_NUM21            (21)
+#define GDMA_CH_NUM22            (22)
+#define GDMA_CH_NUM23            (23)
+#endif
+#if (CHIP_GDMA_CHANNEL_NUM >= 33)
+#define GDMA_CH_NUM24            (24)
+#define GDMA_CH_NUM25            (25)
+#define GDMA_CH_NUM26            (26)
+#define GDMA_CH_NUM27            (27)
+#define GDMA_CH_NUM28            (28)
+#define GDMA_CH_NUM29            (29)
+#define GDMA_CH_NUM30            (30)
+#define GDMA_CH_NUM31            (31)
+#define GDMA_CH_NUM32            (32)
 #endif
 
-#define GDMA_CH_NUM0         0
-#define GDMA_CH_NUM1         1
-#define GDMA_CH_NUM2         2
-#define GDMA_CH_NUM3         3
-#define GDMA_CH_NUM4         4
-#define GDMA_CH_NUM5         5
-#define GDMA_CH_NUM6         6
-#define GDMA_CH_NUM7         7
-#define GDMA_CH_NUM8         8
-#if (CHIP_GDMA_CHANNEL_NUM > 9)
-#define GDMA_CH_NUM9         9
-#endif
-#if (CHIP_GDMA_CHANNEL_NUM == 24)
-#define GDMA0_CH_NUM10       10
-#define GDMA0_CH_NUM11       11
-#define GDMA0_CH_NUM12       12
-#define GDMA0_CH_NUM13       13
-#define GDMA0_CH_NUM14       14
-#define GDMA0_CH_NUM15       15
-
-#define GDMA1_CH_NUM0        16
-#define GDMA1_CH_NUM1        17
-#define GDMA1_CH_NUM2        18
-#define GDMA1_CH_NUM3        19
-#define GDMA1_CH_NUM4        20
-#define GDMA1_CH_NUM5        21
-#define GDMA1_CH_NUM6        22
-#define GDMA1_CH_NUM7        23
-#endif
-#if (CHIP_GDMA_CHANNEL_NUM == 27)
-#define GDMA_CH_NUM10        10
-#define GDMA_CH_NUM11        11
-#define GDMA_CH_NUM12        12
-#define GDMA_CH_NUM13        13
-#define GDMA_CH_NUM14        14
-#define GDMA_CH_NUM15        15
-#define GDMA_CH_NUM16        16
-#define GDMA_CH_NUM17        17
-#define GDMA_CH_NUM18        18
-#define GDMA_CH_NUM19        19
-#define GDMA_CH_NUM20        20
-#define GDMA_CH_NUM21        21
-#define GDMA_CH_NUM22        22
-#define GDMA_CH_NUM23        23
-#define GDMA_CH_NUM24        24
-#define GDMA_CH_NUM25        25
-#define GDMA_CH_NUM26        26
-#endif
-
-#if (CHIP_GDMA_CHANNEL_NUM == 9)
-#define GDMA_CH_NUM_MIN    GDMA_CH_NUM0
-#define GDMA_CH_NUM_MAX    GDMA_CH_NUM8
-
-#define IS_GDMA_ALL_PERIPH(PERIPH) (((PERIPH) == GDMA_Channel0) || \
-                                    ((PERIPH) == GDMA_Channel1) || \
-                                    ((PERIPH) == GDMA_Channel2) || \
-                                    ((PERIPH) == GDMA_Channel3) || \
-                                    ((PERIPH) == GDMA_Channel4) || \
-                                    ((PERIPH) == GDMA_Channel5) || \
-                                    ((PERIPH) == GDMA_Channel6) || \
-                                    ((PERIPH) == GDMA_Channel7) || \
-                                    ((PERIPH) == GDMA_Channel8))
-#elif (CHIP_GDMA_CHANNEL_NUM == 10)
-#define GDMA_CH_NUM_MIN    GDMA_CH_NUM0
-#define GDMA_CH_NUM_MAX    GDMA_CH_NUM9
-
-#define IS_GDMA_ALL_PERIPH(PERIPH) (((PERIPH) == GDMA_Channel0) || \
-                                    ((PERIPH) == GDMA_Channel1) || \
-                                    ((PERIPH) == GDMA_Channel2) || \
-                                    ((PERIPH) == GDMA_Channel3) || \
-                                    ((PERIPH) == GDMA_Channel4) || \
-                                    ((PERIPH) == GDMA_Channel5) || \
-                                    ((PERIPH) == GDMA_Channel6) || \
-                                    ((PERIPH) == GDMA_Channel7) || \
-                                    ((PERIPH) == GDMA_Channel8) || \
-                                    ((PERIPH) == GDMA_Channel9))
-#elif (CHIP_GDMA_CHANNEL_NUM == 24)
-#define GDMA_CH_NUM_MIN    GDMA_CH_NUM0
-#define GDMA_CH_NUM_MAX    GDMA1_CH_NUM7
-
-#define IS_GDMA_ALL_PERIPH(PERIPH) (((PERIPH) == GDMA_Channel0)  || \
-                                    ((PERIPH) == GDMA_Channel1)  || \
-                                    ((PERIPH) == GDMA_Channel2)  || \
-                                    ((PERIPH) == GDMA_Channel3)  || \
-                                    ((PERIPH) == GDMA_Channel4)  || \
-                                    ((PERIPH) == GDMA_Channel5)  || \
-                                    ((PERIPH) == GDMA_Channel6)  || \
-                                    ((PERIPH) == GDMA_Channel7)  || \
-                                    ((PERIPH) == GDMA_Channel8)  || \
-                                    ((PERIPH) == GDMA_Channel9)  || \
-                                    ((PERIPH) == GDMA_Channel10) || \
-                                    ((PERIPH) == GDMA_Channel11) || \
-                                    ((PERIPH) == GDMA_Channel12) || \
-                                    ((PERIPH) == GDMA_Channel13) || \
-                                    ((PERIPH) == GDMA_Channel14) || \
-                                    ((PERIPH) == GDMA_Channel15) || \
-                                    ((PERIPH) == GDMA1_Channel0) || \
-                                    ((PERIPH) == GDMA1_Channel1) || \
-                                    ((PERIPH) == GDMA1_Channel2) || \
-                                    ((PERIPH) == GDMA1_Channel3) || \
-                                    ((PERIPH) == GDMA1_Channel4) || \
-                                    ((PERIPH) == GDMA1_Channel5) || \
-                                    ((PERIPH) == GDMA1_Channel7))
-#elif (CHIP_GDMA_CHANNEL_NUM == 27)
-#define GDMA0_CH_MAX        3
-#define GDMA1_CH_MAX        8
-#define GDMA2_CH_MAX        16
-
-#define GDMA0_CH_NUM0       0
-#define GDMA0_CH_NUM1       1
-#define GDMA0_CH_NUM2       2
-
-#define GDMA1_CH_NUM0       3
-#define GDMA1_CH_NUM1       4
-#define GDMA1_CH_NUM2       5
-#define GDMA1_CH_NUM3       6
-#define GDMA1_CH_NUM4       7
-#define GDMA1_CH_NUM5       8
-#define GDMA1_CH_NUM6       9
-#define GDMA1_CH_NUM7       10
-
-#define GDMA2_CH_NUM0       11
-#define GDMA2_CH_NUM1       12
-#define GDMA2_CH_NUM2       13
-#define GDMA2_CH_NUM3       14
-#define GDMA2_CH_NUM4       15
-#define GDMA2_CH_NUM5       16
-#define GDMA2_CH_NUM6       17
-#define GDMA2_CH_NUM7       18
-#define GDMA2_CH_NUM8       19
-#define GDMA2_CH_NUM9       20
-#define GDMA2_CH_NUM10      21
-#define GDMA2_CH_NUM11      22
-#define GDMA2_CH_NUM12      23
-#define GDMA2_CH_NUM13      24
-#define GDMA2_CH_NUM14      25
-#define GDMA2_CH_NUM15      26
-
-#define GDMA0_CH_NUM_MIN    GDMA0_CH_NUM0
-#define GDMA0_CH_NUM_MAX    GDMA0_CH_NUM2
-
-#define GDMA1_CH_NUM_MIN    GDMA1_CH_NUM0
-#define GDMA1_CH_NUM_MAX    GDMA1_CH_NUM7
-
-#define GDMA2_CH_NUM_MIN    GDMA2_CH_NUM0
-#define GDMA2_CH_NUM_MAX    GDMA2_CH_NUM15
-
-#define IS_GDMA_ALL_PERIPH(PERIPH) (((PERIPH) == GDMA_Channel0) || \
-                                    ((PERIPH) == GDMA_Channel1) || \
-                                    ((PERIPH) == GDMA_Channel2) || \
-                                    ((PERIPH) == GDMA_Channel3) || \
-                                    ((PERIPH) == GDMA_Channel4) || \
-                                    ((PERIPH) == GDMA_Channel5) || \
-                                    ((PERIPH) == GDMA_Channel6) || \
-                                    ((PERIPH) == GDMA_Channel7) || \
-                                    ((PERIPH) == GDMA_Channel8) || \
-                                    ((PERIPH) == GDMA_Channel9) || \
-                                    ((PERIPH) == GDMA_Channel10) || \
-                                    ((PERIPH) == GDMA_Channel11) || \
-                                    ((PERIPH) == GDMA_Channel12) || \
-                                    ((PERIPH) == GDMA_Channel13) || \
-                                    ((PERIPH) == GDMA_Channel14) || \
-                                    ((PERIPH) == GDMA_Channel15) || \
-                                    ((PERIPH) == GDMA_Channel16) || \
-                                    ((PERIPH) == GDMA_Channel17) || \
-                                    ((PERIPH) == GDMA_Channel18) || \
-                                    ((PERIPH) == GDMA_Channel19) || \
-                                    ((PERIPH) == GDMA_Channel20) || \
-                                    ((PERIPH) == GDMA_Channel21) || \
-                                    ((PERIPH) == GDMA_Channel22) || \
-                                    ((PERIPH) == GDMA_Channel23) || \
-                                    ((PERIPH) == GDMA_Channel24) || \
-                                    ((PERIPH) == GDMA_Channel25) || \
-                                    ((PERIPH) == GDMA_Channel26))
-#endif
+#define IS_GDMA_ChannelNum(NUM)  ((NUM) < CHIP_GDMA_CHANNEL_NUM)
 
 /** End of GDMA_Define
   * \}
   */
 
 /**
- * \brief      GDMA Data Transfer Direction
- *
+ * \defgroup   GDMA_Data_Transfer_Direction GDMA Data Transfer Direction
+ * \{
  * \ingroup    GDMA_Exported_Constants
  */
 
@@ -255,16 +123,21 @@ typedef enum
                           ((DIR) == GDMA_DIR_PeripheralToMemory) || \
                           ((DIR) == GDMA_DIR_PeripheralToPeripheral))
 
+/** End of GDMA_Data_Transfer_Direction
+  * \}
+  */
+
 /**
- * \brief       GDMA Source Incremented Mode
- *
+ * \defgroup    GDMA_Source_Incremented_Mode GDMA Source Incremented Mode
+ * \{
  * \ingroup     GDMA_Exported_Constants
  */
-
 typedef enum
 {
     DMA_SourceInc_Inc = 0x0,
+#if (GDMA_SUPPORT_ADDRESS_DEC == 1)
     DMA_SourceInc_Dec = 0x1,
+#endif
     DMA_SourceInc_Fix = 0x2,
 } GDMASrcInc_TypeDef;
 
@@ -272,16 +145,21 @@ typedef enum
                                   ((STATE) == DMA_SourceInc_Dec) || \
                                   ((STATE) == DMA_SourceInc_Fix))
 
+/** End of GDMA_Source_Incremented_Mode
+  * \}
+  */
+
 /**
- * \brief       GDMA Destination Incremented Mode
- *
+ * \defgroup    GDMA_Destination_Incremented_Mode GDMA Destination Incremented Mode
+ * \{
  * \ingroup     GDMA_Exported_Constants
  */
-
 typedef enum
 {
     DMA_DestinationInc_Inc = 0x0,
+#if (GDMA_SUPPORT_ADDRESS_DEC == 1)
     DMA_DestinationInc_Dec = 0x1,
+#endif
     DMA_DestinationInc_Fix = 0x2,
 } GDMADestInc_TypeDef;
 
@@ -289,12 +167,15 @@ typedef enum
                                        ((STATE) == DMA_DestinationInc_Dec) || \
                                        ((STATE) == DMA_DestinationInc_Fix))
 
+/** End of GDMA_Destination_Incremented_Mode
+  * \}
+  */
+
 /**
- * \brief       GDMA Data Size
- *
+ * \defgroup    GDMA_Data_Size GDMA Data Size
+ * \{
  * \ingroup     GDMA_Exported_Constants
  */
-
 typedef enum
 {
     GDMA_DataSize_Byte     = 0x0,
@@ -306,9 +187,13 @@ typedef enum
                                  ((SIZE) == GDMA_DataSize_HalfWord) || \
                                  ((SIZE) == GDMA_DataSize_Word))
 
+/** End of GDMA_Data_Size
+  * \}
+  */
+
 /**
- * \brief       GDMA Msize
- *
+ * \defgroup    GDMA_Msize GDMA Msize
+ * \{
  * \ingroup     GDMA_Exported_Constants
  */
 
@@ -333,6 +218,10 @@ typedef enum
                              ((SIZE) == GDMA_Msize_128) || \
                              ((SIZE) == GDMA_Msize_256))
 
+/** End of GDMA_Msize
+  * \}
+  */
+
 /**
  * \defgroup    GDMA_Interrupts  GDMA Interrupts
  * \{
@@ -346,29 +235,25 @@ typedef enum
 #define GDMA_INT_Half_Block             (BIT5)
 #endif
 
+#define IS_GDMA_CONFIG_IT(IT) ((((IT) & 0xFFFFFFE0) == 0x00) && ((IT) != 0x00))
+
 /** End of GDMA_Interrupts
   * \}
   */
-
-#define IS_GDMA_CONFIG_IT(IT) ((((IT) & 0xFFFFFFE0) == 0x00) && ((IT) != 0x00))
 
 /**
  * \defgroup    GDMA_Multi-block_Mode GDMA Multi-block Mode
  * \{
  * \ingroup     GDMA_Exported_Constants
  */
-#define AUTO_RELOAD_WITH_CONTIGUOUS_SAR (BIT30)
-#define AUTO_RELOAD_WITH_CONTIGUOUS_DAR (BIT31)
+#define AUTO_RELOAD_WITH_CONTIGUOUS_SAR (BIT31)
+#define AUTO_RELOAD_WITH_CONTIGUOUS_DAR (BIT30)
 #define AUTO_RELOAD_TRANSFER            (BIT30 | BIT31)
 #define LLI_WITH_CONTIGUOUS_SAR         (BIT27)
 #define LLI_WITH_AUTO_RELOAD_SAR        (BIT27 | BIT30)
 #define LLI_WITH_CONTIGUOUS_DAR         (BIT28)
 #define LLI_WITH_AUTO_RELOAD_DAR        (BIT28 | BIT31)
 #define LLI_TRANSFER                    (BIT27 | BIT28)
-
-/** End of GDMA_Multi-block_Mode
-  * \}
-  */
 
 #define IS_GDMA_MULTIBLOCKMODE(MODE) (((MODE) == AUTO_RELOAD_WITH_CONTIGUOUS_SAR) || \
                                       ((MODE) == AUTO_RELOAD_WITH_CONTIGUOUS_DAR) || \
@@ -378,6 +263,10 @@ typedef enum
                                       ((MODE) == LLI_WITH_CONTIGUOUS_DAR) || \
                                       ((MODE) == LLI_WITH_AUTO_RELOAD_DAR) || \
                                       ((MODE) == LLI_TRANSFER))
+
+/** End of GDMA_Multi-block_Mode
+  * \}
+  */
 
 /**
  * \defgroup    GDMA_Multi-Block_Select_Bit GDMA Multi-Block Select Bit
@@ -449,8 +338,10 @@ typedef struct
     uint8_t GDMA_SourceHandshake;           /*!< Specifies the handshake index in source.
                                                  This parameter can be a value of \ref GDMA_Handshake_Type. */
     uint8_t GDMA_DestHandshake;             /*!< Specifies the handshake index in Destination.
-                                                 This parameter can be a value of \ref GDMA_Handshake_Type. */
+                                                This parameter can be a value of \ref GDMA_Handshake_Type. */
+#if (GDMA_SUPPORT_SECURE_MODE == 1)
     uint8_t GDMA_Secure_En;                 /*!< Enable or disable Secure function. */
+#endif
 
 #if (GDMA_SUPPORT_GATHER_SCATTER_FUNCTION == 1)
     uint8_t  GDMA_Gather_En;                /*!< Enable or disable Gather function. NOTE:4 bytes ALIGN.*/
@@ -602,7 +493,7 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
 void GDMA_StructInit(GDMA_InitTypeDef *GDMA_InitStruct);
 
 /**
- * \brief  Enables or disables the selected GDMA channel.
+ * \brief  Enable or disable the selected GDMA channel.
  *
  * \param[in]  GDMA_ChannelNum: Select the GDMA channel number. \ref GDMA_CHANNEL_NUM
  * \param[in]  NewState: New state of the selected DMA channel.
@@ -653,7 +544,7 @@ void GDMA_StructInit(GDMA_InitTypeDef *GDMA_InitStruct);
 void GDMA_Cmd(uint8_t GDMA_ChannelNum, FunctionalState NewState);
 
 /**
- * \brief   Enables or disables the specified DMA channelx interrupt source.
+ * \brief   Enable or disable the specified DMA channelx interrupt source.
  * \param[in] GDMA_Channel_Num: can be 0 to 9 to select the DMA Channel(for RTL8762G, 3 to 26 for RTL8772F).
  * \param[in] GDMA_IT: Specifies the GDMA interrupt source to be enabled or disabled.
  *            This parameter can be any combination of the following values:
@@ -793,6 +684,7 @@ void GDMA_ClearAllTypeINT(uint8_t GDMA_ChannelNum);
  */
 FlagStatus GDMA_GetChannelStatus(uint8_t GDMA_ChannelNum);
 
+#if (GDMA_SUPPORT_SECURE_MODE == 1)
 /**
  * \brief     Enable or disable the specified DMA channel secure functions.
  *
@@ -813,8 +705,9 @@ FlagStatus GDMA_GetChannelStatus(uint8_t GDMA_ChannelNum);
  * \endcode
  */
 void GDMA_SecureCmd(GDMA_ChannelTypeDef *GDMA_Channelx, FunctionalState NewState);
+#endif
 
-
+#if (GDMA_SUPPORT_OSW_OSR_CHANGE == 1)
 /**
  * \brief     Set GDMA OSW.
  *
@@ -888,6 +781,7 @@ uint8_t GDMA_GetOSWCount(uint8_t GDMA_ChannelNum);
  * \endcode
  */
 uint8_t GDMA_GetOSRCount(uint8_t GDMA_ChannelNum);
+#endif
 
 /**
  * \brief      Set GDMA transmission source address.
@@ -1065,46 +959,6 @@ FlagStatus GDMA_GetFIFOStatus(GDMA_ChannelTypeDef *GDMA_Channelx);
  */
 void GDMA_SuspendCmd(GDMA_ChannelTypeDef *GDMA_Channelx,
                      FunctionalState NewState);
-
-/**
- * \brief  Check GDMA suspend command status.
- *
- * \param[in]  GDMA_Channelx: Select the GDMA peripheral. \ref GDMA_Declaration
- *
- * \return GDMA suspend command status.
- * \retval SET: Suspend.
- * \retval RESET: Not suspend.
- *
- * <b>Example usage</b>
- * \code{.c}
- *
- * void gdma_demo(void)
- * {
- *     FlagStatus flag_status = GDMA_GetSuspendCmdStatus(GDMA2_Channel0);
- * }
- * \endcode
- */
-FlagStatus GDMA_GetSuspendCmdStatus(GDMA_ChannelTypeDef *GDMA_Channelx);
-
-/**
- * \brief  Check GDMA suspend channel status.
- *
- * \param[in] GDMA_Channelx: Select the GDMA peripheral. \ref GDMA_Declaration
- *
- * \return GDMA suspend channel status.
- * \retval SET: Inactive.
- * \retval RESET: Active.
- *
- * <b>Example usage</b>
- * \code{.c}
- *
- * void gdma_demo(void)
- * {
- *     FlagStatus flag_status = GDMA_GetSuspendChannelStatus(GDMA2_Channel0);
- * }
- * \endcode
- */
-FlagStatus GDMA_GetSuspendChannelStatus(GDMA_ChannelTypeDef *GDMA_Channelx);
 
 /**
  * \brief     Get GDMA Channelx of the specified DMA Channel Number.

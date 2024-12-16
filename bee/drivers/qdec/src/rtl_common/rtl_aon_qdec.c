@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+**********************************************************************************************************
+* \file     rtl_aon_qdec.c
+* \brief    This file provides all the AON QDEC firmware functions.
+* \details
+* \author   Grace_yan
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
@@ -34,18 +41,11 @@ void AON_QDEC_Init(AON_QDEC_TypeDef *AON_QDECx, AON_QDEC_InitTypeDef *AON_QDEC_I
         aon_qdec_0x00.b.x_initial_phase = AON_QDEC_InitStruct->initPhaseX;
         AON_QDECx->AON_QDEC_CONFIG = aon_qdec_0x00.d32;
         for (volatile uint32_t i = 0; i < 150; i++);
-
-        aon_qdec_0x00.b.x_set_initial_phase = 0x0;
-        AON_QDECx->AON_QDEC_CONFIG = aon_qdec_0x00.d32;
-        for (volatile uint32_t i = 0; i < 150; i++);
-    }
-    else
-    {
-        aon_qdec_0x00.b.x_set_initial_phase = 0x0;
-        AON_QDECx->AON_QDEC_CONFIG = aon_qdec_0x00.d32;
-        for (volatile uint32_t i = 0; i < 150; i++);
     }
 
+    aon_qdec_0x00.b.x_set_initial_phase = 0x0;
+    AON_QDECx->AON_QDEC_CONFIG = aon_qdec_0x00.d32;
+    for (volatile uint32_t i = 0; i < 150; i++);
 
     /* The max debounce cnt is 0x1FFF*/
     if (AON_QDEC_InitStruct->debounceTimeX >=  0x1FFF)
@@ -60,7 +60,7 @@ void AON_QDEC_Init(AON_QDEC_TypeDef *AON_QDECx, AON_QDEC_InitTypeDef *AON_QDEC_I
     AON_QDECx->AON_QDEC_CONFIG = aon_qdec_0x00.d32;
 
     AON_QDEC_INT_CLR_TypeDef aon_qdec_0x08 = {.d32 = AON_QDECx->AON_QDEC_INT_CLR};
-    aon_qdec_0x08.b.acc_cnt_clr = 0x0; // write 1 to clear acc cnt
+    aon_qdec_0x08.b.acc_cnt_clr = 0x1; // write 1 to clear acc cnt
     AON_QDECx->AON_QDEC_INT_CLR = aon_qdec_0x08.d32;
     return;
 }
@@ -84,7 +84,7 @@ void AON_QDEC_StructInit(AON_QDEC_InitTypeDef *AON_QDEC_InitStruct)
 
 
 /**
-  * \brief  Enables or disables the specified AON Qdecoder interrupts.
+  * \brief  Enable or disable the specified AON Qdecoder interrupts.
   * \param  AON_QDECx: selected AON Qdecoder peripheral.
   * \param  AON_QDEC_IT: specifies the AON QDECODER interrupts sources to be enabled or disabled.
   *         This parameter can be one of the following values:
@@ -169,7 +169,7 @@ FlagStatus AON_QDEC_GetFlagState(AON_QDEC_TypeDef *AON_QDECx, uint32_t AON_QDEC_
 }
 
 /**
-  * \brief  Enables or disables mask the specified AON Qdecoder axis interrupts.
+  * \brief  Enable or disable mask the specified AON Qdecoder axis interrupts.
   * \param  AON_QDECx: selected AON Qdecoder peripheral.
   * \param  AON_QDEC_AXIS: specifies the AON Qdecoder axis.
   *         This parameter can be one or logical OR of the following values:

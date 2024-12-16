@@ -1,16 +1,20 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_rtc.c
+* \brief    This file provides all the RTC firmware functions.
+* \details
+* \author   grace_yan
+* \date     2023-10-17
+* \version  v1.0
+*********************************************************************************************************
+*/
 
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
 #include "rtl_rtc.h"
-#if (RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL == 1)
-#include "rtl_aon_reg.h"
-#endif
 
 /*============================================================================*
  *                           Public Functions
@@ -42,10 +46,14 @@ void RTC_DeInit(void)
     RTC->RTC_COMP_1 = 0;
     RTC->RTC_COMP_2 = 0;
     RTC->RTC_COMP_3 = 0;
+
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
     RTC->RTC_COMP0_GT = 0;
     RTC->RTC_COMP1_GT = 0;
     RTC->RTC_COMP2_GT = 0;
     RTC->RTC_COMP3_GT = 0;
+#endif
+
     RTC->RTC_PRESCALE_CMP0 = 0;
 
     /* Reset prescale counter and counter */
@@ -382,6 +390,7 @@ void RTC_SetCompValue(RTCComIndex_TypeDef index, uint32_t value)
     *(&(RTC->RTC_COMP_0) + index) = value;
 }
 
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
 /**
   * \brief  Set RTC comparator GT value.
   * \param  index: The comparator gt number, can be 0 ~ 3.
@@ -395,6 +404,7 @@ void RTC_SetCompGTValue(RTCCmopGTIndex_TypeDef index, uint32_t value)
 
     *(&(RTC->RTC_COMP0_GT) + index) = value;
 }
+#endif
 
 /**
   * \brief  Set RTC prescaler comparator value.
@@ -436,6 +446,7 @@ uint32_t RTC_GetCompValue(RTCComIndex_TypeDef index)
     return *(&(RTC->RTC_COMP_0) + index);
 }
 
+#if (RTC_SUPPORT_COMPARE_GUARDTIME == 1)
 /**
   * \brief  Get RTC comparator gt value.
   * \param  index: The comparator number 0~3.
@@ -445,6 +456,7 @@ uint32_t RTC_GetCompGTValue(RTCCmopGTIndex_TypeDef index)
 {
     return *(&(RTC->RTC_COMP0_GT) + index);
 }
+#endif
 
 /**
   * \brief  Get RTC prescaler comparator value.
@@ -458,13 +470,12 @@ uint32_t RTC_GetPreCompValue(void)
 
 /**
   * \brief  Write backup register for store time information.
-  * \param  value: valuer=write to back up reister
+  * \param  value: valuer=write to back up register
   * \return None.
   */
 void RTC_WriteBackupReg(uint32_t value)
 {
-//    RTC_WriteReg((uint32_t)(&(RTC->RTC_BACKUP_REG)), value);
-    (RTC->RTC_BACKUP_REG) = value;
+    (RTC->RTC_BACKUP) = value;
 }
 
 /**
@@ -474,22 +485,78 @@ void RTC_WriteBackupReg(uint32_t value)
   */
 uint32_t RTC_ReadBackupReg(void)
 {
-    return (RTC->RTC_BACKUP_REG);
+    return (RTC->RTC_BACKUP);
 }
 
-/**
-  * \brief  Select source clock to gpio input of RTC.
-  * \param  gpio: the selected gpio.
-  * \return None
-  */
-#if (RTC_SUPPORT_CLK_INPUT_FROM_PAD_SEL == 1)
-void RTC_SelectSrcToGpioInput(RTCInSel_TypeDef rtc_in)
+/*============================================================================*
+ *                        RAP Functions
+ *============================================================================*/
+#if (RTC_SUPPORT_RAP_FUNCTION == 1)
+void RTC_RAPQactiveCtrl(uint32_t Qactive, FunctionalState NewState)
 {
-    /* Set en_gpio_32k if any muxes need USE_32K_GPIO_IN */
-    AON_REG_UPDATE(AON_REG176X_Page0, EN_32K_GPIO_IN_MSK, true << __builtin_ctz(EN_32K_GPIO_IN_MSK));
-    AON_REG_UPDATE(AON_NS_PAD_AON_PINMUX_CFG0, RTC_IN_SEL_MSK, rtc_in << __builtin_ctz(RTC_IN_SEL_MSK));
-    AON_REG_UPDATE(AON_REG00_SEL_32K, 0x1F000000, 1 << 25);
+    return;
 }
+
+void RTC_RAPModeCmd(FunctionalState NewState)
+{
+    RTC_TASK_CTRL_TypeDef rtc_ctrl = {.d32 = RTC->RTC_TASK_CTRL};
+    rtc_ctrl.b.rtc_rap_mode = NewState;
+    RTC->RTC_TASK_CTRL = rtc_ctrl.d32;
+
+    return;
+}
+
+void RTC_TaskTrigger(uint32_t Task)
+{
+    RTC_TASK_CTRL_TypeDef rtc_ctrl = {.d32 = RTC->RTC_TASK_CTRL};
+    if (Task == RTC_TASK_START)
+    {
+        rtc_ctrl.b.rtc_fw_task_start = 1;
+    }
+    else if (Task == RTC_TASK_STOP)
+    {
+        rtc_ctrl.b.rtc_fw_task_stop = 1;
+    }
+    else if (Task == RTC_TASK_CLR)
+    {
+        rtc_ctrl.b.rtc_fw_task_clear = 1;
+    }
+    RTC->RTC_TASK_CTRL = rtc_ctrl.d32;
+
+    return;
+}
+
+void RTC_ShortcutCmd(uint32_t Task, uint32_t Event, FunctionalState NewState)
+{
+    RTC_SHOT_CTRL_TypeDef rtc_short = {.d32 = RTC->RTC_SHOT_CTRL};
+    if (Task == RTC_SHORTCUT_TASK_STOP)
+    {
+        rtc_short.b.rtc_task_stop_sub_en = NewState;
+    }
+    else if (Task == RTC_SHORTCUT_TASK_CLEAR)
+    {
+        rtc_short.b.rtc_task_clear_sub_en = NewState;
+    }
+    if (Event == RTC_SHORTCUT_EVENT_COM0)
+    {
+        rtc_short.b.rtc_event_cmp0_pub_en = NewState;
+    }
+    else if (Event == RTC_SHORTCUT_EVENT_COM1)
+    {
+        rtc_short.b.rtc_event_cmp1_pub_en = NewState;
+    }
+    else if (Event == RTC_SHORTCUT_EVENT_COM2)
+    {
+        rtc_short.b.rtc_event_cmp2_pub_en = NewState;
+    }
+    else if (Event == RTC_SHORTCUT_EVENT_COM3)
+    {
+        rtc_short.b.rtc_event_cmp3_pub_en = NewState;
+    }
+    RTC->RTC_SHOT_CTRL = rtc_short.d32;
+    return;
+}
+
 #endif
 
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/

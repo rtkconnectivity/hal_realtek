@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_uart_def.h
+* \brief    UART related definitions for RTL87x2G
+* \details
+* \author
+* \date     2023-11-15
+* \version  v1.1
+* *********************************************************************************************************
+*/
 
 #ifndef RTL_UART_DEF_H
 #define RTL_UART_DEF_H
@@ -18,6 +25,11 @@ extern "C" {
 /*============================================================================*
  *                          UART Defines
  *============================================================================*/
+/** \defgroup UART        UART
+  * \brief
+  * \{
+  */
+
 /** \defgroup UART_Exported_Constants UART Exported Constants
   * \brief
   * \{
@@ -28,11 +40,11 @@ extern "C" {
  * \{
  * \ingroup  UART_Exported_Constants
  */
-#define CHIP_UART_NUM                                  (6)
-#define UART_SUPPORT_TX_DONE                           (1)
-#define UART_SUPPORT_TX_THD                            (1)
-#define UART_SUPPORT_TXDATA_API                        (0)
-#define UART_SUPPORT_HALF_WORD                         (0)
+#define UART_SUPPORT_TX_DONE                (1)
+#define UART_SUPPORT_TX_THD                 (1)
+#define UART_SUPPORT_TXDATA_API             (0)
+#define UART_SUPPORT_HALF_WORD              (0)
+#define UART_SUPPORT_CLEAR_TX_FIFO          (0)
 
 /** End of UART_Defines
   * \}
@@ -42,6 +54,9 @@ extern "C" {
   * \}
   */
 
+/** End of UART
+  * \}
+  */
 
 /*============================================================================*
  *                         UART Registers Memory Map
@@ -59,42 +74,55 @@ typedef struct
     __IO uint32_t UART_STSR;                 /*!< 0x20 */
     __IO uint32_t UART_RBR_THR;              /*!< 0x24 */
     __IO uint32_t UART_MISCR;                /*!< 0x28 */
-    __IO uint32_t UART_RSVD1;                /*!< 0x2C */
-    __IO uint32_t UART_RSVD2;                /*!< 0x30 */
-    __IO uint32_t UART_RSVD3;                /*!< 0x34 */
-    __IO uint32_t UART_RSVD4;                /*!< 0x38 */
-    __IO uint32_t UART_RSVD5;                /*!< 0x3C */
+    __IO uint32_t UART_RSVD1[5];             /*!< 0x2C - 0x3C */
     __IO uint32_t UART_RX_TIMEOUT;           /*!< 0x40 */
     __IO uint32_t UART_RX_TIMEOUT_STS;       /*!< 0x44 */
     __IO uint32_t UART_RX_TIMEOUT_EN;        /*!< 0x48 */
-    __I uint32_t  UART_RXTX_FIFO_WL;         /*!< 0x4C */
+    __I  uint32_t UART_RXTX_FIFO_WL;         /*!< 0x4C */
     __IO uint32_t UART_INT_MASK;             /*!< 0x50 */
-    __I uint32_t  UART_TXDONE_INT;           /*!< 0x54 */
-    __I uint32_t  UART_TX_THD_INT;           /*!< 0x58 */
-    __IO uint32_t UART_RSVD6;                /*!< 0x5C */
+    __I  uint32_t UART_TXDONE_INT;           /*!< 0x54 */
+    __I  uint32_t UART_TX_THD_INT;           /*!< 0x58 */
+    __IO uint32_t UART_RSVD2;                /*!< 0x5C */
 } UART_TypeDef;
 
 /*============================================================================*
  *                         UART Declaration
  *============================================================================*/
-/** \defgroup 87X2G_UART      UART
+/** \defgroup UART        UART
+  * \brief
+  * \{
+  */
+
+/** \defgroup UART_Exported_Constants UART Exported Constants
   * \brief
   * \{
   */
 
 /** \defgroup UART_Declaration UART Declaration
-  * \brief
   * \{
+  * \ingroup  UART_Exported_Constants
   */
 
-#define UART0              ((UART_TypeDef *) UART0_REG_BASE)
-#define UART1              ((UART_TypeDef *) UART1_REG_BASE)
-#define UART2              ((UART_TypeDef *) UART2_REG_BASE)
-#define UART3              ((UART_TypeDef *) UART3_REG_BASE)
-#define UART4              ((UART_TypeDef *) UART4_REG_BASE)
-#define UART5              ((UART_TypeDef *) UART5_REG_BASE)
-#define UART                            UART0
+#define UART0                   ((UART_TypeDef *) UART0_REG_BASE)
+#define UART1                   ((UART_TypeDef *) UART1_REG_BASE)
+#define UART2                   ((UART_TypeDef *) UART2_REG_BASE)
+#define UART3                   ((UART_TypeDef *) UART3_REG_BASE)
+#define UART4                   ((UART_TypeDef *) UART4_REG_BASE)
+#define UART5                   ((UART_TypeDef *) UART5_REG_BASE)
+#define UART                    UART0
+
+#define IS_UART_PERIPH(PERIPH)  (((PERIPH) == UART0) || \
+                                 ((PERIPH) == UART1) || \
+                                 ((PERIPH) == UART2) || \
+                                 ((PERIPH) == UART3) || \
+                                 ((PERIPH) == UART4) || \
+                                 ((PERIPH) == UART5))
+
 /** End of UART_Declaration
+  * \}
+  */
+
+/** End of UART_Exported_Constants
   * \}
   */
 
@@ -570,19 +598,91 @@ typedef union
         } UART_TX_THD_INT_TypeDef;
 
     /*============================================================================*
-     *                          UART TYPE/API Wrappers
+     *                        UART Constants
      *============================================================================*/
+    /** \defgroup UART          UART
+      * \brief
+      * \{
+      */
+
     /** \defgroup UART_Exported_Constants UART Exported Constants
       * \brief
       * \{
       */
 
     /**
-     * \brief       To be compatible with the previous driver.
-     * \defgroup    UART_InitStruct_Wrapper UART InitStruct Wrapper
+     * \defgroup    UART_Source_Clock UART Source Clock
      * \{
      * \ingroup     UART_Exported_Constants
      */
+    typedef enum
+{
+    UART_CLOCK_SRC_40M,
+} UARTClockSrc_TypeDef;
+
+#define IS_UART_SRC_CLOCK(CLK) ((CLK) == UART_CLOCK_SRC_40M)
+
+/** End of UART_Source_Clock
+  * \}
+  */
+
+/**
+ * \defgroup    UART_Clock_Divider UART Clock Divider
+ * \{
+ * \ingroup     UART_Exported_Constants
+ */
+typedef enum
+{
+    UART_CLOCK_DIVIDER_1 = 0x0,
+    UART_CLOCK_DIVIDER_2 = 0x1,
+    UART_CLOCK_DIVIDER_4 = 0x2,
+    UART_CLOCK_DIVIDER_8 = 0x3,
+    UART_CLOCK_DIVIDER_16 = 0x4,
+    UART_CLOCK_DIVIDER_32 = 0x5,
+    UART_CLOCK_DIVIDER_40 = 0x6,
+    UART_CLOCK_DIVIDER_64 = 0x7,
+} UARTClockDiv_TypeDef;
+
+#define IS_UART_CLK_DIV(DIV) (((DIV) == UART_CLOCK_DIVIDER_1) || \
+                              ((DIV) == UART_CLOCK_DIVIDER_2) || \
+                              ((DIV) == UART_CLOCK_DIVIDER_4) || \
+                              ((DIV) == UART_CLOCK_DIVIDER_8) || \
+                              ((DIV) == UART_CLOCK_DIVIDER_16) || \
+                              ((DIV) == UART_CLOCK_DIVIDER_32) || \
+                              ((DIV) == UART_CLOCK_DIVIDER_40) || \
+                              ((DIV) == UART_CLOCK_DIVIDER_64))
+
+/** End of UART_Clock_Divider
+  * \}
+  */
+
+/** End of UART_Exported_Constants
+  * \}
+  */
+
+/** End of UART
+  * \}
+  */
+
+/*============================================================================*
+ *                          UART TYPE/API Wrappers
+ *============================================================================*/
+/** \defgroup UART        UART
+  * \brief
+  * \{
+  */
+
+/** \defgroup UART_Exported_Constants UART Exported Constants
+  * \brief
+  * \{
+  */
+
+/**
+ * \brief       To be compatible with the previous driver.
+ * \defgroup    UART_InitStruct_Wrapper UART InitStruct Wrapper
+ * \{
+ * \ingroup     UART_Exported_Constants
+ */
 #define UART_OvsrAdj                ovsr_adj
 #define UART_Div                    div
 #define UART_Ovsr                   ovsr
@@ -599,16 +699,16 @@ typedef union
 #define UART_TxDmaEn                TxDmaEn
 #define UART_RxDmaEn                RxDmaEn
 
-    /** End of UART_InitStruct_Wrapper
-      * \}
-      */
+/** End of UART_InitStruct_Wrapper
+  * \}
+  */
 
-    /**
-     * \brief       To be compatible with the previous driver.
-     * \defgroup    UART_Constant_Wrapper UART Constant Wrapper
-     * \{
-     * \ingroup     UART_Exported_Constants
-     */
+/**
+ * \brief       To be compatible with the previous driver.
+ * \defgroup    UART_Constant_Wrapper UART Constant Wrapper
+ * \{
+ * \ingroup     UART_Exported_Constants
+ */
 #define UART_INT_LINE_STS           UART_INT_RX_LINE_STS
 #define UART_INT_ID_RX_TMEOUT       UART_INT_ID_RX_DATA_TIMEOUT
 #define UART_FLAG_THR_EMPTY         UART_FLAG_TX_FIFO_EMPTY
@@ -617,16 +717,16 @@ typedef union
 
 #define UART_INT_ID_TX_EMPTY        UART_INT_ID_TX_FIFO_EMPTY
 
-    /** End of UART_Constant_Wrapper
-      * \}
-      */
+/** End of UART_Constant_Wrapper
+  * \}
+  */
 
-    /**
-     * \brief       To be compatible with the previous driver.
-     * \defgroup    UART_API_Wrapper UART API Wrapper
-     * \{
-     * \ingroup     UART_Exported_Constants
-     */
+/**
+ * \brief       To be compatible with the previous driver.
+ * \defgroup    UART_API_Wrapper UART API Wrapper
+ * \{
+ * \ingroup     UART_Exported_Constants
+ */
 #define UART_GetFlagState           UART_GetFlagStatus
 #define UART_ChangeBaudRate         UART_SetBaudRate
 #define UART_ChangeParams           UART_SetParams
@@ -635,13 +735,17 @@ typedef union
 #define UART_GetTxFIFOLen           UART_GetTxFIFODataLen
 #define UART_GetRxFIFOLen           UART_GetRxFIFODataLen
 
-    /** End of UART_API_Wrapper
-      * \}
-      */
+/** End of UART_API_Wrapper
+  * \}
+  */
 
-    /** End of UART_Exported_Constants
-      * \}
-      */
+/** End of UART_Exported_Constants
+  * \}
+  */
+
+/** End of UART
+  * \}
+  */
 
 #ifdef  __cplusplus
 }

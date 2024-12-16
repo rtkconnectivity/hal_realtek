@@ -1,8 +1,15 @@
-/*
- * Copyright (c) 2024 Realtek Semiconductor Corp.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+/**
+*********************************************************************************************************
+*               Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
+*********************************************************************************************************
+* \file     rtl_adc.h
+* \brief    The header file of the peripheral ADC driver.
+* \details  This file provides all ADC firmware functions.
+* \author   echo
+* \date     2023-10-17
+* \version  v1.0
+* *********************************************************************************************************
+*/
 
 /*============================================================================*
  *               Define to prevent recursive inclusion
@@ -17,16 +24,18 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
+#include "utils/rtl_utils.h"
 #if defined (CONFIG_SOC_SERIES_RTL87X2G)
 #include "adc/src/rtl87x2g/rtl_adc_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3E)
 #include "adc/src/rtl87x3e/rtl_adc_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3D)
-#include "adc/src/rtl8763d/rtl_adc_def.h"
+#include "adc/src/rtl87x3d/rtl_adc_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL8762J)
+#include "adc/src/rtl87x2j/rtl_adc_def.h"
 #endif
 
-
-/** \defgroup 87X2G_ADC         ADC
+/** \defgroup ADC         ADC
   * \brief
   * \{
   */
@@ -44,93 +53,99 @@ extern "C" {
  * \{
  * \ingroup     ADC_Exported_Constants
  */
-#define ADC_Channel_Index_0         0
-#define ADC_Channel_Index_1         1
-#define ADC_Channel_Index_2         2
-#define ADC_Channel_Index_3         3
-#define ADC_Channel_Index_4         4
+#define ADC_Channel_Index_0           0
+#define ADC_Channel_Index_1           1
+#define ADC_Channel_Index_2           2
+#define ADC_Channel_Index_3           3
+#define ADC_Channel_Index_4           4
 #if (CHIP_ADC_CHANNEL_NUM > 4)
-#define ADC_Channel_Index_5         5
-#define ADC_Channel_Index_6         6
-#define ADC_Channel_Index_7         7
+#define ADC_Channel_Index_5           5
+#define ADC_Channel_Index_6           6
+#define ADC_Channel_Index_7           7
 #endif
 #if (CHIP_ADC_CHANNEL_NUM > 8)
-#define ADC_Channel_Index_8         8
-#define ADC_Channel_Index_9         9
-#define ADC_Channel_Index_10        10
-#define ADC_Channel_Index_11        11
-#define ADC_Channel_Index_12        12
-#define ADC_Channel_Index_13        13
-#define ADC_Channel_Index_14        14
-#define ADC_Channel_Index_15        15
+#define ADC_Channel_Index_8           8
+#define ADC_Channel_Index_9           9
+#define ADC_Channel_Index_10          10
+#define ADC_Channel_Index_11          11
+#define ADC_Channel_Index_12          12
+#define ADC_Channel_Index_13          13
+#define ADC_Channel_Index_14          14
+#define ADC_Channel_Index_15          15
 #endif
 #define IS_ADC_CHANNEL(ch)      ((ch) < CHIP_ADC_CHANNEL_NUM)
-
-#define ADC_Schedule_Index_0        0
-#define ADC_Schedule_Index_1        1
-#define ADC_Schedule_Index_2        2
-#define ADC_Schedule_Index_3        3
-#define ADC_Schedule_Index_4        4
-#define ADC_Schedule_Index_5        5
-#define ADC_Schedule_Index_6        6
-#define ADC_Schedule_Index_7        7
-#define ADC_Schedule_Index_8        8
-#define ADC_Schedule_Index_9        9
-#define ADC_Schedule_Index_10       10
-#define ADC_Schedule_Index_11       11
-#define ADC_Schedule_Index_12       12
-#define ADC_Schedule_Index_13       13
-#define ADC_Schedule_Index_14       14
-#define ADC_Schedule_Index_15       15
-#if (CHIP_ADC_SCHEDULE_NUM > 16)
-#define ADC_Schedule_Index_16       16
-#define ADC_Schedule_Index_17       17
-#define ADC_Schedule_Index_18       18
-#define ADC_Schedule_Index_19       19
-#endif
 
 /** End of ADC_Channel_Index
   * \}
   */
 
+/**
+ * \defgroup    ADC_Schedule_Index ADC Schedule Index
+ * \{
+ * \ingroup     ADC_Exported_Constants
+ */
+#define ADC_Schedule_Index_0          0
+#define ADC_Schedule_Index_1          1
+#define ADC_Schedule_Index_2          2
+#define ADC_Schedule_Index_3          3
+#define ADC_Schedule_Index_4          4
+#define ADC_Schedule_Index_5          5
+#define ADC_Schedule_Index_6          6
+#define ADC_Schedule_Index_7          7
+#define ADC_Schedule_Index_8          8
+#define ADC_Schedule_Index_9          9
+#define ADC_Schedule_Index_10         10
+#define ADC_Schedule_Index_11         11
+#define ADC_Schedule_Index_12         12
+#define ADC_Schedule_Index_13         13
+#define ADC_Schedule_Index_14         14
+#define ADC_Schedule_Index_15         15
+#if (CHIP_ADC_SCHEDULE_NUM > 16)
+#define ADC_Schedule_Index_16         16
+#define ADC_Schedule_Index_17         17
+#define ADC_Schedule_Index_18         18
+#define ADC_Schedule_Index_19         19
+#endif
 #define IS_ADC_SCH_INDEX(IDEX) ((IDEX) < CHIP_ADC_SCHEDULE_NUM)
 
-#define IS_ADC_PERIPH(PERIPH) ((PERIPH) == ADC)
+/** End of ADC_Schedule_Index
+  * \}
+  */
 
 /**
  * \defgroup    ADC_Schedule_Table ADC Channel and Mode
  * \{
  * \ingroup     ADC_Exported_Constants
  */
+#define SCHEDULE_TABLE(Index)         (Index)
+#define EXT_SINGLE_ENDED(Index)       ((uint16_t)((ADC_MODE_SINGLE_ENDED_VALUE << CHIP_ADC_MODE_OFFSET) | (Index)))
+#define EXT_DIFFERENTIAL(Index)       ((uint16_t)((ADC_MODE_DIFFERENTIAL_VALUE << CHIP_ADC_MODE_OFFSET) | (Index)))
 
-#define SCHEDULE_TABLE(index)                       index
-#define EXT_SINGLE_ENDED(index)                     ((uint16_t)((0x00 << CHIP_ADC_MODE_OFFSET) | (index)))
-#define EXT_DIFFERENTIAL(index)                     ((uint16_t)((0x01 << CHIP_ADC_MODE_OFFSET) | (index)))
-
-#define INTERNAL_VBAT_MODE                          ((uint16_t)((0x02 << CHIP_ADC_MODE_OFFSET) | 0x00))
+#define INTERNAL_VBAT_MODE            ((uint16_t)((ADC_MODE_INTERNAL_VALUE << CHIP_ADC_MODE_OFFSET) | 0x00))
 #if ADC_SUPPORT_VADPIN_MODE
-#define INTERNAL_VADPIN_MODE                        ((uint16_t)((0x02 << CHIP_ADC_MODE_OFFSET) | 0x01))
+#define INTERNAL_VADPIN_MODE          ((uint16_t)((ADC_MODE_INTERNAL_VALUE << CHIP_ADC_MODE_OFFSET) | 0x01))
+#endif
+
+
+#if ADC_SUPPORT_VADPIN_MODE
+#define IS_ADC_SCHEDULE_INDEX_CONFIG(CONFIG) (((CONFIG) & (0xffff << 2 << CHIP_ADC_MODE_OFFSET)) == 0 && \
+                                              ((IS_ADC_SCH_INDEX((CONFIG) & (~(0xffff << CHIP_ADC_MODE_OFFSET))) && \
+                                                (CONFIG & BIT(CHIP_ADC_MODE_OFFSET + 1) == 0)) || \
+                                               (CONFIG) == INTERNAL_VBAT_MODE || \
+                                               (CONFIG) == INTERNAL_VADPIN_MODE))
+#else
+#define IS_ADC_SCHEDULE_INDEX_CONFIG(CONFIG) (((CONFIG) & (0xffff << 2 << CHIP_ADC_MODE_OFFSET)) == 0 && \
+                                              ((IS_ADC_SCH_INDEX((CONFIG) & (~(0xffff << CHIP_ADC_MODE_OFFSET))) && \
+                                                (CONFIG & BIT(CHIP_ADC_MODE_OFFSET + 1) == 0)) || \
+                                               (CONFIG) == INTERNAL_VBAT_MODE))
 #endif
 
 /** End of ADC_Schedule_Table
   * \}
   */
 
-#if ADC_SUPPORT_VADPIN_MODE
-#define IS_ADC_SCHEDULE_INDEX_CONFIG(CONFIG) (((CONFIG) & (0xffff << 2 << CHIP_ADC_MODE_OFFSET)) ==0 \
-                                              && ((IS_ADC_SCH_INDEX((CONFIG) & (~(0xffff << CHIP_ADC_MODE_OFFSET))) \
-                                                   && (CONFIG & BIT(CHIP_ADC_MODE_OFFSET + 1) == 0)) \
-                                                  || (CONFIG) == INTERNAL_VBAT_MODE \
-                                                  || (CONFIG) == INTERNAL_VADPIN_MODE))
-#else
-#define IS_ADC_SCHEDULE_INDEX_CONFIG(CONFIG) (((CONFIG) & (0xffff << 2 << CHIP_ADC_MODE_OFFSET)) ==0 \
-                                              && ((IS_ADC_SCH_INDEX((CONFIG) & (~(0xffff << CHIP_ADC_MODE_OFFSET))) \
-                                                   && (CONFIG & BIT(CHIP_ADC_MODE_OFFSET + 1) == 0)) \
-                                                  || (CONFIG) == INTERNAL_VBAT_MODE))
-#endif
-
 /**
- * \defgroup    ADC_Convert_Time ADC_CONVERT_TIME
+ * \defgroup    ADC_Convert_Time ADC Convert Time
  * \{
  * \ingroup     ADC_Exported_Constants
  */
@@ -142,14 +157,14 @@ typedef enum
     ADC_CONVERT_TIME_1100NS,
 } ADCConvertTim_TypeDef;
 
+#define IS_ADC_CONVERT_TIME(TIME) (((TIME) == ADC_CONVERT_TIME_500NS) || \
+                                   ((TIME) == ADC_CONVERT_TIME_700NS) || \
+                                   ((TIME) == ADC_CONVERT_TIME_900NS) || \
+                                   ((TIME) == ADC_CONVERT_TIME_1100NS))
+
 /** End of ADC_Convert_Time
   * \}
   */
-
-#define IS_ADC_CONVERT_TIME(TIME) (((TIME) == ADC_CONVERT_TIME_500NS)\
-                                   || ((TIME) == ADC_CONVERT_TIME_700NS)\
-                                   || ((TIME) == ADC_CONVERT_TIME_900NS)\
-                                   || ((TIME) == ADC_CONVERT_TIME_1100NS))
 
 /**
  * \defgroup    ADC_Latch_Data_Edge ADC Latch Data Edge
@@ -162,12 +177,11 @@ typedef enum
     ADC_LATCH_DATA_Negative,
 } ADCDataLatchEdge_TypeDef;
 
+#define IS_ADC_LATCH_MODE(MODE) (((MODE) == ADC_LATCH_DATA_Positive) || ((MODE) == ADC_LATCH_DATA_Negative))
+
 /** End of ADC_Latch_Data_Edge
   * \}
   */
-
-#define IS_ADC_LATCH_MODE(MODE) (((MODE) == ADC_LATCH_DATA_Positive) || ((MODE) == ADC_LATCH_DATA_Negative))
-
 
 /**
  * \defgroup    ADC_Data_Align ADC Data Align
@@ -180,38 +194,37 @@ typedef enum
     ADC_DATA_ALIGN_MSB,
 } ADCAlign_TypeDef;
 
+#define IS_ADC_DATA_ALIGN(DATA_ALIGN) (((DATA_ALIGN) == ADC_DATA_ALIGN_LSB) || ((DATA_ALIGN) == ADC_DATA_ALIGN_MSB))
+
 /** End of ADC_Data_Align
   * \}
   */
-
-#define IS_ADC_DATA_ALIGN(DATA_ALIGN) (((DATA_ALIGN) == ADC_DATA_ALIGN_LSB) || ((DATA_ALIGN) == ADC_DATA_ALIGN_MSB))
 
 /**
  * \defgroup    ADC_Clock ADC Clock
  * \{
  * \ingroup     ADC_Exported_Constants
  */
-
 /*  adc sample clock frequence default value as follow, other vaule(0~0x1fff) is also support if user wanted */
-#define ADC_CLK_625K                                 (0x0f)
-#define ADC_CLK_312_5K                               (0x1f)
-#define ADC_CLK_156_25K                              (0x3f)
-#define ADC_CLK_78_125K                              (0x7f)
-#define ADC_CLK_39K                                  (0xff)
+#define ADC_CLK_625K                  (0x0f)
+#define ADC_CLK_312_5K                (0x1f)
+#define ADC_CLK_156_25K               (0x3f)
+#define ADC_CLK_78_125K               (0x7f)
+#define ADC_CLK_39K                   (0xff)
 
-#define ADC_CLK_19_5K                                (0x1ff)
-#define ADC_CLK_9_8K                                 (0x3ff)
-#define ADC_CLK_4_88K                                (0x7ff)
-#define ADC_CLK_2_44K                                (0xfff)
-#define ADC_CLK_1_22K                                (0x1fff)
+#define ADC_CLK_19_5K                 (0x1ff)
+#define ADC_CLK_9_8K                  (0x3ff)
+#define ADC_CLK_4_88K                 (0x7ff)
+#define ADC_CLK_2_44K                 (0xfff)
+#define ADC_CLK_1_22K                 (0x1fff)
 
 /** End of ADC_Clock
   * \}
   */
 
 /**
- * \brief       Number of raw data for calculate average
- *
+ * \defgroup    ADC_Raw_Data_Average ADC Raw Data Average
+ * \{
  * \ingroup     ADC_Exported_Constants
  */
 typedef enum
@@ -227,81 +240,45 @@ typedef enum
     ADC_DATA_AVERAGE_MAX,
 } ADCDataAvgSel_TypeDef;
 
-#define IS_ADC_DATA_AVG_NUM(NUM) (((NUM) == ADC_DATA_AVERAGE_OF_2) ||\
-                                  ((NUM) == ADC_DATA_AVERAGE_OF_4) ||\
-                                  ((NUM) == ADC_DATA_AVERAGE_OF_8) ||\
-                                  ((NUM) == ADC_DATA_AVERAGE_OF_16) ||\
-                                  ((NUM) == ADC_DATA_AVERAGE_OF_32) ||\
-                                  ((NUM) == ADC_DATA_AVERAGE_OF_64) ||\
-                                  ((NUM) == ADC_DATA_AVERAGE_OF_128) ||\
+#define IS_ADC_DATA_AVG_NUM(NUM) (((NUM) == ADC_DATA_AVERAGE_OF_2) || \
+                                  ((NUM) == ADC_DATA_AVERAGE_OF_4) || \
+                                  ((NUM) == ADC_DATA_AVERAGE_OF_8) || \
+                                  ((NUM) == ADC_DATA_AVERAGE_OF_16) || \
+                                  ((NUM) == ADC_DATA_AVERAGE_OF_32) || \
+                                  ((NUM) == ADC_DATA_AVERAGE_OF_64) || \
+                                  ((NUM) == ADC_DATA_AVERAGE_OF_128) || \
                                   ((NUM) == ADC_DATA_AVERAGE_OF_256))
 
+/** End of ADC_Data_Average
+  * \}
+  */
+
 
 /**
- * \brief       ADC RG2X_0 Delay Time
- *
- * \ingroup     ADC_Exported_Constants
- */
-typedef enum
-{
-    ADC_RG2X_0_DELAY_10_US,
-    ADC_RG2X_0_DELAY_20_US,
-    ADC_RG2X_0_DELAY_40_US,
-    ADC_RG2X_0_DELAY_80_US,
-} ADCRG2X0Delay_TypeDef;
-
-#define IS_ADC_RG2X_0_DELAY_TIME(TIME) (((TIME) == ADC_RG2X_0_DELAY_10_US) || ((TIME) == ADC_RG2X_0_DELAY_20_US)\
-                                        || ((TIME) == ADC_RG2X_0_DELAY_40_US) || ((TIME) == ADC_RG2X_0_DELAY_80_US))
-
-/**
- * \brief       ADC RG0X_1 Delay Time
- *
- * \ingroup     ADC_Exported_Constants
- */
-typedef enum
-{
-    ADC_RG0X_1_DELAY_20_US,
-    ADC_RG0X_1_DELAY_40_US,
-    ADC_RG0X_1_DELAY_80_US,
-    ADC_RG0X_1_DELAY_160_US,
-} ADCRG0X1Delay_TypeDef;
-
-#define IS_ADC_RG0X_1_DELAY_TIME(TIME) (((TIME) == ADC_RG0X_1_DELAY_20_US) || ((TIME) == ADC_RG0X_1_DELAY_40_US)\
-                                        || ((TIME) == ADC_RG0X_1_DELAY_80_US) || ((TIME) == ADC_RG0X_1_DELAY_160_US))
-
-/**
- * \brief       ADC RG0X_0 Delay Time
- *
- * \ingroup     ADC_Exported_Constants
- */
-typedef enum
-{
-    ADC_RG0X_0_DELAY_30_US,
-    ADC_RG0X_0_DELAY_60_US,
-    ADC_RG0X_0_DELAY_120_US,
-    ADC_RG0X_0_DELAY_240_US,
-} ADCRG0X0Delay_TypeDef;
-
-#define IS_ADC_RG0X_0_DELAY_TIME(TIME) (((TIME) == ADC_RG0X_0_DELAY_30_US) || ((TIME) == ADC_RG0X_0_DELAY_60_US)\
-                                        || ((TIME) == ADC_RG0X_0_DELAY_120_US) || ((TIME) == ADC_RG0X_0_DELAY_240_US))
-
-/**
- * \brief       ADC FIFO Threshold
- *
+ * \defgroup    ADC_FIFO_Threshold ADC FIFO Threshold
+ * \{
  * \ingroup     ADC_Exported_Constants
  */
 #define IS_ADC_FIFO_THRESHOLD(THD) ((THD) <= 0x3F)
 
+/** End of ADC_FIFO_Threshold
+  * \}
+  */
+
 /**
- * \brief       ADC Burst Size
- *
+ * \defgroup    ADC_Burst_Size ADC Burst Size
+ * \{
  * \ingroup     ADC_Exported_Constants
  */
 #define IS_ADC_BURST_SIZE_CONFIG(CONFIG) ((CONFIG) <= 0x3F)
 
+/** End of ADC_Burst_Size
+  * \}
+  */
+
 /**
- * \brief       ADC Operation Mode
- *
+ * \defgroup    ADC_Operation_Mode ADC Operation Mode
+ * \{
  * \ingroup     ADC_Exported_Constants
  */
 typedef enum
@@ -312,44 +289,131 @@ typedef enum
 
 #define IS_ADC_MODE(MODE) (((MODE) == ADC_CONTINUOUS_MODE) || ((MODE) == ADC_ONE_SHOT_MODE))
 
+/** End of ADC_Operation_Mode
+  * \}
+  */
+
+/**
+ * \defgroup    ADC_Power_Mode  ADC Power Mode
+ * \{
+ * \ingroup     ADC_Exported_Constants
+ */
+typedef enum
+{
+    ADC_POWER_ON_AUTO,
+    ADC_POWER_ON_MANUAL,
+} ADCPowerMode_TypeDef;
+
+#define IS_ADC_POWER_MODE(MODE) (((MODE) == ADC_POWER_ON_AUTO) || ((MODE) == ADC_POWER_ON_MANUAL))
+
+/** End of ADC_Power_Mode
+  * \}
+  */
+
 /**
  * \defgroup    ADC_Interrupts_Definition ADC Interrupts Definition
  * \{
  * \ingroup     ADC_Exported_Constants
  */
-#define ADC_INT_FIFO_RD_REQ                         ((uint32_t)(1 << 0))
-#define ADC_INT_FIFO_RD_ERR                         ((uint32_t)(1 << 1))
-#define ADC_INT_FIFO_THD                            ((uint32_t)(1 << 2))
+#define ADC_INT_FIFO_RD_REQ           ((uint32_t)(1 << 0))
+#define ADC_INT_FIFO_RD_ERR           ((uint32_t)(1 << 1))
+#define ADC_INT_FIFO_THD              ((uint32_t)(1 << 2))
 #if ADC_SUPPORT_INT_FIFO_FULL
-#define ADC_INT_FIFO_FULL                           ((uint32_t)(1 << 3))
+#define ADC_INT_FIFO_FULL             ((uint32_t)(1 << 3))
 #else
-#define ADC_INT_FIFO_OVERFLOW                       ((uint32_t)(1 << 3))
+#define ADC_INT_FIFO_OVERFLOW         ((uint32_t)(1 << 3))
 #endif
-#define ADC_INT_ONE_SHOT_DONE                       ((uint32_t)(1 << 4))
+#define ADC_INT_ONE_SHOT_DONE         ((uint32_t)(1 << 4))
 #if ADC_SUPPORT_INT_FIFO_FULL
-#define ADC_INT_FIFO_OVERFLOW                       ((uint32_t)(1 << 5))
+#define ADC_INT_FIFO_OVERFLOW         ((uint32_t)(1 << 5))
+#endif
+
+#if ADC_SUPPORT_INT_FIFO_FULL
+#define IS_ADC_INT(INT) (((INT) == ADC_INT_FIFO_RD_REQ) || \
+                         ((INT) == ADC_INT_FIFO_RD_ERR) || \
+                         ((INT) == ADC_INT_FIFO_THD) || \
+                         ((INT) == ADC_INT_FIFO_OVERFLOW) || \
+                         ((INT) == ADC_INT_ONE_SHOT_DONE) || \
+                         ((INT) == ADC_INT_FIFO_FULL))
+#else
+#define IS_ADC_INT(INT) (((INT) == ADC_INT_FIFO_RD_REQ) || \
+                         ((INT) == ADC_INT_FIFO_RD_ERR) || \
+                         ((INT) == ADC_INT_FIFO_THD) || \
+                         ((INT) == ADC_INT_FIFO_OVERFLOW) || \
+                         ((INT) == ADC_INT_ONE_SHOT_DONE))
 #endif
 
 /** End of ADC_Interrupts_Definition
   * \}
   */
 
-#if ADC_SUPPORT_INT_FIFO_FULL
-#define IS_ADC_INT(INT) (((INT) == ADC_INT_FIFO_RD_REQ) || ((INT) == ADC_INT_FIFO_RD_ERR)\
-                         || ((INT) == ADC_INT_FIFO_THD) || ((INT) == ADC_INT_FIFO_OVERFLOW)\
-                         || ((INT) == ADC_INT_ONE_SHOT_DONE) || ((INT) == ADC_INT_FIFO_FULL))
-#else
-#define IS_ADC_INT(INT) (((INT) == ADC_INT_FIFO_RD_REQ) || ((INT) == ADC_INT_FIFO_RD_ERR)\
-                         || ((INT) == ADC_INT_FIFO_THD) || ((INT) == ADC_INT_FIFO_OVERFLOW)\
-                         || ((INT) == ADC_INT_ONE_SHOT_DONE))
-#endif
-
-
+/**
+ * \defgroup    ADC_Data_Minus ADC Data Minus
+ * \{
+ * \ingroup     ADC_Exported_Constants
+ */
 #define IS_ADC_DATA_MINUS(DATA_MINUS) (((DATA_MINUS) == ENABLE) || ((DATA_MINUS) == DISABLE))
 
+/** End of ADC_Data_Minus
+  * \}
+  */
+
+/**
+ * \defgroup    ADC_Overwrite_Mode ADC Overwrite Mode
+ * \{
+ * \ingroup     ADC_Exported_Constants
+ */
 #define IS_ADC_OVERWRITE_MODE(MODE) (((MODE) == ENABLE) || ((MODE) == DISABLE))
 
+/** End of ADC_Overwrite_Mode
+  * \}
+  */
+
+/**
+ * \defgroup    ADC_Power_Always_On ADC Power Always On
+ * \{
+ * \ingroup     ADC_Exported_Constants
+ */
 #define IS_ADC_POWER_ALWAYS_ON(CMD) (((CMD) == ENABLE) || ((CMD) == DISABLE))
+
+/** End of ADC_Power_Always_On
+  * \}
+  */
+
+#if (ADC_SUPPORT_RAP_FUNCTION == 1)
+
+/**
+ * \defgroup    ADC_Qactive_Force TIM Qactive Force
+ * \{
+ * \ingroup     ADC_Exported_Constants
+ */
+typedef enum
+{
+    ADC_QACTIVE_FW_SCLK_FORCE = 0x0,
+    ADC_QACTIVE_FW_PCLK_FORCE = 0x1,
+    ADC_QACTIVE_FW_PCLK_ICG = 0x1,
+} ADCQactiveForce_TypeDef;
+
+/** End of ADC_Qactive_Force
+  * \}
+  */
+
+/**
+ * \defgroup    ADC_Task TIM Task
+ * \{
+ * \ingroup     ADC_Exported_Constants
+ */
+typedef enum
+{
+    ADC_TASK_ONE_SHOT_SAMPLE = 0,
+} ADCTask_TypeDef;
+
+/** End of ADC_Task
+  * \}
+  */
+
+#endif
+
 
 /** End of ADC_Exported_Constants
   * \}
@@ -370,47 +434,58 @@ typedef enum
  */
 typedef struct
 {
-    uint16_t ADC_SampleTime;                        /*!< Specifies the ADC Sample clock. (n+1) cycles of 10MHz (19~16383).*/
-    ADCConvertTim_TypeDef ADC_ConvertTime;        /**< Specifies the ADC Sample convert time.*/
-    FunctionalState ADC_DataWriteToFifo;          /*!< Write ADC one shot mode data into fifo.*/
-    uint8_t ADC_FifoThdLevel;                       /*!< Specifies the ADC fifo threshold to trigger interrupt ADC_INT_FIFO_TH.
-                                                         This parameter can be a value of 0 to 31. */
-    uint8_t ADC_WaterLevel;                         /*!< Specifies the ADC fifo Burst Size to trigger GDMA.
-                                                         This parameter can be a value of 0 to 31. */
-    FunctionalState
-    ADC_FifoOverWriteEn;            /*!< Specifies if Over Write fifo when fifo overflow.*/
+    uint16_t ADC_SampleTime;                /*!< Specifies the ADC Sample clock. (n+1) cycles of 10MHz (19~16383).*/
+
+    ADCConvertTim_TypeDef ADC_ConvertTime;  /**< Specifies the ADC Sample convert time.*/
+
+    FunctionalState ADC_DataWriteToFifo;    /*!< Write ADC one shot mode data into fifo.*/
+
+    uint8_t ADC_FifoThdLevel;               /*!< Specifies the ADC fifo threshold to trigger interrupt ADC_INT_FIFO_TH.
+                                                This parameter can be a value of 0 to 31. */
+
+    uint8_t ADC_WaterLevel;                 /*!< Specifies the ADC fifo Burst Size to trigger GDMA.
+                                                This parameter can be a value of 0 to 31. */
+
+    FunctionalState ADC_FifoOverWriteEn;    /*!< Specifies if Over Write fifo when fifo overflow.*/
+
 #if ADC_SUPPORT_DMA_EN
-    FunctionalState ADC_DmaEn;                      /*!< Specifies if DMA enable.*/
+    FunctionalState ADC_DmaEn;              /*!< Specifies if DMA enable.*/
 #endif
-    uint16_t ADC_SchIndex[CHIP_ADC_SCHEDULE_NUM];   /*!< Specifies ADC mode and channel for schedule table.*/
-    uint32_t ADC_Bitmap;                            /*!< Specifies the schedule table channel map.
-                                                         This parameter can be a value of 16Bits map. */
-    FunctionalState
-    ADC_TimerTriggerEn;                     /*!< Enable ADC one-shot mode when tim7 toggles. */
-    ADCAlign_TypeDef ADC_DataAlign;                /*!< ADC Data MSB or LSB aligned. */
 
-    FunctionalState
-    ADC_DataMinusEn;                 /**< Enable or disable function that adc data latched minus
-                                                         the given offset before writes to reg/FIFO. */
-    uint16_t ADC_DataMinusOffset;                   /**< Offset to be minused from adc data latched.
-                                                         This parameter can be a value of 0 to 4095. */
-    ADCDataAvgSel_TypeDef ADC_DataAvgSel;        /**< Number of data for calculate average. */
-    uint8_t ADC_DataAvgEn;                          /**< Enable the calculation for average result of the one-shot data. */
-    uint8_t ADC_DataLatchDly;                       /*!< Specifies delay of ck_ad to latch data.*/
-    ADCRG2X0Delay_TypeDef
-    ADC_RG2X0Dly;           /*!< Specifies the power on delay time selection of RG2X_AUXADC[0]. */
-    ADCRG0X1Delay_TypeDef
-    ADC_RG0X1Dly;           /*!< Specifies the power on delay time selection of RG0X_AUXADC[1]. */
-    ADCRG0X0Delay_TypeDef
-    ADC_RG0X0Dly;           /*!< Specifies the power on delay time selection of RG0X_AUXADC[0]. */
+    uint16_t ADC_SchIndex[CHIP_ADC_SCHEDULE_NUM]; /*!< Specifies ADC mode and channel for schedule table.*/
 
-    FunctionalState
-    ADC_FifoStopWriteEn;            /*!< Stop fifo from writing data. This bit will be asserted automatically as fifo overflow,
-                                                         (not automatically when ADC_FIFO_OVER_WRITE_ENABLE), need to be cleared in order to write
-                                                         data again. This will not stop overwrite mode.*/
+    uint32_t ADC_Bitmap;                    /*!< Specifies the schedule table channel map.
+                                                 This parameter can be a value of 16Bits map. */
 
-    FunctionalState ADC_PowerAlwaysOnEn;             /*!< Specifies the power always on. */
+    FunctionalState ADC_TimerTriggerEn;     /*!< Enable ADC one-shot mode when tim7 toggles. */
 
+    ADCAlign_TypeDef ADC_DataAlign;         /*!< ADC Data MSB or LSB aligned. */
+
+    FunctionalState ADC_DataMinusEn;        /**< Enable or disable function that adc data latched
+                                                 minus the given offset before writes to reg/FIFO. */
+
+    uint16_t ADC_DataMinusOffset;           /**< Offset to be minused from adc data latched.
+                                                 This parameter can be a value of 0 to 4095. */
+
+    ADCDataAvgSel_TypeDef ADC_DataAvgSel;   /**< Number of data for calculate average. */
+
+    uint8_t ADC_DataAvgEn;                  /**< Enable the calculation for average result of the one shot data. */
+
+    uint8_t ADC_DataLatchDly;               /*!< Specifies delay of ck_ad to latch data.*/
+
+    FunctionalState ADC_FifoStopWriteEn;    /*!< Stop fifo from writing data. This bit will be asserted
+                                                 automatically as fifo overflow, (not automatically when
+                                                 ADC_FIFO_OVER_WRITE_ENABLE), need to be cleared in order
+                                                 to write data again. This will not stop overwrite mode.*/
+
+    ADCPowerMode_TypeDef ADC_PowerOnMode;   /**< Specifies ADC power on mode.
+                                                 This parameter can be a value of \ref ADC_Power_On_Mode. */
+
+    FunctionalState ADC_PowerAlwaysOnEn;    /*!< Specifies the power always on. */
+
+#if ADC_SUPPORT_POWER_ON_DELAY
+    FunctionalState ADC_PowerOnDlyEn;       /*!< Enable or Disable ADC 8ms delay after adc power on. */
+#endif
 } ADC_InitTypeDef;
 
 /** End of ADC_Exported_Types
@@ -748,6 +823,7 @@ void ADC_ReadFIFOData(ADC_TypeDef *ADCx, uint16_t *outBuf, uint16_t Num);
  * \brief   Get ADC fifo data number.
  * \param[in] ADCx: selected ADC peripheral.
  * \return  Current data number in ADC FIFO.
+ *
  * <b>Example usage</b>
  * \code{.c}
  *
@@ -773,6 +849,7 @@ uint8_t ADC_GetFIFODataLen(ADC_TypeDef *ADCx);
  *     \arg INTERNAL_VBAT_MODE
  * \param[in]  Index: Schedule table index.
  * \return  None.
+ *
  * <b>Example usage</b>
  * \code{.c}
  *
@@ -784,11 +861,6 @@ uint8_t ADC_GetFIFODataLen(ADC_TypeDef *ADCx);
  *
  */
 void ADC_SchIndexConfig(ADC_TypeDef *ADCx, uint8_t AdcMode, uint16_t Index);
-
-/**
- * \brief  Same as function ADC_SchIndexConfig, this function is version bee2.
- */
-void ADC_SchTableConfig(ADC_TypeDef *ADCx, uint16_t Index, uint8_t AdcMode);
 
 /**
  * \brief   Config adc schedule table.
@@ -931,6 +1003,23 @@ void ADC_ClearFIFO(ADC_TypeDef *ADCx);
  *
  */
 uint8_t ADC_GetAllFlagStatus(ADC_TypeDef *ADCx);
+
+/**
+  * \brief  Get the index state of ADC controller.
+  * \param[in]  ADCx: Specify ADC peripheral.
+  * \return BIT15:0 stores the data in the fifo, BIT31:28 stores the index of the data.
+  */
+uint32_t ADC_ReadScheduleIndexandFifoData(ADC_TypeDef *ADCx);
+
+#if (ADC_SUPPORT_RAP_FUNCTION == 1)
+
+void ADC_RAPModeCmd(ADC_TypeDef *ADCx, FunctionalState NewState);
+
+void ADC_RAPQactiveCtrl(ADC_TypeDef *ADCx, uint32_t Qactive, FunctionalState NewState);
+
+void ADC_TaskTrigger(ADC_TypeDef *ADCx, uint32_t Task);
+
+#endif
 
 /** End of ADC_Exported_Functions
   * \}
