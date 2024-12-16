@@ -380,20 +380,15 @@ bool os_task_notify_take_zephyr(long xClearCountOnExit, uint32_t xTicksToWait,
             if (ret == 0)
             {
                 *p_notify = sem->count + 1;
-                return true;
             }
-            else
-            {
-                *p_notify = 0;
-                return false;
-            }
-
             if (xClearCountOnExit == true)
             {
                 sem->count = 0;
             }
-
-            return true;
+            if (ret == 0)
+            {
+                return true;
+            }
         }
     }
     *p_notify = 0;
