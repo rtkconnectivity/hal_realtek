@@ -102,7 +102,7 @@
         SegCom_CTL_IRQn =                       71, \
         A2C_IRQn =                              72, \
         ETH_IRQn =                              73, \
-        IMDC_IRQn =                             74, \
+        IDU_IRQn =                             74, \
         Slave_Port_Monitor_IRQn =               75, \
         PTA_Mailbox_IRQn =                      76, \
         USB_IRQn =                              77, \
@@ -315,7 +315,7 @@
         SegCom_CTL_VECTORn =                       87, \
         A2C_VECTORn =                              88, \
         ETH_VECTORn =                              89, \
-        IMDC_VECTORn =                             90, \
+        IDU_VECTORn =                             90, \
         Slave_Port_Monitor_VECTORn =               91, \
         PTA_Mailbox_VECTORn =                      92, \
         USB_VECTORn =                              93, \
