@@ -100,7 +100,7 @@ extern "C" {
 #define APBPeriph_GPIOA_CLOCK               ((uint32_t)(1 << 1))
 
 #define APBPeriph_DISP_CLOCK                ((uint32_t)(1 << 23))
-#define APBPeriph_IMDC_CLOCK                ((uint32_t)(1 << 7))
+#define APBPeriph_IDU_CLOCK                ((uint32_t)(1 << 7))
 
 #define APBPeriph_TIMER_CLOCK               ((uint32_t)(1 << 31))
 
@@ -212,7 +212,7 @@ extern "C" {
 #define APBPeriph_GPIOA                 ((uint32_t)(0x8))
 
 #define APBPeriph_DISP                  ((uint32_t)(0x809))
-#define APBPeriph_IMDC                  ((uint32_t)(0x809))
+#define APBPeriph_IDU                  ((uint32_t)(0x809))
 
 #define APBPeriph_TIMER                 ((uint32_t)(0xA))
 

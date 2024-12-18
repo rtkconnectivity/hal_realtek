@@ -122,7 +122,7 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
 
     /* ---------------- Configure CTL register ---------------- */
     /* Config low 32 bits of CTL register  */
-    GDMA_CTL_LOWx_TypeDef gdma_0x18 = {.d32 = GDMA_Channelx->GDMA_CTL_LOWx};
+    GDMA_CTL_LOWx_TypeDef gdma_0x18 = {.d32 = GDMA_Channelx->GDMA_CTLx_L};
     gdma_0x18.b.INT_EN = ENABLE;
     gdma_0x18.b.DST_TR_WIDTH = GDMA_InitStruct->GDMA_DestinationDataSize;
     gdma_0x18.b.SRC_TR_WIDTH = GDMA_InitStruct->GDMA_SourceDataSize;
@@ -131,7 +131,7 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
     gdma_0x18.b.DEST_MSIZE = GDMA_InitStruct->GDMA_DestinationMsize;
     gdma_0x18.b.SRC_MSIZE = GDMA_InitStruct->GDMA_SourceMsize;
     gdma_0x18.b.TT_FC = GDMA_InitStruct->GDMA_DIR;
-    GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+    GDMA_Channelx->GDMA_CTLx_L = gdma_0x18.d32;
 
     /* Config high 32 bits of CTL register */
     GDMA_Channelx->GDMA_CTL_HIGHx = GDMA_InitStruct->GDMA_BufferSize;
@@ -181,14 +181,14 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
         /* Clear LLI for source/destination */
         gdma_0x18.b.LLP_DST_EN = 0x0;
         gdma_0x18.b.LLP_SRC_EN = 0x0;
-        GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+        GDMA_Channelx->GDMA_CTLx_L = gdma_0x18.d32;
 
         if (GDMA_InitStruct->GDMA_Multi_Block_Mode & LLP_SELECTED_BIT)
         {
             GDMA_Channelx->GDMA_LLPx = GDMA_InitStruct->GDMA_Multi_Block_Struct;
             gdma_0x18.b.LLP_DST_EN = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT27) >> 27;
             gdma_0x18.b.LLP_SRC_EN = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT28) >> 28;
-            GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+            GDMA_Channelx->GDMA_CTLx_L = gdma_0x18.d32;
         }
         gdma_0x40.b.RELOAD_SRC = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT30) >> 30;
         gdma_0x40.b.RELOAD_DST = (GDMA_InitStruct->GDMA_Multi_Block_Mode & BIT31) >> 31;
@@ -232,7 +232,7 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
 #endif
     {
         gdma_0x18.b.SRC_GATHER_EN = 0x1;
-        GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+        GDMA_Channelx->GDMA_CTLx_L = gdma_0x18.d32;
 
         GDMA_SGR_LOW_t gdma_0x48 = {.d32 = GDMA_Channelx->GDMA_SGR_LOW};
         gdma_0x48.b.SGI = GDMA_InitStruct->GDMA_GatherInterval & 0xFFFFF;
@@ -255,7 +255,7 @@ void GDMA_Init(GDMA_ChannelTypeDef *GDMA_Channelx, GDMA_InitTypeDef *GDMA_InitSt
 #endif
     {
         gdma_0x18.b.DST_SCATTER_EN = 0x1;
-        GDMA_Channelx->GDMA_CTL_LOWx = gdma_0x18.d32;
+        GDMA_Channelx->GDMA_CTLx_L = gdma_0x18.d32;
 
         GDMA_DSR_LOW_t gdma_0x50 = {.d32 = GDMA_Channelx->GDMA_DSR_LOW};
         gdma_0x50.b.DSI = GDMA_InitStruct->GDMA_ScatterInterval & 0xFFFFF;
@@ -995,7 +995,7 @@ FlagStatus GDMA_GetSuspendChannelStatus(GDMA_ChannelTypeDef *GDMA_Channelx)
  */
 void GDMA_SetLLPMode(GDMA_ChannelTypeDef *GDMA_Channelx, uint32_t mode)
 {
-    GDMA_Channelx->GDMA_CTL_LOWx = ((GDMA_Channelx->GDMA_CTL_LOWx & (~LLI_TRANSFER)) | mode);
+    GDMA_Channelx->GDMA_CTLx_L = ((GDMA_Channelx->GDMA_CTLx_L & (~LLI_TRANSFER)) | mode);
 }
 
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/

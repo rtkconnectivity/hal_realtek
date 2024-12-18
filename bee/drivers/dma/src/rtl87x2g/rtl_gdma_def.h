@@ -53,7 +53,7 @@ typedef struct
     __I  uint32_t GDMA_CURR_DARx;           /*!< 0x0C */
     __IO uint32_t GDMA_LLPx;                /*!< 0x10 */
     __IO uint32_t GDMA_RSVD;                /*!< 0x14 */
-    __IO uint32_t GDMA_CTL_LOWx;            /*!< 0x18 */
+    __IO uint32_t GDMA_CTLx_L;            /*!< 0x18 */
     __IO uint32_t GDMA_CTL_HIGHx;           /*!< 0x1C */
     __IO uint32_t GDMA_RSVD1[8];            /*!< 0x20 ~ 0x3C */
     __IO uint32_t GDMA_CFG_LOWx;            /*!< 0x40 */
@@ -792,8 +792,8 @@ typedef union
 #define GDMA_Handshake_ENH_TIM2             (24)
 #define GDMA_Handshake_ENH_TIM3             (25)
 #define GDMA_Handshake_ADC_RX               (26)
-#define GDMA_Handshake_IMDC_RX              (27)
-#define GDMA_Handshake_IMDC_TX              (28)
+#define GDMA_Handshake_IDU_RX              (27)
+#define GDMA_Handshake_IDU_TX              (28)
 #define GDMA_Handshake_TIM5                 (29)
 #define GDMA_Handshake_TIM6                 (30)
 #define GDMA_Handshake_TIM7                 (31)
