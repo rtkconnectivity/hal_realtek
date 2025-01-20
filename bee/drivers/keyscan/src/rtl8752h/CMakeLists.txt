@@ -4,3 +4,5 @@
 zephyr_library()
 
 zephyr_library_sources(rtl876x_keyscan.c)
+
+zephyr_library_sources(rtl8752h_keyscan.c)

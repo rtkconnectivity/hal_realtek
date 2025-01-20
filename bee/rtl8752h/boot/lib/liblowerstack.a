@@ -7,6 +7,7 @@ btmac_pm_check_inactive = 0x000506c7 ;
 btmac_pm_initiate_wakeup = 0x00050709 ;
 btmac_pm_set_power_mode = 0x00050721 ;
 btmac_pm_get_statistics = 0x00050739 ;
+btmac_pm_get_error_code = 0x0005072d;
 low_task_handle = 0x002029b4 ;
 g_modem_psd_report_array = 0x002029e4 ;
 bzdma_supported_le_max_seg_num = 0x00202a61 ;
