@@ -277,6 +277,7 @@ platform_delay_us = 0x0013d810 ;
 platform_pm_init = 0x0013d834 ;
 platform_pm_register_callback_func = 0x0013d83c ;
 platform_pm_register_callback_func_with_priority = 0x0013d840 ;
+platform_pm_system = 0x0013d854 ;
 platform_rtc_aon_init = 0x0013d8ec ;
 platform_rtc_get_counter = 0x0013d908 ;
 pmu_apply_voltage_tune = 0x0013d938 ;
