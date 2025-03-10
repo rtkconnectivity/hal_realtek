@@ -55,17 +55,82 @@ jobs:
             west init -l app
             west update
       
+      - name: Install curl and jq
+        run: sudo apt-get update && sudo apt-get install -y curl jq
+    
+      - name: Get Related PR Info
+        id: get_pr_description
+        shell: bash
+        run: |
+          PR_DESCRIPTION=$(jq --raw-output .pull_request.body "$GITHUB_EVENT_PATH")
+          cd zmk
+          workspace=$(pwd)
+          echo "workspace: $workspace"
+          related_pr_detail=""
+          related_repo=""
+          readarray -t project_list <<< "$(west list)"
+          if echo "$PR_DESCRIPTION" | grep -q '\[Related PR\]'; then
+            RELATED_PRS=$(echo "$PR_DESCRIPTION" | grep '\[Related PR\]' | sed 's/.*\[Related PR\] //')
+            echo "Found Related PRs: "
+            echo "$RELATED_PRS"
+            for RELATED_PR in $RELATED_PRS; do
+              related_info=""
+              DEPEND_REPO=$(echo $RELATED_PR | cut -d':' -f1)
+              echo ">>>>>>> $DEPEND_REPO"
+              DEPEND_BRANCH=$(echo $RELATED_PR | cut -d':' -f2)
+              echo ">>>>>>> $DEPEND_BRANCH"
+              DEPEND_PR_NUMBER=$(echo $RELATED_PR | cut -d':' -f3 | tr -d '\n\r ')
+              echo ">>>>>>> $DEPEND_PR_NUMBER"
+              HEAD_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/$DEPEND_REPO/pulls/$DEPEND_PR_NUMBER" | jq -r '.head.sha')
+              echo ">>>>>>> $HEAD_SHA"
+              echo "Related PR: $DEPEND_REPO $DEPEND_BRANCH $DEPEND_PR_NUMBER $HEAD_SHA"
+              for i in "${project_list[@]}";do
+                project_detail=($i)
+                project_url=`echo ${project_detail[3]}`
+                depend_repository_name=`echo "$DEPEND_REPO" | awk -F/ '{print $NF}'`
+                if [[ $project_url == *"${depend_repository_name}" ]]
+                  then
+                    DENPEND_PROJECT_PATH=`echo ${project_detail[1]}`
+                    echo "DENPEND_PROJECT_PATH -> $DENPEND_PROJECT_PATH"
+                    if [ -z "$DENPEND_PROJECT_PATH" ]
+                      then
+                        echo "logic error, can not find local path for $DENPEND_PROJECT_PATH"
+                        exit 1
+                    else
+                      cd $DENPEND_PROJECT_PATH
+                      git remote add origin ${GITHUB_SERVER_URL}/${DEPEND_REPO}
+                      echo "need to checkout ${DEPEND_REPO} in zmk/$DENPEND_PROJECT_PATH"
+                      echo "${manifest-rev}"
+                      echo "manifest_rev=$( git rev-parse manifest-rev )"
+                      manifest_rev=$(git rev-parse manifest-rev)
+                      echo "${manifest_rev}"
+                      related_info="$DEPEND_REPO $HEAD_SHA $DENPEND_PROJECT_PATH $manifest_rev"
+                      related_pr_detail="$related_info\n$related_pr_detail"
+                      related_repo="$DEPEND_REPO $HEAD_SHA $workspace/$DENPEND_PROJECT_PATH\n$related_repo"
+                      cd $workspace
+                    fi
+                    echo "--> $related_pr_detail"
+                fi
+              done
+            done
+          else
+            echo "No Related PRs found in the PR description."
+          fi
+          echo "related_pr_detail=$related_pr_detail" >> $GITHUB_ENV
+          echo "related_repo=$related_repo" >> $GITHUB_ENV
+
       - name: check hal_realtek path and manifest_rev
         shell: bash
         run: |
             echo "GITHUB_REPOSITORY -> $GITHUB_REPOSITORY"
             cd zmk
             readarray -t project_list <<< "$(west list)"
-
             EVENT_PROJECT_PATH=""
             for i in "${project_list[@]}"
               do
                   project_detail=($i)
+                  echo "project_detail: $project_detail"
                   project_url=`echo ${project_detail[3]}`
                   repository_name=`echo "$GITHUB_REPOSITORY" | awk -F/ '{print $NF}'`
                   if [[ $project_url == *"${repository_name}" ]]
@@ -77,20 +142,19 @@ jobs:
                       break
                   fi
               done
-
               if [ -z "$EVENT_PROJECT_PATH" ]
               then 
                   echo "logic error, can not find local path for ${GITHB_REPOSITY}"
                   exit 1
               fi
-
               cd $EVENT_PROJECT_PATH
               git remote add origin ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}
               echo "need to checkout ${GITHUB_REPOSITORY} in zmk/$EVENT_PROJECT_PATH"
               echo "${manifest-rev}"
               echo "manifest_rev=$( git rev-parse manifest-rev )" >> $GITHUB_ENV
+              echo "${manifest-rev}"
       
-      - name: checkout event triggered ref
+      - name: checkout trigger pr ref
         uses: actions/checkout@v4
         with:
             repository: ${{ github.repository }}
@@ -100,16 +164,78 @@ jobs:
             persist-credentials: false
             clean: false
 
-
       - name: after check temp module
         shell: bash
         run: |
           cd zmk/$EVENT_PROJECT_PATH
-          git log
           echo "manifest_rev -> ${manifest_rev}"
           git branch manifest-rev $manifest_rev
-          git log
 
+      - name: checkout depend ref
+        id: generate_related_matrix
+        if: env.related_pr_detail
+        shell: bash
+        run: |
+          related_repo="${{ env.related_repo }}"
+          echo "related_repo -> $related_repo"
+          related_pr="${related_repo%\\n}"
+          echo "related_pr:"
+          echo "$related_pr"
+          echo "-------------------------------------------"
+          readarray -t related_pr_list <<< "$related_pr"
+          #repo_array=$(printf '%s\n' "${related_pr_list[@]}" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          #echo "repo_array:"
+          #echo "$repo_array"
+          #echo "REPO_ARRAY=$repo_array" >> $GITHUB_ENV
+          #echo "::set-output name=repo_array::$repo_array"
+          cd zmk
+          workspace=$(pwd)
+          echo "$workspace"
+          for i in "${related_pr_list[@]}"
+            do
+              related_pr_detail=($i)
+              repo_path=`echo ${related_pr_detail[2]}`
+              repo=`echo ${related_pr_detail[0]}`
+              sha=`echo ${related_pr_detail[1]}`
+              echo "Checking out $repo_path at $sha"
+
+              REPO_URL="https://github.com/$repo.git"
+              
+              rm -rf $repo
+              mkdir -p $repo
+              cd $repo
+
+              git init
+              git remote add origin $REPO_URL
+              git fetch origin $sha --depth=1
+              git checkout FETCH_HEAD
+
+              git log
+
+            done
+
+      - name: after check depend PR temp module
+        if: env.related_pr_detail
+        shell: bash
+        run: |
+          related_pr_detail="${{ env.related_pr_detail }}"
+          echo "related_pr_detail -> $related_pr_detail"
+          related_pr="${related_pr_detail%\\n}"
+          echo "related_pr:"
+          echo "$related_pr"
+          readarray -t related_pr_list <<< "$related_pr"
+          pwd
+          workspace=$(pwd)
+          for i in "${related_pr_list[@]}"
+            do
+              related_pr_detail=($i)
+              repo_path=`echo ${related_pr_detail[2]}`
+              cd zmk/$repo_path
+              pwd
+              echo "depend_manifest-rev -> $(echo "${related_pr_detail[3]}" | tr -d '-')"
+              git branch depend_manifest-rev $(echo "${related_pr_detail[3]}" | tr -d '-')
+              cd $workspace
+            done
 
       - name: do build
         shell: bash
