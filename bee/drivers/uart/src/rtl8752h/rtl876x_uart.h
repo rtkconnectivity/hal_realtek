@@ -34,6 +34,10 @@ extern "C" {
 #include "rtl876x.h"
 #include "rtl876x_alias.h"
 
+typedef struct
+{
+    uint32_t uart_reg[12];
+} UARTStoreReg_Typedef;
 
 /*============================================================================*
  *                         Types
