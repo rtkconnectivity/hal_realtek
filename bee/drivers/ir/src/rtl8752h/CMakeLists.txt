@@ -3,6 +3,6 @@
 
 zephyr_library()
 
-zephyr_library_sources(rtl876x_gpio.c)
+zephyr_library_sources(rtl876x_ir.c)
 
-zephyr_library_sources(rtl8752h_gpio.c)
+zephyr_library_sources(rtl8752h_ir.c)
