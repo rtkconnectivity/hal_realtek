@@ -25,6 +25,12 @@ add_subdirectory_ifdef(CONFIG_REALTEK_I2C i2c)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_KEYSCAN keyscan)
 
+add_subdirectory_ifdef(CONFIG_REALTEK_IR ir)
+
+add_subdirectory_ifdef(CONFIG_REALTEK_I2S i2s)
+
+add_subdirectory_ifdef(CONFIG_REALTEK_CODEC codec)
+
 add_subdirectory_ifdef(CONFIG_REALTEK_AON_QDEC qdec)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_SPI spi)
