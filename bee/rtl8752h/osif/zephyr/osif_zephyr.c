@@ -462,7 +462,6 @@ bool os_sys_tick_get_zephyr(uint64_t *p_sys_tick)
 bool os_systick_handler_zephyr(void)
 {
     DBG_DIRECT("%s is called", __func__);
-    sys_clock_only_add_cycle_count(1);
     sys_clock_announce_only_add_ticks(1);
     return true;
 }
@@ -471,7 +470,6 @@ bool os_sys_tick_increase_zephyr(uint32_t tick_increment,
                                  k_ticks_t *p_old_tick)
 {
     *p_old_tick = sys_clock_tick_get();
-    sys_clock_only_add_cycle_count(tick_increment);
     sys_clock_announce_only_add_ticks(tick_increment);
     return true;
 }
