@@ -53,6 +53,7 @@ typedef PMCheckResult(*DLPSEnterCheckFunc)();
 /** @brief This CB is used for any module which needs to control the hw before entering or after exiting from DLPS */
 typedef void (*DLPSHWControlFunc)();
 
+typedef void (*PlatformPMScheduleBottomHalfFunc)(void (*)(void));
 /*============================================================================*
  *                              Platform Unit
 *============================================================================*/
@@ -162,6 +163,33 @@ typedef enum
 /*============================================================================*
  *                              Variables
 *============================================================================*/
+
+typedef struct _PlatformPMSystem
+{
+    PlatformPowerMode power_mode;
+
+    PlatformWakeupReason wakeup_reason;
+    PlatformPowerModeErrorCode error_code;
+    uint32_t *refuse_reason;
+
+    uint32_t wakeup_count;
+    uint32_t allow_sleep_count;
+    uint32_t last_wakeup_clk;
+    uint32_t last_sleep_clk;
+    uint32_t total_wakeup_time;
+    uint32_t total_sleep_time;
+
+    uint32_t stage_time[PLATFORM_PM_STAGE_MAX];
+    uint32_t minimum_sleep_time;
+    uint32_t learning_guard_time;
+
+    T_OS_QUEUE callback_func_queue[PLATFORM_PM_STAGE_MAX];
+
+    PlatformPMScheduleBottomHalfFunc schedule_bottom_half_callback;
+} PlatformPMSystem;
+
+extern PlatformPMSystem platform_pm_system;
+
 /** @defgroup DLPS_PLATFORM_Exported_Variables DLPS Platform Exported Variables
   * @{
   */
