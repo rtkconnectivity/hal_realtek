@@ -31,6 +31,11 @@ extern "C" {
  *============================================================================*/
 #include "rtl876x.h"
 
+typedef struct
+{
+    uint32_t gpio_reg[10];
+} GPIOStoreReg_Typedef;
+
 /**
  * \cond        private
  * \defgroup    GPIO_Debounce_Register GPIO Debounce Register
