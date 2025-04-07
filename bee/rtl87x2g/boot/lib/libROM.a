@@ -169,3 +169,4 @@ platform_rtc_get_counter = 0x0014f340 ;
 flash_nor_ioctl_buf = 0x0014f40c ;
 flash_nor_ioctl_buf_len = 0x0014f410 ;
 secure_app_num = 0x0014fc28 ;
+pad_short_pulse_wake_up = 0x0001c289;
