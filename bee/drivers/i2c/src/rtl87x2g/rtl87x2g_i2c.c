@@ -206,7 +206,7 @@ void I2C_DLPSExit(void *PeriReg, void *StoreBuf)
 
     I2Cx->IC_INTR_MASK   = store_buf->i2c_reg[8];
     I2Cx->IC_RX_TL       = store_buf->i2c_reg[9];
-    I2Cx->IC_RX_TL       = store_buf->i2c_reg[10];
+    I2Cx->IC_TX_TL       = store_buf->i2c_reg[10];
     I2Cx->IC_ENABLE      = store_buf->i2c_reg[11];
     I2Cx->IC_SDA_HOLD    = store_buf->i2c_reg[12];
     I2Cx->IC_SLV_DATA_NACK_ONLY = store_buf->i2c_reg[13];
