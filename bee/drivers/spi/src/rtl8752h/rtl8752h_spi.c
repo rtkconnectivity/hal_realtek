@@ -69,6 +69,8 @@ void SPI_DLPSExit(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_SPI1, APBPeriph_SPI1_CLOCK, ENABLE);
     }
 
+    *(volatile uint32_t *)0x40000308 = store_buf->spi_reg[12];
+    *(volatile uint32_t *)0x4000035CUL = store_buf->spi_reg[13];
     SPIx->CTRLR0 = store_buf->spi_reg[0];
     SPIx->CTRLR1 = store_buf->spi_reg[1];
     SPIx->SER = store_buf->spi_reg[3];
