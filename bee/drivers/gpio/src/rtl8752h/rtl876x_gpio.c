@@ -79,6 +79,7 @@ void GPIO_Init(GPIO_InitTypeDef *GPIO_InitStruct)
             /* configure GPIO interrupt trigger type */
             if (GPIO_InitStruct->GPIO_ITTrigger == GPIO_INT_Trigger_LEVEL)
             {
+                GPIO->INTBOTHEDGE &= ~GPIO_InitStruct->GPIO_Pin;
                 GPIO->INTTYPE = GPIO->INTTYPE & (~GPIO_InitStruct->GPIO_Pin);
 
                 /* Level-sensitive synchronization enable register */
@@ -86,6 +87,7 @@ void GPIO_Init(GPIO_InitTypeDef *GPIO_InitStruct)
             }
             else if (GPIO_InitStruct->GPIO_ITTrigger == GPIO_INT_Trigger_EDGE)
             {
+                GPIO->INTBOTHEDGE &= ~GPIO_InitStruct->GPIO_Pin;
                 GPIO->INTTYPE = (GPIO->INTTYPE & (~GPIO_InitStruct->GPIO_Pin))
                                 | GPIO_InitStruct->GPIO_Pin;
             }
