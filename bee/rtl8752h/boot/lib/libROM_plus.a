@@ -27,3 +27,4 @@ si_flow_after_exit_low_power_mode = 0x00200900;
 si_flow_after_power_on_sequence_restart = 0x002008f8;
 si_flow_data_init = 0x002008f0;
 thermal_meter_read = 0x00200ce0 ;
+secure_boot_failed_line = 0x00200e98;
