@@ -121,7 +121,7 @@ void GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_InitStruct)
 
         if (GPIO_InitStruct->GPIO_ITCmd == ENABLE)
         {
-            GPIOx->GPIO_INT_MASK = ~GPIO_Pin_All;
+            GPIOx->GPIO_INT_MASK_REG = ~GPIO_Pin_All;
 
             /* configure GPIO interrupt trigger type */
             if (GPIO_InitStruct->GPIO_ITTrigger == GPIO_INT_TRIGGER_LEVEL)
@@ -247,11 +247,11 @@ void GPIO_MaskINTConfig(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, FunctionalState 
 
     if (NewState != DISABLE)
     {
-        GPIOx->GPIO_INT_MASK |= GPIO_Pin;
+        GPIOx->GPIO_INT_MASK_REG |= GPIO_Pin;
     }
     else
     {
-        GPIOx->GPIO_INT_MASK &= ~(GPIO_Pin);
+        GPIOx->GPIO_INT_MASK_REG &= ~(GPIO_Pin);
     }
 }
 
