@@ -109,10 +109,12 @@ void SPI_Init(SPI_TypeDef *SPIx, SPI_InitTypeDef *SPI_InitStruct)
 #endif
 
 #if (SPI_SUPPORT_APH_BRIDGE_FOR_HIGH_SPEED == 1)
+        extern void SPI_ConfigAPHBridge(SPI_TypeDef * SPIx);
         SPI_ConfigAPHBridge(SPIx);
 #endif
 
 #if (SPI0_SUPPORT_HS == 1)
+        extern void SPI_SPI0AHBBridgeConfig(FunctionalState NewState);
         if (SPIx == SPI0)
         {
             SPI_SPI0AHBBridgeConfig(DISABLE);
