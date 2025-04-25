@@ -32,9 +32,10 @@ extern "C" {
  *============================================================================*/
 #include "rtl876x.h"
 #include "rtl876x_alias.h"
-#include "platform_utils.h"
 #include "adc_lib.h"
 #include "trace.h"
+
+extern void (*platform_delay_ms)(uint32_t t);
 
 typedef struct
 {
