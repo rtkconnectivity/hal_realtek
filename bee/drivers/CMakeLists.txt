@@ -31,7 +31,9 @@ add_subdirectory_ifdef(CONFIG_REALTEK_I2S i2s)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_CODEC codec)
 
-add_subdirectory_ifdef(CONFIG_REALTEK_AON_QDEC qdec)
+if (CONFIG_REALTEK_AON_QDEC OR CONFIG_REALTEK_QDEC)
+add_subdirectory(qdec)
+endif()
 
 add_subdirectory_ifdef(CONFIG_REALTEK_SPI spi)
 
