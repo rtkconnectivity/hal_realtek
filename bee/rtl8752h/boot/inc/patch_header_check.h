@@ -86,10 +86,12 @@ typedef enum
     AppData4    = 0x2797,
     AppData5    = 0x2798,
     AppData6    = 0x2799,
+    AppConfigFile = 0x2799,
     UpperStack  = 0x279a,
     IMG_BT_STACKPATCH = 0x279b,
     IMAGE_MAX,
 
+    IMAGE_USER_DATA2 = 0xFFFD,  /**<the image only support unsafe single bank ota*/
     IMAGE_USER_DATA = 0xFFFE,  /**<the image only support unsafe single bank ota*/
 } T_IMG_ID;
 
@@ -417,7 +419,6 @@ extern bool get_active_bank_image_version(T_IMG_ID image_id, T_IMAGE_VERSION *p_
 
 extern IMG_CHECK_ERR_TYPE image_entry_check(T_ROM_HEADER_FORMAT *rom_header,
                                             T_ROM_HEADER_FORMAT *patch_header);
-
 /** @} */ /* End of group FLASH_DEVICE_Exported_Functions */
 /** @} */ /* End of group FLASH_DEVICE */
 
