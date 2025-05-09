@@ -37,6 +37,47 @@
 
 LOG_MODULE_REGISTER(osif);
 
+#define RAM_DATA_START   DT_REG_ADDR(DT_NODELABEL(ram_data))
+#define RAM_DATA_SIZE    DT_REG_SIZE(DT_NODELABEL(ram_data))
+
+#define RAM_CODE_START   DT_REG_ADDR(DT_NODELABEL(ram_code))
+#define RAM_CODE_SIZE    DT_REG_SIZE(DT_NODELABEL(ram_code))
+
+#define HEAP_START       DT_REG_ADDR(DT_NODELABEL(heap))
+#define HEAP_SIZE        DT_REG_SIZE(DT_NODELABEL(heap))
+
+#define RAM_REGION_START 0x100c00
+#define RAM_REGION_END   0x13cc00
+#define MAX_TOTAL_SIZE   (240 * 1024) // 240KB
+
+#define END_ADDRESS(start, size) ((start) + (size))
+
+// Assert for RAM Data Region
+BUILD_ASSERT(RAM_DATA_START >= RAM_REGION_START &&
+             END_ADDRESS(RAM_DATA_START, RAM_DATA_SIZE) <= RAM_REGION_END,
+             "RAM Data Region is out of bounds");
+
+// Assert for RAM Code Region
+BUILD_ASSERT(RAM_CODE_START >= RAM_REGION_START &&
+             END_ADDRESS(RAM_CODE_START, RAM_CODE_SIZE) <= RAM_REGION_END,
+             "RAM Code Region is out of bounds");
+
+// Assert for Heap Region
+BUILD_ASSERT(HEAP_START >= RAM_REGION_START &&
+             END_ADDRESS(HEAP_START, HEAP_SIZE) <= RAM_REGION_END,
+             "Heap Region is out of bounds");
+
+// Assert for Overlap
+BUILD_ASSERT(END_ADDRESS(RAM_DATA_START, RAM_DATA_SIZE) <= RAM_CODE_START,
+             "RAM_DATA end address overlaps with RAM_CODE start address");
+
+BUILD_ASSERT(END_ADDRESS(RAM_CODE_START, RAM_CODE_SIZE) <= HEAP_START,
+             "RAM_CODE end address overlaps with HEAP_START start address");
+
+// Assert for Total Size
+BUILD_ASSERT(RAM_DATA_SIZE + RAM_CODE_SIZE + HEAP_SIZE <= MAX_TOTAL_SIZE,
+             "Total size of TCM regions exceeds 240KB!");
+
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 Timer_Info timer_number_array[TIMER_NUMBER_MAX];
 
@@ -51,8 +92,7 @@ void os_heap_init_zephyr(void)
 {
     // init heap in data on region
     // RAM_TYPE: RAM_TYPE_DATA_ON
-    k_heap_init(&data_on_heap, (void *)(DT_REG_ADDR(DT_NODELABEL(heap))),
-                DT_REG_SIZE(DT_NODELABEL(heap)));
+    k_heap_init(&data_on_heap, (void *)HEAP_START, HEAP_SIZE);
 
     // init heap in bufferON region
     // RAM_TYPE: RAM_TYPE_BUFFER_ON
