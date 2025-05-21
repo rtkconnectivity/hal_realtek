@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-
 #include "zephyr/kernel.h"
 #include "zephyr/kernel/thread.h"
 #include <zephyr/sys/sys_heap.h>
@@ -9,13 +8,12 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/timer/system_timer.h>
 #include <kernel_internal.h> //for z_idle_threads and arch_kernel_init
-
 #include "patch_os.h"
 #include "os_pm.h"
 #include "os_queue.h"
 #include "mem_types.h"
-
 #include "dlps.h"
+#include "trace.h"
 typedef enum
 {
     SCHEDULER_SUSPENDED = 0,
@@ -64,12 +62,12 @@ extern void (*platform_pm_register_callback_func_with_priority)(void *, Platform
 // extern variable
 extern T_OS_QUEUE lpm_excluded_handle[PLATFORM_PM_EXCLUDED_TYPE_MAX];
 
-#define REALTEK_OSIF_DBG     1
-#if REALTEK_OSIF_DBG
-#include "trace.h"
-#define DBG_DIRECT_OPTIONAL(...) DBG_DIRECT(__VA_ARGS__)
+#define REALTEK_OSIF_DBG_LOG     0
+#if REALTEK_OSIF_DBG_LOG
+
+#define OSIF_DBG_LOG(...) DBG_DIRECT(__VA_ARGS__)
 #else
-#define DBG_DIRECT_OPTIONAL(...) do { } while(0)
+#define OSIF_DBG_LOG(...) do { } while(0)
 #endif
 
 /************************************************************ Mem Management ************************************************************/
@@ -461,7 +459,7 @@ bool os_sys_tick_get_zephyr(uint64_t *p_sys_tick)
 
 bool os_systick_handler_zephyr(void)
 {
-    DBG_DIRECT("%s is called", __func__);
+    OSIF_DBG_LOG("%s is called", __func__);
     sys_clock_announce_only_add_ticks(1);
     return true;
 }
@@ -501,7 +499,7 @@ bool os_sem_create_zephyr(void **pp_handle, const char *p_name, uint32_t init_co
     }
     else
     {
-        DBG_DIRECT("alloc sem object failed because data ram heap is full");
+        OSIF_DBG_LOG("alloc sem object failed because data ram heap is full");
         *p_result = false;
     }
 
@@ -1241,7 +1239,7 @@ void pendcall_handler(struct k_work *item)
 {
     Pend_Call *cb =
         CONTAINER_OF(item, Pend_Call, work);
-    DBG_DIRECT("pendcall func:%x p1: %x p2: %x\n", cb->Pend_func, (uint32_t)cb->para1, cb->para2);
+    OSIF_DBG_LOG("pendcall func:%x p1: %x p2: %x\n", cb->Pend_func, (uint32_t)cb->para1, cb->para2);
     cb->Pend_func(cb->para1, cb->para2);
     sys_multi_heap_free(&multi_heap, cb);
 }
@@ -1385,7 +1383,7 @@ uint32_t os_pm_next_timeout_value_get_zephyr(void)
             break;
         }
     }
-    DBG_DIRECT("timeout_tick_res=%d", timeout_tick_res);
+    OSIF_DBG_LOG("timeout_tick_res=%d", timeout_tick_res);
     return timeout_tick_res;
 }
 
@@ -1401,7 +1399,7 @@ uint32_t os_sys_tick_clk_get_zephyr(void)
 
 void os_task_dlps_return_idle_task_zephyr(void)
 {
-    DBG_DIRECT("%s is called", __func__);
+    OSIF_DBG_LOG("%s is called", __func__);
 
     arch_kernel_init();//perform arm initialization: including fault exception init & msp setting.
 
