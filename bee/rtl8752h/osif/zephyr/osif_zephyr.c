@@ -14,24 +14,10 @@
 #include "os_pm.h"
 #include "os_queue.h"
 #include "mem_types.h"
-
+#include "osif_zephyr.h"
 #include "dlps.h"
-typedef enum
-{
-    SCHEDULER_SUSPENDED = 0,
-    SCHEDULER_NOT_STARTED = 1,
-    SCHEDULER_RUNNING = 2
-} SCHEDULER_STATE;
-#define TASK_SEM_ARRAY_NUMBER 5
-#define CONFIG_ZEPHYR_PRI_MAX 6
 
-typedef struct
-{
-    void *task_handle;
-    void *sem_handle;
-} task_sem_item;
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
-
 
 #if (CONFIG_REALTEK_BT_CONTROLLER_STACK_SIZE < (1024+512))
 #error "CONFIG_REALTEK_CONTROLLER_STACK_SIZE should be larger than 1.5KB"
@@ -41,14 +27,6 @@ task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 // K_THREAD_STACK_DEFINE(lowstack_stack, LOWSTACK_STACKSIZE);
 struct z_thread_stack_element *lowstack_stack;
 struct k_thread lowstack_thread_handle;
-
-typedef struct timer_info
-{
-    void *timer_handle;
-    uint32_t timer_id;
-} Timer_Info;
-#define TIMER_NUMBER_MAX 64
-Timer_Info timer_number_array[TIMER_NUMBER_MAX];
 
 BOOL_PATCH_FUNC patch_osif_os_task_name_get;
 // extern function
@@ -149,7 +127,7 @@ bool os_mem_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
     *pp = sys_multi_heap_alloc(&multi_heap, (void *)ram_type, size);
     if (*pp == NULL)
     {
-        // DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed!");
+        DBG_DIRECT("os_mem_alloc_intern_zephyr alloc failed!");
     }
     return true;
 }
@@ -163,7 +141,7 @@ bool os_mem_zalloc_intern_zephyr(RAM_TYPE ram_type, size_t size,
     *pp = sys_multi_heap_alloc(&multi_heap, (void *)ram_type, size);
     if (*pp == NULL)
     {
-        // DBG_DIRECT("os_mem_zalloc_intern_zephyr alloc failed! ram_type:%d", ram_type);
+        DBG_DIRECT("os_mem_zalloc_intern_zephyr alloc failed! ram_type:%d", ram_type);
     }
     else
     {
@@ -231,14 +209,14 @@ bool os_mem_peek_zephyr(RAM_TYPE ram_type, size_t *p_size)
     }
 
 
-    // printk("RAM type of heap: %d, heap size: %zu, allocated %zu, free %zu, max allocated %zu\n",
-    //        ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
-    //        stats.max_allocated_bytes);
+    printk("RAM type of heap: %d, heap size: %zu, allocated %zu, free %zu, max allocated %zu\n",
+           ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
+           stats.max_allocated_bytes);
 
     /* use DBG_DIRECT when zephyr log system is not initialized*/
-    DBG_DIRECT("RAM type of heap: %d, heap size: %d, allocated %d, free %d, max allocated %d\n",
-               ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
-               stats.max_allocated_bytes);
+// DBG_DIRECT("RAM type of heap: %d, heap size: %d, allocated %d, free %d, max allocated %d\n",
+//            ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
+//            stats.max_allocated_bytes);
 
 #else
     // printk("System heap runtime statistics not enabled");
@@ -250,6 +228,9 @@ bool os_mem_peek_zephyr(RAM_TYPE ram_type, size_t *p_size)
 }
 void os_mem_peek_printf_zephyr(void)
 {
+    size_t a;
+    os_mem_peek_zephyr(0, &a);
+    os_mem_peek_zephyr(1, &a);
     return;
 }
 /****************************************************************************/
@@ -516,7 +497,9 @@ bool os_sem_delete_zephyr(void *p_handle, bool *p_result)
 
     if (p_handle == NULL)
     {
+        DBG_DIRECT("%s: Sem to delete is a NULL pointer!", __func__);
         *p_result = false;
+        return true;
     }
 
     obj = (struct k_sem *)p_handle;
@@ -560,6 +543,12 @@ bool os_sem_give_zephyr(void *p_handle, bool *p_result)
     else
     {
         obj = (struct k_sem *)p_handle;
+        if (k_sem_count_get(obj) == obj->limit)
+        {
+            DBG_DIRECT("%s: All tokens have already been released", __func__);
+            *p_result  = false;
+            return true;
+        }
         k_sem_give(obj);
 
         *p_result  = true;
@@ -682,7 +671,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
         *pp_handle = &lowstack_thread_handle;
         thread_id = k_thread_create(&lowstack_thread_handle, lowstack_stack, LOWSTACK_STACKSIZE,
                                     (k_thread_entry_t) p_routine, p_param, NULL, NULL,
-                                    K_HIGHEST_THREAD_PRIO, 0, K_MSEC(10));
+                                    K_HIGHEST_THREAD_PRIO, 0, K_MSEC(10));//need to wait thread signal created
         k_thread_name_set(thread_id, p_name);
         *p_is_create_success = true;
         return true;
@@ -819,6 +808,14 @@ bool os_task_priority_get_zephyr(void *p_handle, uint16_t *p_priority, bool *p_r
 bool os_task_priority_set_zephyr(void *p_handle, uint16_t priority, bool *p_result)
 {
     struct k_thread *obj;
+
+    if (priority > 6 || priority < 0)
+    {
+        *p_result = false;
+        DBG_DIRECT("%s: Invalid priority. Priority is expected to 0 ~ 6.", __func__);
+        return true;
+    }
+
     uint16_t switch_priority = CONFIG_ZEPHYR_PRI_MAX - priority;
 
     if (p_handle != NULL)
@@ -957,195 +954,235 @@ bool os_task_status_dump_zephyr(void)
     return true;
 }
 /* ************************************************* OSIF TIMER ************************************************* */
+
+K_MEM_SLAB_DEFINE(osif_timer_slab, sizeof(struct osif_timer),
+                  CONFIG_OSIF_TIMER_MAX_COUNT, __alignof__(struct osif_timer));
+
+/* Workaround: For app_timer feature in HAL LIB. */
+static struct osif_timer *osif_timer_pool[CONFIG_OSIF_TIMER_MAX_COUNT];
+
 bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t timer_id,
                             uint32_t interval_ms, bool reload, void (*p_timer_callback)(), bool *p_result)
 {
-    uint8_t i;
-    k_timeout_t timer_ticks;
+    struct osif_timer *timer;
 
-    timer_ticks = K_MSEC(interval_ms);
-    /* Find a free space */
-    for (i = 0; i < TIMER_NUMBER_MAX; i++)
+    if (reload != TimerOnce && reload != TimerPeriodic)
     {
-        if (timer_number_array[i].timer_handle == 0)
-        {
-            break;
-        }
+        return NULL;
     }
 
-    if (i == TIMER_NUMBER_MAX)
+    if (k_mem_slab_alloc(&osif_timer_slab, (void **)&timer, K_NO_WAIT) == 0)
     {
-        *p_result = false;
-        return true;
+        (void)memset(timer, 0, sizeof(struct osif_timer));
     }
     else
     {
-        struct k_timer *timer_obj;
-        timer_obj = (struct k_timer *) sys_multi_heap_alloc(&multi_heap,
-                                                            RAM_TYPE_DATA_ON, sizeof(struct k_timer));
-        if (timer_obj != NULL)
-        {
-            memset(timer_obj, 0, sizeof(struct k_timer));
-            *pp_handle = timer_obj;
-        }
-        else
-        {
-            DBG_DIRECT("alloc timer object failed because data ram heap is full, timer name:%s", p_timer_name);
-            *p_result = false;
-            return true;
-        }
-
-        if (reload == true)
-        {
-            k_timer_init(timer_obj, (k_timer_expiry_t) p_timer_callback, NULL);
-            timer_obj->period = timer_ticks;
-        }
-        else
-        {
-            k_timer_init(timer_obj, (k_timer_expiry_t) p_timer_callback, NULL);
-            timer_obj->period = K_NO_WAIT;
-        }
-
-        k_timeout_t *duration = sys_multi_heap_alloc(&multi_heap, RAM_TYPE_DATA_ON, sizeof(k_timeout_t));
-        if (duration != NULL)
-        {
-            *duration = timer_ticks;
-            k_timer_user_data_set(timer_obj, (void *)duration);
-        }
-        else
-        {
-            DBG_DIRECT("alloc timer userdata failed because data ram heap is full, timer name:%s",
-                       p_timer_name);
-            *p_result = false;
-            return true;
-        }
-
-        uint32_t key = arch_irq_lock();
-        timer_number_array[i].timer_handle = (void *)(*pp_handle);
-        timer_number_array[i].timer_id = timer_id;
-        arch_irq_unlock(key);
-
-        *p_result = true;
-        return true;
+        DBG_DIRECT("Exceed Max number of timers: %d!", CONFIG_OSIF_TIMER_MAX_COUNT);
+        return NULL;
     }
+
+    timer->name = p_timer_name;
+    timer->timer_id = timer_id;
+    timer->interval_ms = interval_ms;
+    timer->status = NOT_ACTIVE;
+    timer->type = reload;
+
+    k_timer_init(&timer->ztimer, (k_timer_expiry_t) p_timer_callback, NULL);
+
+    uint32_t key = irq_lock();
+    *pp_handle = timer;
+    // Attempt to store the timer in the pool
+    bool stored = false;
+    for (int i = 0; i < CONFIG_OSIF_TIMER_MAX_COUNT; i++)
+    {
+        if (osif_timer_pool[i] == NULL)
+        {
+            osif_timer_pool[i] = timer;
+            stored = true;
+            break; // Timer stored successfully, exit the loop
+        }
+    }
+    irq_unlock(key);
+
+    if (!stored)
+    {
+        // If storing the timer failed, clean up and release resources
+        k_mem_slab_free(&osif_timer_slab, (void *)timer);
+        *pp_handle = NULL;
+        DBG_DIRECT("Failed to store timer in pool, pool is full.");
+    }
+
+    *p_result = stored;
+    return true;
+
 }
 
 bool os_timer_id_get_zephyr(void **pp_handle, uint32_t *p_timer_id, bool *p_result)
 {
-    if (pp_handle && *pp_handle)
+    if (pp_handle == NULL)
     {
-        for (uint8_t i = 0; i < TIMER_NUMBER_MAX; i++)
-        {
-            if (timer_number_array[i].timer_handle == *pp_handle)
-            {
-                *p_timer_id = timer_number_array[i].timer_id;
-                *p_result = true;
-                return true;
-            }
-        }
+        DBG_DIRECT("%s: Variable timer handle pointer is not declared!", __func__);
+        *p_result = false;
+        return true;
     }
-    *p_result = false;
+
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL, or not declare a timer handle pointer!", __func__);
+        *p_result = false;
+        return true;
+    }
+    *p_timer_id = timer->timer_id;
+    *p_result = true;
     return true;
 }
 
 bool os_timer_start_zephyr(void **pp_handle, bool *p_result)
 {
-    struct k_timer *timer = *pp_handle;
-    k_timeout_t *duration;
-    if (timer)
+    if (pp_handle == NULL)
     {
-        if (!K_TIMEOUT_EQ(timer->period, K_NO_WAIT))
-        {
-            k_timer_start(timer, timer->period, timer->period);
-        }
-        else
-        {
-
-            duration = k_timer_user_data_get(timer);
-            k_timer_start(timer, *duration, K_NO_WAIT);
-        }
-        *p_result = true;
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        *p_result = false;
         return true;
     }
-    *p_result = false;
+
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL!", __func__);
+        *p_result = false;
+        return true;
+    }
+
+    if (timer->type == TimerPeriodic)
+    {
+        k_timer_start(&timer->ztimer, K_MSEC(timer->interval_ms), K_MSEC(timer->interval_ms));
+    }
+    else if (timer->type == TimerOnce)
+    {
+        k_timer_start(&timer->ztimer, K_MSEC(timer->interval_ms), K_NO_WAIT);
+    }
+
+    timer->status = ACTIVE;
+
+    *p_result = true;
     return true;
 }
 
 bool os_timer_restart_zephyr(void **pp_handle, uint32_t interval_ms, bool *p_result)
 {
-    struct k_timer *timer = *pp_handle;
-    k_timeout_t timer_ticks;
-    k_timeout_t *duration;
-
-    timer_ticks = K_MSEC(interval_ms);
-
-    if (timer && (timer_ticks.ticks > 0))
+    if (pp_handle == NULL)
     {
-        if (!K_TIMEOUT_EQ(timer->period, K_NO_WAIT))
-        {
-            k_timer_start(timer, timer_ticks, timer_ticks);
-        }
-        else
-        {
-            duration = k_timer_user_data_get(timer);
-            duration->ticks = timer_ticks.ticks;
-            k_timer_start(timer, timer_ticks, K_NO_WAIT);
-        }
-        *p_result = true;
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        *p_result = false;
         return true;
     }
-    *p_result = false;
+
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL!", __func__);
+        *p_result = false;
+        return true;
+    }
+
+    uint32_t key = irq_lock();
+    timer->interval_ms = interval_ms;
+    irq_unlock(key);
+
+    if (timer->type == TimerPeriodic)
+    {
+        k_timer_start(&timer->ztimer, K_MSEC(timer->interval_ms), K_MSEC(timer->interval_ms));
+    }
+    else if (timer->type == TimerOnce)
+    {
+        k_timer_start(&timer->ztimer, K_MSEC(timer->interval_ms), K_NO_WAIT);
+    }
+
+    timer->status = ACTIVE;
+
+    *p_result = true;
     return true;
 }
 
 bool os_timer_stop_zephyr(void **pp_handle, bool *p_result)
 {
-    struct k_timer *timer = *pp_handle;
-    if (timer)
+    if (pp_handle == NULL)
     {
-        k_timer_stop(timer);
-        *p_result = true;
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        *p_result = false;
         return true;
     }
-    *p_result = false;
-    return true;
 
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL!", __func__);
+        *p_result = false;
+        return true;
+    }
+
+    if (timer->status == NOT_ACTIVE)
+    {
+        DBG_DIRECT("%s: timer is inactive, cannot stop!", __func__);
+        *p_result = false;
+        return true;
+    }
+
+    k_timer_stop(&timer->ztimer);
+
+    *p_result = true;
+    return true;
 }
 
 bool os_timer_delete_zephyr(void **pp_handle, bool *p_result)
 {
-    struct k_timer *timer = *pp_handle;
-    k_timeout_t *duration;
-
-    if (timer)
+    if (pp_handle == NULL)
     {
-        uint32_t key = arch_irq_lock();
-        for (uint8_t i = 0; i < TIMER_NUMBER_MAX; i++)
-        {
-            if (timer_number_array[i].timer_handle == *pp_handle)
-            {
-                timer_number_array[i].timer_handle = 0;
-                break;
-            }
-        }
-        arch_irq_unlock(key);
-
-        k_timer_stop(timer);
-
-        duration = k_timer_user_data_get(timer);
-        sys_multi_heap_free(&multi_heap, duration);
-        duration = NULL;
-        sys_multi_heap_free(&multi_heap, timer);
-        timer = NULL;
-
-        *pp_handle = NULL;
-
-        *p_result = true;
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        *p_result = false;
         return true;
     }
-    *p_result = false;
+
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL!", __func__);
+        *p_result = false;
+        return true;
+    }
+
+    if (timer->status == ACTIVE)
+    {
+        k_timer_stop(&timer->ztimer);
+        timer->status = NOT_ACTIVE;
+    }
+
+    k_mem_slab_free(&osif_timer_slab, (void *)timer);
+
+    uint32_t key = irq_lock();
+
+    for (int i = 0; i < CONFIG_OSIF_TIMER_MAX_COUNT; i++)
+    {
+        if (osif_timer_pool[i] == timer)
+        {
+            osif_timer_pool[i] = NULL;
+            break;
+        }
+    }
+    *pp_handle = NULL;
+    irq_unlock(key);
+
+    *p_result = true;
     return true;
 }
+
 
 bool os_timer_dump_zephyr(bool *p_result)
 {
@@ -1154,25 +1191,34 @@ bool os_timer_dump_zephyr(bool *p_result)
 
 bool os_timer_state_get_zephyr(void **pp_handle, uint32_t *p_timer_state, bool *p_result)
 {
-    /* implements according to z_abort_timeout */
-    if (pp_handle && *pp_handle)
+    if (pp_handle == NULL)
     {
-        struct k_timer *obj;
-
-        obj = (struct k_timer *)*pp_handle;
-
-        if (sys_dnode_is_linked(&obj->timeout.node))
-        {
-            *p_timer_state = 1;
-        }
-        else
-        {
-            *p_timer_state = 0;
-        }
-        *p_result = true;
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        *p_result = false;
         return true;
     }
-    *p_result = false;
+
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL!", __func__);
+        *p_result = false;
+        return true;
+    }
+
+    uint32_t key = irq_lock();
+    if (!(k_timer_remaining_get(&timer->ztimer)))
+    {
+        *p_timer_state = 0; // timer has expired or stopped.
+    }
+    else
+    {
+        *p_timer_state = 1; // timer is running.
+    }
+    irq_unlock(key);
+
+    *p_result = true;
     return true;
 }
 
@@ -1183,59 +1229,34 @@ bool os_timer_init_zephyr(void)
 
 bool os_timer_number_get_zephyr(void **pp_handle, uint32_t *p_timer_num, bool *p_result)
 {
-    if (pp_handle && *pp_handle)
+    if (*p_timer_num >= CONFIG_OSIF_TIMER_MAX_COUNT)
     {
-        for (uint8_t i = 0; i < TIMER_NUMBER_MAX; i++)
-        {
-            if (timer_number_array[i].timer_handle == *pp_handle)
-            {
-                *p_timer_num = i;
-                *p_result = true;
-                return true;
-            }
-        }
+        DBG_DIRECT("%s: input timer_index %d is out of bound! Max timer number:%d", __func__, *p_timer_num,
+                   CONFIG_OSIF_TIMER_MAX_COUNT);
+        return NULL;
     }
-    else
-    {
-        *p_timer_num = 0xFF;
-        *p_result = false;
-        return true;
-    }
-
-    *p_result = false;
-    return true;
+    return osif_timer_pool[*p_timer_num];
 }
 
 bool os_timer_get_auto_reload_zephyr(void **pp_handle, long *p_autoreload)
 {
-    if (pp_handle && *pp_handle)
+    if (pp_handle == NULL)
     {
-        struct k_timer *obj;
-
-        obj = (struct k_timer *)*pp_handle;
-
-        if (K_TIMEOUT_EQ(obj->period, K_NO_WAIT))
-        {
-            *p_autoreload = 0;
-        }
-        else
-        {
-            *p_autoreload = 1;
-        }
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        return true;
     }
+
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL!", __func__);
+        return false;
+    }
+
+    *p_autoreload = timer->type;
     return true;
 }
-
-typedef void (*PendedFunctionOS_t)(void *para1, uint32_t para2);
-typedef struct pend_call
-{
-    struct k_work work;
-    PendedFunctionOS_t Pend_func;
-    void *para1;
-    uint32_t para2;
-} Pend_Call;
-
-
 
 void pendcall_handler(struct k_work *item)
 {
