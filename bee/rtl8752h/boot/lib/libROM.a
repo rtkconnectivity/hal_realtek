@@ -532,3 +532,4 @@ patch_ftl_save_to_storage = 0x00201890 ;
 patch_ftl_load_from_storage = 0x00201894 ;
 patch_HardFaultRecord_TryToSave = 0x002018bc ;
 lpm_excluded_handle = 0x002018c4 ;
+HardFault_Handler = 0x00000101 ;

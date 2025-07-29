@@ -31,7 +31,6 @@ struct k_thread lowstack_thread_handle;
 BOOL_PATCH_FUNC patch_osif_os_task_name_get;
 // extern function
 extern void os_queue_func_init(void);
-extern void sys_clock_only_add_cycle_count(int32_t ticks);
 extern void sys_clock_announce_only_add_ticks(int32_t ticks);
 extern void z_thread_timeout(struct _timeout *t);
 extern struct _timeout *get_first_timeout(void);
@@ -450,6 +449,7 @@ bool os_systick_handler_zephyr(void)
 bool os_sys_tick_increase_zephyr(uint32_t tick_increment,
                                  k_ticks_t *p_old_tick)
 {
+    DBG_DIRECT("%s is called, add tick:%d", __func__, tick_increment);
     *p_old_tick = sys_clock_tick_get();
     sys_clock_announce_only_add_ticks(tick_increment);
     return true;
@@ -1012,6 +1012,8 @@ bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t
         DBG_DIRECT("Failed to store timer in pool, pool is full.");
     }
 
+    // DBG_DIRECT("create timer:%x, name:%s",timer,p_timer_name);
+
     *p_result = stored;
     return true;
 
@@ -1219,6 +1221,38 @@ bool os_timer_state_get_zephyr(void **pp_handle, uint32_t *p_timer_state, bool *
     irq_unlock(key);
 
     *p_result = true;
+    return true;
+}
+
+bool os_timer_is_timer_active_zephyr(void **pp_handle, bool *is_active)
+{
+    if (pp_handle == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        *is_active = 0;
+        return true;
+    }
+
+    struct osif_timer *timer = (struct osif_timer *)*pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL!", __func__);
+        *is_active = 0;
+        return true;
+    }
+
+    uint32_t key = irq_lock();
+    if (!(k_timer_remaining_get(&timer->ztimer)))
+    {
+        *is_active = 0; // timer has expired or stopped.
+    }
+    else
+    {
+        *is_active = 1; // timer is running.
+    }
+    irq_unlock(key);
+
     return true;
 }
 
@@ -1430,8 +1464,8 @@ void os_task_dlps_return_idle_task_zephyr(void)
     // RamVectorTableUpdate(GDMA0_Channel9_VECTORn, _isr_wrapper);
 
     // ToDo: Check whether it is needed by BT wakeup
-    // NVIC_SetPriority(PendSV_IRQn, 0xff);
-    // NVIC_SetPriority(SysTick_IRQn, 0xff);
+    NVIC_SetPriority(PendSV_IRQn, 0xff);
+    NVIC_SetPriority(SysTick_IRQn, 0xff);
 
     uint32_t z_idle_stack_ptr;
     struct k_thread *thread = &z_idle_threads[0];
@@ -1466,8 +1500,6 @@ void os_pm_store_zephyr(void)
 void os_pm_restore_zephyr(void)
 {
     os_pm_restore_tickcount();
-
-    // os_sched_restore_zephyr();
 }
 
 
@@ -1548,13 +1580,15 @@ void osif_timer_func_init_zephyr(void)
     patch_osif_os_timer_state_get  = (BOOL_PATCH_FUNC)os_timer_state_get_zephyr;
     patch_osif_os_timer_init       = (BOOL_PATCH_FUNC)os_timer_init_zephyr;
     patch_osif_os_timer_number_get = (BOOL_PATCH_FUNC)os_timer_number_get_zephyr;
+    patch_osif_os_timer_is_timer_active = (BOOL_PATCH_FUNC)os_timer_is_timer_active_zephyr;
 }
 
 void os_pm_init_zephyr(void)
 {
     power_manager_slave_register_function_to_return(os_task_dlps_return_idle_task_zephyr);
 
-    // platform_pm_register_schedule_bottom_half_callback_func(os_pm_bottom_half_zephyr); //may use syswork queue in zephyr? (still need to evaluate)
+    // Since syswork queue (priority -1) < lowstack thread(priority -15), so we cannot use syswork q to process DLPS pend call.
+    // platform_pm_register_schedule_bottom_half_callback_func(os_pm_bottom_half_zephyr);
 
     platform_pm_register_callback_func_with_priority((void *)os_pm_check, PLATFORM_PM_CHECK, 1);
     platform_pm_register_callback_func_with_priority((void *)os_pm_store_zephyr, PLATFORM_PM_STORE, 1);
@@ -1565,9 +1599,7 @@ void os_pm_init_zephyr(void)
 
 void osif_pm_func_init_zephyr(void)
 {
-    // os_pm_init = os_pm_init_zephyr;
-    os_pm_store = os_pm_store_zephyr;
-    os_pm_restore = os_pm_restore_zephyr;
+    os_pm_init = os_pm_init_zephyr;
     patch_osif_os_task_dlps_return_idle_task = (BOOL_PATCH_FUNC)os_task_dlps_return_idle_task_zephyr;
 
     patch_osif_os_sys_tick_increase = os_sys_tick_increase_zephyr;
