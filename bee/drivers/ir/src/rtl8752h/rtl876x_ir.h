@@ -37,7 +37,7 @@ extern "C" {
 
 typedef struct
 {
-    uint32_t ir_reg[6];
+    uint32_t ir_reg[4];
 } IRStoreReg_Typedef;
 /*============================================================================*
  *                         Types
