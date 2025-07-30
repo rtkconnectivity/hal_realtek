@@ -19,7 +19,7 @@
   * \param  StoreBuf: Store buffer to store IR register data.
   * \return None.
   */
-void IR_DLPS_Enter(void *PeriReg, void *StoreBuf)
+void IR_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     IR_TypeDef *IRx = (IR_TypeDef *)PeriReg;
     IRStoreReg_Typedef *store_buf = (IRStoreReg_Typedef *)StoreBuf;
@@ -41,7 +41,7 @@ void IR_DLPS_Enter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore IR register data.
   * \return None
   */
-void IR_DLPS_Exit(void *PeriReg, void *StoreBuf)
+void IR_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     IR_TypeDef *IRx = (IR_TypeDef *)PeriReg;
     IRStoreReg_Typedef *store_buf = (IRStoreReg_Typedef *)StoreBuf;
