@@ -8,7 +8,6 @@
 #define _OSIF_ZEPHYR_H_
 #include <zephyr/kernel.h>
 
-#define CONFIG_ZEPHYR_PRI_MAX 6
 #define TIMER_NUMBER_MAX 64
 #define TASK_SEM_ARRAY_NUMBER 5
 

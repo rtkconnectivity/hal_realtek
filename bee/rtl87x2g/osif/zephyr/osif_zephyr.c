@@ -218,7 +218,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
 
     k_tid_t thread_handle;
 
-    int switch_priority = CONFIG_ZEPHYR_PRI_MAX - priority;
+    int switch_priority = CONFIG_REALTEK_OSIF_MAX_TASK_PRIORITY - priority;
 
     thread_handle = (struct k_thread *) k_heap_alloc(&data_on_heap,
                                                      sizeof(struct k_thread), K_NO_WAIT);
@@ -328,7 +328,7 @@ bool os_task_priority_get_zephyr(void *p_handle, uint16_t *p_priority)
         obj = _current;
     }
     priority = k_thread_priority_get(obj);
-    *p_priority = CONFIG_ZEPHYR_PRI_MAX - priority;
+    *p_priority = CONFIG_REALTEK_OSIF_MAX_TASK_PRIORITY - priority;
 
     return true;
 }
@@ -336,7 +336,7 @@ bool os_task_priority_get_zephyr(void *p_handle, uint16_t *p_priority)
 bool os_task_priority_set_zephyr(void *p_handle, uint16_t priority)
 {
     struct k_thread *obj;
-    uint16_t switch_priority = CONFIG_ZEPHYR_PRI_MAX - priority;
+    uint16_t switch_priority = CONFIG_REALTEK_OSIF_MAX_TASK_PRIORITY - priority;
 
     if (p_handle != NULL)
     {

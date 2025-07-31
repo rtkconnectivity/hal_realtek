@@ -1,6 +1,0 @@
-config REALTEK_BT_CONTROLLER_STACK_SIZE
-	int "RealTek bt lowstack stack size"
-	default 3072
-	depends on SOC_SERIES_RTL8752H
-	help
-	  This option set the bt lowstack stack size.

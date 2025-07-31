@@ -2,9 +2,7 @@
 
 #define ACTIVE 1
 #define NOT_ACTIVE 0
-#define CONFIG_OSIF_TIMER_MAX_COUNT 20
 #define TASK_SEM_ARRAY_NUMBER 5
-#define CONFIG_ZEPHYR_PRI_MAX 6
 
 typedef enum
 {
@@ -34,12 +32,3 @@ typedef struct
     void *task_handle;
     void *sem_handle;
 } task_sem_item;
-
-typedef void (*PendedFunctionOS_t)(void *para1, uint32_t para2);
-typedef struct pend_call
-{
-    struct k_work work;
-    PendedFunctionOS_t Pend_func;
-    void *para1;
-    uint32_t para2;
-} Pend_Call;
