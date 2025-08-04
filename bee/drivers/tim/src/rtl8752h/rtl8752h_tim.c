@@ -29,8 +29,8 @@ void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     store_buf->tim_reg[0] = TIMx->LoadCount;
     store_buf->tim_reg[1] = TIMx->ControlReg;
-    store_buf->tim_reg[2] = *(volatile uint32_t *)((uint32_t)TIMER0_LOAD_COUNT2 +
-                                                   4 * ((uint32_t)TIMx - (uint32_t)TIM0_REG_BASE) / 20);
+    store_buf->tim_reg[2] = *(volatile uint32_t *)((uint32_t)&TIMER0_LOAD_COUNT2 +
+                                                   4 * ((uint32_t)TIMx - (uint32_t)TIM0_REG_BASE) / sizeof(TIM_TypeDef));
 
     store_buf->tim_reg[3] = *((volatile uint32_t *)0x4000035CUL);
     store_buf->tim_reg[4] = *((volatile uint32_t *)0x40000360UL);
@@ -63,8 +63,8 @@ void TIM_DLPSExit(void *PeriReg, void *StoreBuf)
 
     TIMx->LoadCount = store_buf->tim_reg[0];
     TIMx->ControlReg = store_buf->tim_reg[1];
-    *(volatile uint32_t *)((uint32_t)TIMER0_LOAD_COUNT2 +
-                           4 * ((uint32_t)TIMx - (uint32_t)TIM0_REG_BASE) / 20) = store_buf->tim_reg[2];
+    *(volatile uint32_t *)((uint32_t)&TIMER0_LOAD_COUNT2 +
+                           4 * ((uint32_t)TIMx - (uint32_t)TIM0_REG_BASE) / sizeof(TIM_TypeDef)) = store_buf->tim_reg[2];
 
     TIMER_PWM2_CR = store_buf->tim_reg[8];
 }
