@@ -398,14 +398,13 @@ bool os_delay_zephyr(uint32_t ms)
 
 bool os_sys_time_get_zephyr(uint64_t *p_time_ms)
 {
-    *p_time_ms = k_uptime_get();
+    *p_time_ms = (uint64_t)k_ticks_to_ms_floor64(sys_clock_tick_get_32());
     return true;
 }
 
 bool os_sys_tick_get_zephyr(uint64_t *p_sys_tick)
 {
-    *p_sys_tick = (uint64_t)k_uptime_ticks();
-
+    *p_sys_tick = (uint64_t)sys_clock_tick_get_32();
     return true;
 }
 
@@ -1361,8 +1360,6 @@ uint32_t os_sys_tick_clk_get_zephyr(void)
 
 void os_task_dlps_return_idle_task_zephyr(void)
 {
-    DBG_DIRECT("%s is called", __func__);
-
     arch_kernel_init();//perform arm initialization: including fault exception init & msp setting.
 
     NVIC_SetPriority(PendSV_IRQn, 0xff);

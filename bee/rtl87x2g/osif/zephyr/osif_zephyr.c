@@ -119,12 +119,12 @@ void os_delay_zephyr(uint32_t ms)
 
 uint64_t os_sys_time_get_zephyr(void)
 {
-    return (uint64_t)k_uptime_get();
+    return (uint64_t)k_ticks_to_ms_floor64(sys_clock_tick_get_32());
 }
 
 uint64_t os_sys_tick_get_zephyr(void)
 {
-    return (uint64_t)k_uptime_ticks();
+    return (uint64_t)sys_clock_tick_get_32();
 }
 
 
