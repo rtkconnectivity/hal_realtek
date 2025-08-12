@@ -24,6 +24,7 @@ rsource "wdt/Kconfig"
 rsource "bluetooth/Kconfig"
 rsource "ppt/Kconfig"
 rsource "mac_802154/Kconfig"
+rsource "voice/Kconfig"
 endmenu
 
 config REALTEK_USING_RTL876X_DRIVER
