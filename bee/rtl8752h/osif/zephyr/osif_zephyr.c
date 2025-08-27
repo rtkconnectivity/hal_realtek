@@ -932,11 +932,13 @@ static struct osif_timer *osif_timer_pool[CONFIG_REALTEK_OSIF_TIMER_MAX_COUNT];
 bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t timer_id,
                             uint32_t interval_ms, bool reload, void (*p_timer_callback)(), bool *p_result)
 {
+    *p_result = false;
     struct osif_timer *timer;
 
     if (reload != TimerOnce && reload != TimerPeriodic)
     {
-        return NULL;
+        *p_result = false;
+        return true;
     }
 
     if (k_mem_slab_alloc(&osif_timer_slab, (void **)&timer, K_NO_WAIT) == 0)
@@ -946,7 +948,8 @@ bool os_timer_create_zephyr(void **pp_handle, const char *p_timer_name, uint32_t
     else
     {
         DBG_DIRECT("Exceed Max number of timers: %d!", CONFIG_REALTEK_OSIF_TIMER_MAX_COUNT);
-        return NULL;
+        *p_result = false;
+        return true;
     }
 
     timer->name = p_timer_name;
