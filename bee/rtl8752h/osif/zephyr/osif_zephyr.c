@@ -605,9 +605,9 @@ bool os_mutex_give_zephyr(void *p_handle, bool *p_result)
 }
 /* ************************************************* OSIF TASK ************************************************* */
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
-
+#ifdef CONFIG_BT
 struct k_thread lowstack_thread_handle;
-
+#endif
 bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routine)(void *),
                            void *p_param, uint16_t stack_size, uint16_t priority, bool *p_is_create_success)
 {
@@ -624,6 +624,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
     Reference: https://docs.zephyrproject.org/latest/kernel/services/threads/index.html#meta-irq-priorities  */
 
     if (strcmp(p_name, "low_stack_task") == 0)
+#ifdef CONFIG_BT
     {
         /* place lowstack_stack(3KB) at RAM_TYPE_BUFFER_ON */
         k_thread_stack_t *lowstack_stack;
@@ -645,6 +646,12 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
         *p_is_create_success = true;
         return true;
     }
+#else
+    {
+        DBG_DIRECT("CONFIG_BT not enabled, do not create Lowerstack Task!");
+        return true;
+    }
+#endif
 
     k_tid_t thread_handle;
 
