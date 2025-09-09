@@ -189,8 +189,10 @@ bool os_alloc_secure_ctx_zephyr(uint32_t stack_size)
     return true;
 }
 
+#ifdef CONFIG_BT
 K_THREAD_STACK_DEFINE(lowstack_stack, 768 * 4);
 struct k_thread lowstack_thread_data;
+#endif
 bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routine)(void *),
                            void *p_param, uint16_t stack_size, uint16_t priority)
 {
@@ -207,6 +209,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
     Reference: https://docs.zephyrproject.org/latest/kernel/services/threads/index.html#meta-irq-priorities  */
 
     if (strcmp(p_name, "low_stack_task") == 0)
+#ifdef CONFIG_BT
     {
         ret_thread_handle = k_thread_create(&lowstack_thread_data, lowstack_stack, 768 * 4,
                                             (k_thread_entry_t) p_routine, p_param, NULL, NULL,
@@ -215,6 +218,12 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
         *pp_handle = &lowstack_thread_data;
         return true;
     }
+#else
+    {
+        DBG_DIRECT("CONFIG_BT not enabled, do not create Lowerstack Task!");
+        return true;
+    }
+#endif
 
     k_tid_t thread_handle;
 
