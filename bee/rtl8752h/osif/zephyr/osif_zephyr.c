@@ -147,9 +147,26 @@ bool os_mem_aligned_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size, uint8_t 
 /****************************************************************************/
 /* Free memory                                                              */
 /****************************************************************************/
+
+/*
+ * Original sys_multi_heap_free() using sys_heap API is not processing in critical section.
+ * Implement sys_multi_heap_free_kheap() with kheap API to make sure os_mem_free is thread-safe.
+ */
+void sys_multi_heap_free_kheap(struct sys_multi_heap *mheap, void *block)
+{
+    const struct sys_multi_heap_rec *heap;
+
+    heap = sys_multi_heap_get_heap(mheap, block);
+
+    if (heap != NULL)
+    {
+        k_heap_free((struct k_heap *)heap->heap, block);
+    }
+}
+
 bool os_mem_free_zephyr(void *p_block)
 {
-    sys_multi_heap_free(&multi_heap, p_block);
+    sys_multi_heap_free_kheap(&multi_heap, p_block);
     return true;
 }
 
@@ -158,7 +175,7 @@ bool os_mem_free_zephyr(void *p_block)
 /****************************************************************************/
 bool os_mem_aligned_free_zephyr(void *p_block)
 {
-    sys_multi_heap_free(&multi_heap, p_block);
+    sys_multi_heap_free_kheap(&multi_heap, p_block);
     return true;
 }
 
@@ -183,19 +200,12 @@ bool os_mem_peek_zephyr(RAM_TYPE ram_type, size_t *p_size)
         heap_size =  DT_REG_SIZE(DT_NODELABEL(heap1));
     }
 
-    // printk("RAM type of heap: %d, heap size: %zu, allocated %zu, free %zu, max allocated %zu\n",
-    //        ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
-    //        stats.max_allocated_bytes);
-
     /* use DBG_DIRECT when zephyr log system is not initialized*/
     DBG_DIRECT("RAM type of heap: %d, heap size: %d, allocated %d, free %d, max allocated %d\n",
                ram_type, heap_size, stats.allocated_bytes, stats.free_bytes,
                stats.max_allocated_bytes);
 
 #else
-    // printk("System heap runtime statistics not enabled");
-
-    /* use DBG_DIRECT when zephyr log system is not initialized*/
     DBG_DIRECT("System heap runtime statistics not enabled");
 #endif
     return true;
@@ -244,7 +254,7 @@ bool os_msg_queue_create_intern_zephyr(void **pp_handle, uint32_t msg_num, uint3
             }
             else
             {
-                sys_multi_heap_free(&multi_heap, queue_obj);
+                sys_multi_heap_free_kheap(&multi_heap, queue_obj);
                 DBG_DIRECT("alloc queue buffer failed because data ram heap is full");
                 ret = -ENOMEM;
             }
@@ -274,10 +284,10 @@ bool os_msg_queue_delete_intern_zephyr(void *p_handle, const char *p_func, uint3
 
     if ((obj->flags & K_MSGQ_FLAG_ALLOC) != 0U)
     {
-        sys_multi_heap_free(&multi_heap, obj->buffer_start);
+        sys_multi_heap_free_kheap(&multi_heap, obj->buffer_start);
         obj->buffer_start = NULL;
         obj->flags &= ~K_MSGQ_FLAG_ALLOC;
-        sys_multi_heap_free(&multi_heap, obj);
+        sys_multi_heap_free_kheap(&multi_heap, obj);
         *p_result = true;
         return true;
     }
@@ -471,7 +481,7 @@ bool os_sem_delete_zephyr(void *p_handle, bool *p_result)
 
     obj = (struct k_sem *)p_handle;
 
-    sys_multi_heap_free(&multi_heap, obj);
+    sys_multi_heap_free_kheap(&multi_heap, obj);
     *p_result = true;
     return true;
 }
@@ -556,7 +566,7 @@ bool os_mutex_delete_zephyr(void *p_handle, bool *p_result)
 
     obj = (struct k_mutex *)p_handle;
 
-    sys_multi_heap_free(&multi_heap, obj);
+    sys_multi_heap_free_kheap(&multi_heap, obj);
     *p_result  = true;
     return true;
 }
@@ -676,7 +686,7 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
                                                                      8, stack_size);
     if (stack_buffer == NULL)
     {
-        sys_multi_heap_free(&multi_heap, thread_handle);
+        sys_multi_heap_free_kheap(&multi_heap, thread_handle);
         thread_handle = NULL;
         DBG_DIRECT("alloc thread stack failed because data ram heap is full");
         *p_is_create_success = false;
@@ -849,14 +859,14 @@ bool os_task_signal_create_zephyr(void *p_handle, uint32_t count, bool *p_result
         else
         {
             DBG_DIRECT("k_sem_init failed");
-            sys_multi_heap_free(&multi_heap, sem_obj);
+            sys_multi_heap_free_kheap(&multi_heap, sem_obj);
             *p_result = false;
         }
     }
     else
     {
         DBG_DIRECT("out of TASK_SEM_ARRAY_NUMBER");
-        sys_multi_heap_free(&multi_heap, sem_obj);
+        sys_multi_heap_free_kheap(&multi_heap, sem_obj);
         *p_result = false;
 
     }
