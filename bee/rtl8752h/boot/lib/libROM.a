@@ -437,7 +437,6 @@ altrac_fb_alg_setting = 0x00200f64 ;
 sdm_setting = 0x00200f74 ;
 platform_pm_feature_cfg = 0x00200f80 ;
 efuse_on_ram = 0x00200f81 ;
-flash_sem = 0x0020137c ;
 flash_nor_info = 0x00201394 ;
 flash_sleep_enter = 0x00201424 ;
 flash_sleep_exit = 0x00201428 ;
