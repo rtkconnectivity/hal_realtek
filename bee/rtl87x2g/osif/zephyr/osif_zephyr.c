@@ -14,6 +14,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/timer/system_timer.h>
 #include <kernel_internal.h> //for z_idle_threads and arch_kernel_init
+#include <zephyr/linker/linker-defs.h>
 
 #include "os_queue.h"
 #include "os_msg.h"
@@ -37,46 +38,68 @@
 
 LOG_MODULE_REGISTER(osif);
 
-#define RAM_DATA_START   DT_REG_ADDR(DT_NODELABEL(ram_data))
-#define RAM_DATA_SIZE    DT_REG_SIZE(DT_NODELABEL(ram_data))
+#define TCM0_START   DT_REG_ADDR(DT_NODELABEL(tcm0))
+#define TCM0_SIZE    DT_REG_SIZE(DT_NODELABEL(tcm0))
 
-#define RAM_CODE_START   DT_REG_ADDR(DT_NODELABEL(ram_code))
-#define RAM_CODE_SIZE    DT_REG_SIZE(DT_NODELABEL(ram_code))
+#define TCM1_START   DT_REG_ADDR(DT_NODELABEL(tcm1))
+#define TCM1_SIZE    DT_REG_SIZE(DT_NODELABEL(tcm1))
 
-#define HEAP_START       DT_REG_ADDR(DT_NODELABEL(heap))
-#define HEAP_SIZE        DT_REG_SIZE(DT_NODELABEL(heap))
+#define TCM_HEAP_START       DT_REG_ADDR(DT_NODELABEL(tcm_heap))
+#define TCM_HEAP_SIZE        DT_REG_SIZE(DT_NODELABEL(tcm_heap))
 
-#define RAM_REGION_START 0x100c00
-#define RAM_REGION_END   0x13cc00
-#define MAX_TOTAL_SIZE   (240 * 1024) // 240KB
+#define TCM_START 0x100c00
+#define TCM_END   0x13cc00
+#define TCM_MAX_SIZE   (240 * 1024)
+
+#define EXTRAM_HEAP_START       DT_REG_ADDR(DT_NODELABEL(ext_data_ram_heap))
+#define EXTRAM_HEAP_SIZE        DT_REG_SIZE(DT_NODELABEL(ext_data_ram_heap))
+
+#define EXTRAM_START       DT_REG_ADDR(DT_NODELABEL(ext_data_ram))
+#define EXTRAM_SIZE        DT_REG_SIZE(DT_NODELABEL(ext_data_ram))
+
+#define EXTRAM_MAX_SIZE   (16 * 1024)
 
 #define END_ADDRESS(start, size) ((start) + (size))
 
-// Assert for RAM Data Region
-BUILD_ASSERT(RAM_DATA_START >= RAM_REGION_START &&
-             END_ADDRESS(RAM_DATA_START, RAM_DATA_SIZE) <= RAM_REGION_END,
-             "RAM Data Region is out of bounds");
+BUILD_ASSERT(EXTRAM_START >= 0x200000 &&
+             END_ADDRESS(EXTRAM_START, EXTRAM_SIZE) <= 0x204000,
+             "EXTRAM Region is out of bounds");
 
-// Assert for RAM Code Region
-BUILD_ASSERT(RAM_CODE_START >= RAM_REGION_START &&
-             END_ADDRESS(RAM_CODE_START, RAM_CODE_SIZE) <= RAM_REGION_END,
-             "RAM Code Region is out of bounds");
+BUILD_ASSERT(EXTRAM_HEAP_START >= 0x200000 &&
+             END_ADDRESS(EXTRAM_HEAP_START, EXTRAM_HEAP_SIZE) <= 0x204000,
+             "EXTRAM_HEAP Region is out of bounds");
 
-// Assert for Heap Region
-BUILD_ASSERT(HEAP_START >= RAM_REGION_START &&
-             END_ADDRESS(HEAP_START, HEAP_SIZE) <= RAM_REGION_END,
-             "Heap Region is out of bounds");
+BUILD_ASSERT(END_ADDRESS(EXTRAM_START, EXTRAM_SIZE) <= EXTRAM_HEAP_START,
+             "EXTRAM end address overlaps with EXTRAM_HEAP start address");
+
+BUILD_ASSERT(EXTRAM_SIZE + EXTRAM_HEAP_SIZE <= EXTRAM_MAX_SIZE,
+             "Total size of EXTRAM & EXTRAM_HEAP regions exceeds 16KB!");
+
+// Assert for TCM0 Region
+BUILD_ASSERT(TCM0_START >= TCM_START &&
+             END_ADDRESS(TCM0_START, TCM0_SIZE) <= TCM_END,
+             "TCM0 Region is out of bounds");
+
+// Assert for TCM1 Region
+BUILD_ASSERT(TCM1_START >= TCM_START &&
+             END_ADDRESS(TCM1_START, TCM1_SIZE) <= TCM_END,
+             "TCM1 Region is out of bounds");
+
+// Assert for TCM_HEAP Region
+BUILD_ASSERT(TCM_HEAP_START >= TCM_START &&
+             END_ADDRESS(TCM_HEAP_START, TCM_HEAP_SIZE) <= TCM_END,
+             "TCM_HEAP Region is out of bounds");
 
 // Assert for Overlap
-BUILD_ASSERT(END_ADDRESS(RAM_DATA_START, RAM_DATA_SIZE) <= RAM_CODE_START,
-             "RAM_DATA end address overlaps with RAM_CODE start address");
+BUILD_ASSERT(END_ADDRESS(TCM0_START, TCM0_SIZE) <= TCM1_START,
+             "TCM0 end address overlaps with TCM1 start address");
 
-BUILD_ASSERT(END_ADDRESS(RAM_CODE_START, RAM_CODE_SIZE) <= HEAP_START,
-             "RAM_CODE end address overlaps with HEAP_START start address");
+BUILD_ASSERT(END_ADDRESS(TCM1_START, TCM1_SIZE) <= TCM_HEAP_START,
+             "TCM1 end address overlaps with TCM_HEAP start address");
 
 // Assert for Total Size
-BUILD_ASSERT(RAM_DATA_SIZE + RAM_CODE_SIZE + HEAP_SIZE <= MAX_TOTAL_SIZE,
-             "Total size of TCM regions exceeds 240KB!");
+BUILD_ASSERT(TCM0_SIZE + TCM1_SIZE + TCM_HEAP_SIZE <= TCM_MAX_SIZE,
+             "Total size of Three regions exceeds 240KB!");
 
 task_sem_item task_sem_array[TASK_SEM_ARRAY_NUMBER] = {0};
 Timer_Info timer_number_array[TIMER_NUMBER_MAX];
@@ -92,7 +115,7 @@ void os_heap_init_zephyr(void)
 {
     // init heap in data on region
     // RAM_TYPE: RAM_TYPE_DATA_ON
-    k_heap_init(&data_on_heap, (void *)HEAP_START, HEAP_SIZE);
+    k_heap_init(&data_on_heap, (void *)TCM_HEAP_START, TCM_HEAP_SIZE);
 
     // init heap in bufferON region
     // RAM_TYPE: RAM_TYPE_BUFFER_ON
@@ -100,7 +123,7 @@ void os_heap_init_zephyr(void)
 
     //  init heap in ext_data_ram region
     // RAM_TYPE: RAM_TYPE_EXT_DATA_SRAM
-    k_heap_init(&ext_data_heap, (void *)EXT_DATA_SRAM_HEAP_ADDR, EXT_DATA_SRAM_HEAP_SIZE);
+    k_heap_init(&ext_data_heap, (void *)EXTRAM_HEAP_START, EXTRAM_HEAP_SIZE);
 }
 
 void os_init_zephyr(void)
@@ -127,7 +150,6 @@ uint64_t os_sys_tick_get_zephyr(void)
     return (uint64_t)sys_clock_tick_get_32();
 }
 
-
 bool os_sched_start_zephyr(void)
 {
     return true;
@@ -135,7 +157,6 @@ bool os_sched_start_zephyr(void)
 
 bool os_sched_stop_zephyr(void)
 {
-//TODO
     return true;
 }
 
@@ -931,7 +952,7 @@ void os_mem_free_zephyr(void *p_block)
     {
         k_heap_free(&ext_data_heap, p_block);
     }
-    else if (p_block >= (void *)DT_REG_ADDR(DT_NODELABEL(heap)))
+    else if (p_block >= (void *)DT_REG_ADDR(DT_NODELABEL(tcm_heap)))
     {
         k_heap_free(&data_on_heap, p_block);
     }
@@ -959,7 +980,7 @@ void os_mem_aligned_free_zephyr(void *p_block)
     {
         k_heap_free(&ext_data_heap, p);
     }
-    else if (p >= (void *)DT_REG_ADDR(DT_NODELABEL(heap)))
+    else if (p >= (void *)DT_REG_ADDR(DT_NODELABEL(tcm_heap)))
     {
         k_heap_free(&data_on_heap, p);
     }
@@ -983,7 +1004,7 @@ size_t os_mem_peek_zephyr(RAM_TYPE ram_type)
     {
     case RAM_TYPE_DATA_ON:
         sys_heap_runtime_stats_get(&data_on_heap.heap, &stats);
-        heap_size =  DT_REG_SIZE(DT_NODELABEL(heap));
+        heap_size =  DT_REG_SIZE(DT_NODELABEL(tcm_heap));
         break;
     case RAM_TYPE_BUFFER_ON:
         sys_heap_runtime_stats_get(&buffer_on_heap.heap, &stats);
