@@ -219,6 +219,12 @@ bool os_task_create_zephyr(void **pp_handle, const char *p_name, void (*p_routin
 {
     k_tid_t ret_thread_handle;
 
+    if (priority > 6 || priority < 0)
+    {
+        DBG_DIRECT("%s: Invalid priority. Priority is expected to 0 ~ 6.", __func__);
+        return false;
+    }
+
     /* The lowstack thread must be able to preempt all native cooperative threads in Zephyr
     (such as bt tx thread, mesh adv thread, BT Mesh settings workq and so on..).
     Otherwise, if lowstack thread is not processed in a timely manner within approximately 40ms,
@@ -366,6 +372,11 @@ bool os_task_priority_get_zephyr(void *p_handle, uint16_t *p_priority)
 bool os_task_priority_set_zephyr(void *p_handle, uint16_t priority)
 {
     struct k_thread *obj;
+    if (priority > 6 || priority < 0)
+    {
+        DBG_DIRECT("%s: Invalid priority. Priority is expected to 0 ~ 6.", __func__);
+        return false;
+    }
     uint16_t switch_priority = CONFIG_REALTEK_OSIF_MAX_TASK_PRIORITY - priority;
 
     if (p_handle != NULL)
@@ -602,9 +613,12 @@ bool os_sem_give_zephyr(void *p_handle)
     }
 
     obj = (struct k_sem *)p_handle;
-
+    if (k_sem_count_get(obj) == obj->limit)
+    {
+        DBG_DIRECT("%s: All tokens have already been released", __func__);
+        return false;
+    }
     k_sem_give(obj);
-
     return true;
 }
 
@@ -944,6 +958,12 @@ void *os_mem_aligned_alloc_intern_zephyr(RAM_TYPE ram_type, size_t size, uint8_t
 /****************************************************************************/
 void os_mem_free_zephyr(void *p_block)
 {
+    if (p_block == NULL)
+    {
+        LOG_ERR("Memory free failed, because it is a NULL pointer.\n");
+        return;
+    }
+
     if (p_block >= (void *)BUFFER_ON_HEAP_ADDR)
     {
         k_heap_free(&buffer_on_heap, p_block);
@@ -968,6 +988,12 @@ void os_mem_free_zephyr(void *p_block)
 /****************************************************************************/
 void os_mem_aligned_free_zephyr(void *p_block)
 {
+    if (p_block == NULL)
+    {
+        LOG_ERR("Memory aligned free failed, because it is a NULL pointer.\n");
+        return;
+    }
+
     void *p;
 
     memcpy(&p, (uint8_t *)p_block - sizeof(void *), sizeof(void *));
@@ -1214,13 +1240,31 @@ bool os_timer_restart_zephyr(void **pp_handle, uint32_t interval_ms)
 
 bool os_timer_stop_zephyr(void **pp_handle)
 {
-    struct k_timer *timer = *pp_handle;
-    if (timer)
+    if (pp_handle == NULL)
     {
-        k_timer_stop(timer);
-        return true;
+        DBG_DIRECT("%s: timer handle pointer is not declared!", __func__);
+        return false;
     }
-    return false;
+
+    struct k_timer *timer = *pp_handle;
+
+    if (timer == NULL)
+    {
+        DBG_DIRECT("%s: timer handle pointer is NULL! Timer handle pointer address: %x", __func__,
+                   pp_handle);
+        return false;
+    }
+
+    if (k_timer_remaining_get(timer) == 0)
+    {
+        DBG_DIRECT("%s: timer is inactive, cannot stop! Timer handle pointer address: %x", __func__,
+                   pp_handle);
+        return false;
+    }
+
+    k_timer_stop(timer);
+
+    return true;
 }
 
 bool os_timer_delete_zephyr(void **pp_handle)
