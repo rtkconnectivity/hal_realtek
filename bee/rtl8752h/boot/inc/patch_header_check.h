@@ -408,7 +408,7 @@ extern uint32_t get_temp_ota_bank_addr_by_img_id(T_IMG_ID image_id);
  * @param  image_id specify the image
  * @return size of specified image which located in ota temp bank
 */
-extern uint32_t get_temp_ota_bank_size_by_img_id(T_IMG_ID image_id);
+extern uint32_t patch_get_temp_ota_bank_size_by_img_id(T_IMG_ID image_id);
 
 /**
  * @brief  get version info of specified image which located in active bank

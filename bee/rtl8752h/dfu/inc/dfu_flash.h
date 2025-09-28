@@ -247,6 +247,14 @@ void dfu_set_image_ready(T_IMG_HEADER_FORMAT *p_header, bool compressed_mode);
  */
 bool dfu_copy_img(uint16_t image_id, uint32_t dlAddress, uint32_t dlSize);
 
+
+/**
+ * @brief   Erase a sector of the flash.
+ * @param   addr    flash address to erase
+ * @return  true if erase successfully, false otherwise
+ */
+bool dfu_flash_erase_sector(uint32_t addr);
+
 /** End of DFU_API_Exported_Functions
   * @}
   */

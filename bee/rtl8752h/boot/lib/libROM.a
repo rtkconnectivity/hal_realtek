@@ -65,7 +65,6 @@ get_image_size_in_bank = 0x00006295 ;
 get_header_addr_by_img_id = 0x000062a1 ;
 get_active_bank_image_size_by_img_id = 0x000062ef ;
 is_ota_support_bank_switch = 0x0000633f ;
-get_temp_ota_bank_size_by_img_id = 0x000063e1 ;
 get_active_bank_image_version = 0x000064c7 ;
 image_entry_check = 0x0000651b ;
 platform_random = 0x000065e7 ;
