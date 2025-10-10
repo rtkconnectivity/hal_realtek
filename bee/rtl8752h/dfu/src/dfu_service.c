@@ -34,7 +34,7 @@ uint16_t g_ota_tmp_buf_used_size;
 uint8_t temp_image_num = 0;
 T_TEMP_IMAGE_INFO temp_image_info[IMAGE_MAX - SecureBoot];
 
-uint8_t ota_temp_buffer_head[DFU_TEMP_BUFFER_SIZE];
+uint8_t  __ALIGNED(4) ota_temp_buffer_head[DFU_TEMP_BUFFER_SIZE];
 static bool buffer_check_en = false;
 bool is_ota_procedure = false;
 static uint32_t dfu_resend_offset = 0;
@@ -343,7 +343,7 @@ BT_GATT_SERVICE_DEFINE(rtk_dfu_service, BT_GATT_PRIMARY_SERVICE(&rtk_dfu_srv_uui
                                               BT_GATT_CHRC_WRITE | BT_GATT_CHRC_NOTIFY,
                                               BT_GATT_PERM_WRITE, NULL, dfu_srv_write_cb, NULL),
                        BT_GATT_CCC(dfu_service_cccd_update_cb,
-                                   BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),);
+                                   BT_GATT_PERM_READ | BT_GATT_PERM_WRITE));
 
 /*APP can define differtnt check rules of different images*/
 bool dfu_soc_check_img_version(uint16_t image_id, uint32_t version)
