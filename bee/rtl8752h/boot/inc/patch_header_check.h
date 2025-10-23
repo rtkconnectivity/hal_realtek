@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "rtl876x.h"
+#include "flash_nor_device.h"
 
 /** @addtogroup  FLASH_DEVICE    Flash Device
     * @{
@@ -48,6 +49,8 @@
 
 #define DFU_HEADER_SIZE          12  /*currently, first 12 byte only will be treated as image header*/
 #define IMG_HEADER_SIZE          1024
+#define OTA_HEADER_SIZE          (4 * 1024)
+#define DECODE_OFFSET            (sizeof(T_COMPRESS_IMG_HEADER_FORMAT))
 
 #define FSBL_EXT_PATTERN         0x736c
 
@@ -59,8 +62,6 @@
 /** End of FLASH_DEVICE_Exported_Constants
   * @}
   */
-
-
 
 /*============================================================================*
   *                                   Types
@@ -85,14 +86,13 @@ typedef enum
     AppData3    = 0x2796,
     AppData4    = 0x2797,
     AppData5    = 0x2798,
-    AppData6    = 0x2799,
     AppConfigFile = 0x2799,
     UpperStack  = 0x279a,
     IMG_BT_STACKPATCH = 0x279b,
     IMAGE_MAX,
 
-    IMAGE_USER_DATA2 = 0xFFFD,  /**<the image only support unsafe single bank ota*/
-    IMAGE_USER_DATA = 0xFFFE,  /**<the image only support unsafe single bank ota*/
+    IMAGE_USER_DATA2 = 0xFFFD,  /**< the image only supports unsafe single bank OTA */
+    IMAGE_USER_DATA = 0xFFFE,  /**< the image only supports unsafe single bank OTA */
 } T_IMG_ID;
 
 typedef enum
@@ -146,15 +146,15 @@ typedef struct _IMG_CTRL_HEADER_FORMAT
             uint16_t load_when_boot: 1; // load image when boot
             uint16_t enc_load: 1; // encrypt load part or not
             uint16_t enc_key_select: 3; // referenced to ENC_KEY_SELECT
-            uint16_t not_ready: 1; //for copy image in ota
-            uint16_t not_obsolete: 1; //for copy image in ota
+            uint16_t not_ready: 1; // for copy image in OTA
+            uint16_t not_obsolete: 1; // for copy image in OTA
             uint16_t integrity_check_en_in_boot: 1; // enable image integrity check in boot flow
-//            uint16_t header_size: 4; // unit:KB, set for tool
+//            uint16_t header_size: 4; // unit: KB, set for tool
 //            uint16_t rsvd: 2;
             uint16_t compressed_not_ready: 1;
             uint16_t compressed_not_obsolete: 1;
             uint16_t rsvd: 1;
-            uint16_t image_type: 3; /*for app 000b: normal image, 001b:compressed image, other for more types
+            uint16_t image_type: 3; /* for app 000b: normal image, 001b:compressed image, other for more types
             for patch in temp bank consist of 001b: patch+fsbl, 010b: patch+app, 011b: patch+fsbl+app*/
         } flag_value;
     } ctrl_flag;
@@ -164,12 +164,12 @@ typedef struct _IMG_CTRL_HEADER_FORMAT
 
 typedef struct _COMPRESS_IMG_HEADER_FORMAT //96 bytes
 {
-    T_IMG_CTRL_HEADER_FORMAT ctrl_header; //12bytes
+    T_IMG_CTRL_HEADER_FORMAT ctrl_header; //12 bytes
     uint8_t uuid[16];
     uint32_t version;
     uint32_t compress_algo;
     uint8_t sha256[32];
-    uint8_t reverved[28];
+    uint8_t reserved[28];
 } T_COMPRESS_IMG_HEADER_FORMAT;
 
 typedef struct
@@ -190,7 +190,7 @@ typedef struct
             uint32_t _version_minor: 8;     //!< minor version
             uint32_t _version_revision: 15; //!< revision version
             uint32_t _version_reserve: 5;   //!< reserved
-        } img_sub_version; //!< other image sub version including patch, app, app data1-6
+        } img_sub_version; //!< other image sub version including patch, app, app data 1-6
 
     } ver_info;
 } T_IMAGE_VERSION;
@@ -258,7 +258,7 @@ typedef union _IMG_HEADER_FORMAT
     uint8_t bytes[DEFAULT_HEADER_SIZE];
     struct
     {
-        T_AUTH_HEADER_FORMAT auth;   //16 +384
+        T_AUTH_HEADER_FORMAT auth;   //16 +384 +32
         T_IMG_CTRL_HEADER_FORMAT ctrl_header;
         uint8_t uuid[16];
         uint32_t exe_base;
@@ -288,18 +288,11 @@ typedef union _IMG_HEADER_FORMAT
                 T_FLASH_SEC_FORMAT flash_sec_cfg;
                 uint16_t fsbl_ext_img_id;
                 uint16_t fsbl_ext_load_pattern;
-#if (FT_PATCH == 1)
-                uint8_t reserved1[58];
-                uint32_t ft_ecn_version;
-#else
                 uint8_t reserved1[62];
-#endif
             };
         };
     };
 } T_IMG_HEADER_FORMAT;
-
-
 
 typedef struct _ROM_HEADER_FORMAT
 {
@@ -329,96 +322,214 @@ typedef enum
   * @}
   */
 
-/*************************************************************************************************
-*                          functions
-*************************************************************************************************/
-/**
- * @brief  get image address in ota header
- * @param  ota_addr: valid ota header addr
- * @param  image_id: image id
- * @retval image address in ota header
-*/
-extern uint32_t *get_image_addr_in_bank(uint32_t ota_addr, T_IMG_ID image_id);
-
-/**
- * @brief  get image size in ota header
- * @param  ota_addr: valid ota header addr
- * @param  image_id: image id
- * @retval image size in ota header
-*/
-extern uint32_t *get_image_size_in_bank(uint32_t ota_addr, T_IMG_ID image_id);
-
+/*============================================================================*
+  *                                   Functions
+ *============================================================================*/
 /** @defgroup FLASH_DEVICE_Exported_Functions Flash Device Exported Functions
     * @brief
     * @{
     */
+
 /**
- * @brief  get start address of active ota bank
- * @param  none
- * @return start address of active ota bank
+ * @brief  Get image address in OTA header
+ *
+ * @param[in]  ota_addr: valid OTA header address
+ * @param[in]  image_id: image ID
+ *
+ * @return Image address in OTA header
+*/
+extern uint32_t *get_image_addr_in_bank(uint32_t ota_addr, T_IMG_ID image_id);
+
+/**
+ * @brief  Get image size in OTA header
+ *
+ * @param[in]  ota_addr: valid OTA header address
+ * @param[in]  image_id: image ID
+ *
+ * @return Image size in OTA header
+*/
+extern uint32_t *get_image_size_in_bank(uint32_t ota_addr, T_IMG_ID image_id);
+
+/**
+ * @brief  Get start address of active OTA bank
+ *
+ * @return Start address of active OTA bank
 */
 extern uint32_t get_active_ota_bank_addr(void);
 
 /**
- * @brief  check configurated flash layout support bank switch
- * @param  none
- * @retval true support bank switch
- * @retval false otherwise
+ * @brief  Check configured flash layout support bank switch
+ *
+ * @return Check result
+ * @retval true Support bank switch
+ * @retval false Otherwise
 */
 extern bool is_ota_support_bank_switch(void);
 
 /**
- * @brief  calculated checksum(CRC16 or SHA256 determined by image) over the image, and compared
+ * @brief  Calculate checksum (CRC16 or SHA256 determined by image) over the image, and compare
  *         with given checksum value.
- * @param  p_header image header info of the given image.
- * @retval true if image integrity check pass via checksum compare
- * @retval false otherwise
+ *
+ * @param  p_header Image header info of the given image.
+ *
+ * @return Check result
+ * @retval true If image integrity check passes via checksum compare
+ * @retval false Otherwise
 */
 extern bool check_image_chksum(T_IMG_HEADER_FORMAT *p_header);
+
 /**
  * @brief  Check the validity of the specified image
- * @param  image_id specify the image
- * @param  header_addr specify image header address
- * @retval IMG_CHECK_PASS if image check pass
- * @retval fail otherwise
+ *
+ * @param[in]  image_id Specify the image
+ * @param[in]  header_addr Specify image header address
+ *
+ * @return Check result
+ * @retval IMG_CHECK_PASS If image check passes
+ * @retval fail Otherwise
 */
 extern IMG_CHECK_ERR_TYPE check_header_valid(uint32_t header_addr, T_IMG_ID image_id);
+
 /**
- * @brief  get specified image header address in active bank
- * @param  image_id specify the image
- * @return specified image header address
+ * @brief  Get specified image header address in active bank
+ *
+ * @param[in]  image_id Specify the image
+ *
+ * @return Specified image header address
 */
 extern uint32_t get_header_addr_by_img_id(T_IMG_ID image_id);
 
 /**
- * @brief  get image size of specified image which located in ota active bank
- * @param  image_id specify the image which located in ota active bank
- * @return image size of specified image which located in ota active bank
+ * @brief  Get image size of specified image which is located in OTA active bank
+ *
+ * @param[in]  image_id Specify the image which is located in OTA active bank
+ * @return Image size of specified image which is located in OTA active bank
 */
 extern uint32_t get_active_bank_image_size_by_img_id(T_IMG_ID image_id);
 /**
- * @brief  get start address of specified image which located in ota temp bank
- * @param  image_id specify the image
- * @return start address of specified image which located in ota temp bank
+ * @brief  Get start address of specified image which is located in OTA temp bank
+ *
+ * @param[in]  image_id Specify the image
+ * @return Start address of specified image which is located in OTA temp bank
 */
-extern uint32_t get_temp_ota_bank_addr_by_img_id(T_IMG_ID image_id);
+static uint32_t get_temp_ota_bank_addr_by_img_id(T_IMG_ID image_id);
 
 /**
- * @brief  get size of specified image which located in ota temp bank
- * @param  image_id specify the image
- * @return size of specified image which located in ota temp bank
+ * @brief  Get the size of the specified image located in the OTA temp bank.
+ *
+ * @param[in]  image_id Specify the image.
+ * @return The size of the specified image located in the OTA temp bank.
 */
-extern uint32_t patch_get_temp_ota_bank_size_by_img_id(T_IMG_ID image_id);
+static uint32_t get_temp_ota_bank_size_by_img_id(T_IMG_ID image_id);
 
 /**
- * @brief  get version info of specified image which located in active bank
- * @param  image_id specify the image
- * @return version info of specified image which located in active bank
+ * @brief  Get version info of the specified image located in the active bank.
+ *
+ * @param[in]  image_id Specify the image.
+ * @return Version info of the specified image located in the active bank.
 */
 extern bool get_active_bank_image_version(T_IMG_ID image_id, T_IMAGE_VERSION *p_image_version);
 
 extern IMG_CHECK_ERR_TYPE image_entry_check(T_ROM_HEADER_FORMAT *rom_header,
                                             T_ROM_HEADER_FORMAT *patch_header);
+
+static inline uint32_t get_temp_ota_bank_addr_by_img_id(T_IMG_ID image_id)
+{
+    uint32_t image_addr = 0;
+    if (image_id < OTA || ((image_id >= IMAGE_MAX)))
+    {
+        return image_addr;
+    }
+    if (!is_ota_support_bank_switch())
+    {
+        if (image_id == OTA)
+        {
+            return 0;
+        }
+        image_addr = flash_nor_get_bank_addr(FLASH_OTA_TMP);
+    }
+    else
+    {
+        uint32_t ota_bank0_addr = flash_nor_get_bank_addr(FLASH_OTA_BANK_0);
+        uint32_t temp_bank_addr;
+        if (ota_bank0_addr == get_active_ota_bank_addr())
+        {
+            temp_bank_addr = flash_nor_get_bank_addr(FLASH_OTA_BANK_1);
+        }
+        else
+        {
+            temp_bank_addr = ota_bank0_addr;
+        }
+        if (image_id == OTA)
+        {
+            image_addr = temp_bank_addr;
+        }
+        else if (image_id >= SecureBoot && image_id < IMAGE_MAX)
+        {
+            if (IMG_CHECK_PASS != check_header_valid(temp_bank_addr, OTA))
+            {
+                return 0;
+            }
+            image_addr = *get_image_addr_in_bank(temp_bank_addr, image_id);
+        }
+    }
+    if (image_addr == 0xffffffff)
+    {
+        return 0;
+    }
+    return image_addr;
+}
+
+static inline uint32_t get_temp_ota_bank_size_by_img_id(T_IMG_ID image_id)
+{
+    uint32_t image_size = 0;
+
+    if (image_id < OTA || ((image_id >= IMAGE_MAX)))
+    {
+        return image_size;
+    }
+
+    if (!is_ota_support_bank_switch())
+    {
+        if (image_id == OTA)
+        {
+            return 0;
+        }
+
+        image_size = flash_nor_get_bank_size(FLASH_OTA_TMP);
+    }
+    else
+    {
+        uint32_t ota_bank0_addr = flash_nor_get_bank_addr(FLASH_OTA_BANK_0);
+        uint32_t temp_bank_addr;
+
+        if (ota_bank0_addr == get_active_ota_bank_addr())
+        {
+            temp_bank_addr = flash_nor_get_bank_addr(FLASH_OTA_BANK_1);
+        }
+        else
+        {
+            temp_bank_addr = ota_bank0_addr;
+        }
+
+        if (image_id == OTA)
+        {
+            image_size = OTA_HEADER_SIZE;
+        }
+        else if (image_id >= SecureBoot && image_id < IMAGE_MAX)
+        {
+            if (IMG_CHECK_PASS != check_header_valid(temp_bank_addr, OTA))
+            {
+                return 0;
+            }
+
+            image_size = *get_image_size_in_bank(temp_bank_addr, image_id);
+        }
+    }
+
+    return image_size;
+}
+
 /** @} */ /* End of group FLASH_DEVICE_Exported_Functions */
 /** @} */ /* End of group FLASH_DEVICE */
 
