@@ -56,21 +56,6 @@ typedef enum
 
 typedef enum
 {
-    FLASH_NOR_ERASE_SECTOR  = 1,
-    FLASH_NOR_ERASE_BLOCK   = 2,
-    FLASH_NOR_ERASE_CHIP    = 4,
-} FLASH_NOR_ERASE_MODE;
-
-typedef enum
-{
-    FLASH_NOR_DMA_AUTO_F2R = 0,
-    FLASH_NOR_DMA_AUTO_R2F,
-    FLASH_NOR_DMA_USER_F2R,
-    FLASH_NOR_DMA_USER_R2F
-} FLASH_NOR_DMA_TYPE;
-
-typedef enum
-{
     FLASH_NOR_WREN_REG,
     FLASH_NOR_WREN_DATA,
 } FLASH_NOR_WREN_MODE;
@@ -85,13 +70,6 @@ typedef enum
     FLASH_NOR_PLL_80MHZ,
     FLASH_NOR_CLK_MAX
 } FLASH_NOR_CLK_FREQ;
-
-typedef enum
-{
-    FLASH_NOR_IDX_SPIC0,            /* Nor flash controlled by SPIC0 */
-    FLASH_NOR_IDX_SPIC1,
-    FLASH_NOR_IDX_MAX
-} FLASH_NOR_IDX_TYPE;
 
 typedef enum
 {
@@ -165,46 +143,6 @@ typedef struct _PACKED_ _FLASH_NOR_ADV_CMD_STRUCT
 
 typedef struct
 {
-    // flash info
-    uint32_t  PageSize;
-    uint32_t  Main_Addr;
-    uint32_t  Spic_Cal_Addr;
-
-    // flash layout table
-    uint32_t  ota_bank0_addr;
-    uint32_t  ota_bank0_size;
-    uint32_t  ota_bank1_addr;
-    uint32_t  ota_bank1_size;
-    uint32_t  ftl_addr;
-    uint32_t  ftl_size;
-
-    uint32_t  ota_tmp_addr;
-    uint32_t  ota_tmp_size;
-
-    uint32_t  bkp_data1_addr;
-    uint32_t  bkp_data1_size;
-    uint32_t  bkp_data2_addr;
-    uint32_t  bkp_data2_size;
-
-    // only patch_addr is fixed
-    // other fields are changable
-    // app/ota/ftl/dsp dont need to be sequencial
-    // just beware of the size of them have no overlap condition
-
-    uint32_t  HardFault_Record_CFG;
-    // default value: 0x7
-    // [0]: 1, enable saving HardFault_Record
-    // [1]: reserved//1, 1 bit slow mode
-    // [2]: 1, dump HardFaultRecord in boot time
-    // [3]: 1, Clean up HardFaultRecord after dumping HardFault_Record
-    // [4]: 1, Clean up HardFaultRecord before saving HardFault_Record
-    uint32_t  HardFault_Record_BegAddr;
-    uint32_t  HardFault_Record_EndAddr;
-
-} T_FLASH_INFO_TBL;
-
-typedef struct
-{
     uint8_t              channel_num; /*!< Log DMA Channel Number          */
     GDMA_ChannelTypeDef *channel;     /*!< Log DMA Channel (Register Base) */
     IRQn_Type            irq_no;      /*!< Log DMA Channel IRQ Number      */
@@ -268,42 +206,6 @@ typedef struct _PACKED_ _FLASH_NOR_INFO_STRUCT
     FLASH_NOR_DELAY_INFO_STRUCT delay;
 } FLASH_NOR_INFO_STRUCT;
 
-typedef enum
-{
-    FLASH_NOR_RET_UNKNOWN,
-    FLASH_NOR_RET_NOT_EXIST_BASIC_CMD,
-    FLASH_NOR_RET_NOT_EXIST_ADV_CMD,
-    FLASH_NOR_RET_NOT_EXIST_QUERY_INFO,
-    FLASH_NOR_RET_CMD_NOT_SUPPORT,
-    FLASH_NOR_RET_DEV_NOT_SUPPORT,
-    FLASH_NOR_RET_VENDOR_NOT_SUPPORT,
-    FLASH_NOR_RET_LOCK_FAILED,
-    FLASH_NOR_RET_UNLOCK_FAILED,
-    FLASH_NOR_RET_BIT_MODE_SET_FAILED,
-    FLASH_NOR_RET_BIT_MODE_NOT_SUPPORT,
-    FLASH_NOR_RET_ILLEGAL_OPERATION,
-    FLASH_NOR_RET_PARAM_INVALID,
-    FLASH_NOR_RET_WAIT_BUSY_FAILED,
-    FLASH_NOR_RET_IDX_OUT_OF_RANGE,
-    FLASH_NOR_RET_ADDR_OUT_OF_RANGE,
-    FLASH_NOR_RET_ADDR_LARGER_THAN_FLASH_SIZE,
-    FLASH_NOR_RET_CAL_IN_PHYSICAL_CYC_NOT_FOUND,
-    FLASH_NOR_RET_CAL_RD_DUMMY_LENGTH_NOT_FOUND,
-    FLASH_NOR_RET_CAL_FAILED,
-    FLASH_NOR_RET_MALLOC_FAILED,
-    FLASH_NOR_RET_HOOK_FUNC,
-    FLASH_NOR_RET_SUSPEND_UNNECCESSARY,
-    FLASH_NOR_RET_SET_4_BYTE_ADDRESS_MODE_FAILED,
-    FLASH_NOR_RET_SUCCESS
-} FLASH_NOR_RET_TYPE;
-
-typedef enum
-{
-    FLASH_NOR_1_BIT_MODE,
-    FLASH_NOR_2_BIT_MODE,
-    FLASH_NOR_4_BIT_MODE,
-    FLASH_NOR_8_BIT_MODE,
-} FLASH_NOR_BIT_MODE;
 
 /****************************************************************************************
 * Nor Flash Inter-Function Patch Prototype
@@ -323,7 +225,6 @@ extern FLASH_NOR_RET_TYPE(*flash_nor_cmd_tx)(FLASH_NOR_IDX_TYPE idx, SPIC_ACCESS
 extern FLASH_NOR_RET_TYPE(*flash_nor_wait_busy)(FLASH_NOR_IDX_TYPE idx);
 extern FLASH_NOR_RET_TYPE(*flash_nor_get_status_wip)(FLASH_NOR_IDX_TYPE idx, bool *is_wip);
 extern FLASH_NOR_RET_TYPE(*flash_nor_load_query_info)(FLASH_NOR_IDX_TYPE idx);
-FLASH_NOR_RET_TYPE flash_nor_set_seq_trans(FLASH_NOR_IDX_TYPE idx, bool enable);
 extern FLASH_NOR_RET_TYPE(*flash_nor_get_bit_mode)(FLASH_NOR_IDX_TYPE idx,
                                                    FLASH_NOR_BIT_MODE *mode);
 extern FLASH_NOR_RET_TYPE(*flash_nor_set_bit_mode)(FLASH_NOR_IDX_TYPE idx, FLASH_NOR_BIT_MODE mode);
@@ -360,8 +261,6 @@ extern FLASH_NOR_RET_TYPE(*flash_nor_set_cal_addr)(FLASH_NOR_IDX_TYPE idx, uint3
 extern FLASH_NOR_RET_TYPE(*flash_nor_cal_dummy_cyc)(FLASH_NOR_IDX_TYPE idx, uint32_t cal_addr,
                                                     FLASH_NOR_BIT_MODE mode);
 extern FLASH_NOR_RET_TYPE(*flash_nor_calibration)(FLASH_NOR_IDX_TYPE idx, FLASH_NOR_BIT_MODE mode);
-extern FLASH_NOR_RET_TYPE(*flash_nor_try_high_speed_mode)(FLASH_NOR_IDX_TYPE idx,
-                                                          FLASH_NOR_BIT_MODE bit_mode);
 extern FLASH_NOR_RET_TYPE(*flash_nor_get_tb_bit)(FLASH_NOR_IDX_TYPE idx, bool *from_bottom);
 extern FLASH_NOR_RET_TYPE(*flash_nor_set_tb_bit)(FLASH_NOR_IDX_TYPE idx, bool from_bottom);
 extern void set_flash_interface(FLASH_NOR_INTERFACE_TYPE type);
@@ -384,9 +283,6 @@ uint32_t flash_nor_auto_read(uint32_t addr);
 
 extern void (*flash_nor_dma_init)(FLASH_NOR_DMA_TYPE dma_type, uint32_t src_addr, uint32_t dst_addr,
                                   uint32_t data_len);
-
-void flash_nor_auto_dma_read(FLASH_NOR_DMA_TYPE dma_type, FlashCB flash_cb, uint32_t src_addr,
-                             uint32_t dst_addr, uint32_t data_len);
 
 
 #endif
