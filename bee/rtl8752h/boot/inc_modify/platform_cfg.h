@@ -127,7 +127,7 @@ typedef struct RAM_CONFIG_
 
 enum
 {
-    MEMCFG_ACTIVE,   // Bee3plus iso0 not control data ram, buffer ram and cache ram
+    MEMCFG_ACTIVE,   // rtl8752h iso0 not control data ram, buffer ram and cache ram
     MEMCFG_LOWPOWER,
     MEMCFG_MAX
 };

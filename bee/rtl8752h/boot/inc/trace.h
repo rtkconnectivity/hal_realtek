@@ -73,8 +73,8 @@ typedef enum
     TYPE_BEE3                   = 35,
 
     TYPE_BEE3PRO                = 36,
-    TYPE_BEE3PLUS               = 37,
-    TYPE_BEE4                   = 38,
+    TYPE_RTL8752H               = 37,
+    TYPE_RTL87X2G                   = 38,
 
     /* type 128~207 reserved for 3rd party definition */
 
@@ -216,7 +216,7 @@ typedef enum
 
 
 /* Log type current ic used */
-#define LOG_TYPE                (TYPE_BEE3PLUS)
+#define LOG_TYPE                (TYPE_RTL8752H)
 
 /**
  * trace.h
@@ -389,7 +389,7 @@ const char *trace_binary(uint32_t info, uint16_t length, uint8_t *p_data);
         log_direct_retarget(COMBINE_TRACE_INFO(LOG_TYPE, SUBTYPE_DIRECT, 0, 0), __VA_ARGS__);\
     } while (0)
 
-#if (LOG_TYPE == TYPE_BEE4)
+#if (LOG_TYPE == TYPE_RTL87X2G)
 #define DBG_LOWERSTACK(color, file_num, line_num, str_index, param_num, ...)     do {\
         log_buffer_lowerstack(str_index, param_num, ##__VA_ARGS__);\
     } while (0)

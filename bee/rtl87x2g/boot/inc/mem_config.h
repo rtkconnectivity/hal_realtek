@@ -82,10 +82,10 @@ extern "C" {
 /*=======================================================================================*
   *                                 ITCM1 + DTCM0 + DTCM1 layout
   *=====================================================================================*/
-/* RAM(ITCM1):          Bee4 size: 192K
- * RAM(DTCM0):          Bee4 size:  64K
- * RAM(DTCM1):          Bee4 size:  64K
- * Total RAM(TCM):      Bee4 size: 320K
+/* RAM(ITCM1):          rtl87x2g size: 192K
+ * RAM(DTCM0):          rtl87x2g size:  64K
+ * RAM(DTCM1):          rtl87x2g size:  64K
+ * Total RAM(TCM):      rtl87x2g size: 320K
 example:
    a) non-secure total size:                          243K
       1) non-secure upperstack ram         3K (adjustable, depend on used upperstack version, config NS_RAM_UPPERSTACK_SIZE)

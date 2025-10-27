@@ -97,7 +97,7 @@ typedef enum IRQn
     GPIO_Group1_IRQn,            /**<  [29] GPIO Group1 Interrupt ( an Extension of interrupt )  */
     GPIO_Group0_IRQn,            /**<  [30] GPIO Group0 Interrupt ( an Extension of interrupt )  */
     UART2_IRQn,                  /**<  [31] UART2 interrupt */
-    /******  Bee3Plus Extension Interrupt Numbers ************/
+    /******  rtl8752h Extension Interrupt Numbers ************/
     TIMER4_IRQ                      = 8,
     TIMER5_IRQ                      = 8,
     GPIO3_IRQn                      = 26,
