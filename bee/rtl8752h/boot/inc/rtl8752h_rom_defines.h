@@ -1,10 +1,10 @@
-#ifndef _BEE3PLUS_ROM_DEFINE_H_
-#define _BEE3PLUS_ROM_DEFINE_H_
+#ifndef _RTL8752H_ROM_DEFINE_H_
+#define _RTL8752H_ROM_DEFINE_H_
 
 #define TEST_USB                                        0
 #define TEST_ZIGBEE                                     0
 
-#define _IS_BEE4_SERIES_                                1
+#define _IS_RTL87X2G_SERIES_                                1
 #define DIRECTLY_BRANCH_TO_NS                           0
 #define TZ_FPU_NS_USAGE                                 0
 #define IS_BFHFNMI_NS                                   1
@@ -20,7 +20,7 @@
 #define _IS_ASIC_
 #define SUPPORT_SINGLE_WIRE                             1
 #define SECURE_IP_VERIFICATION                          0 /* Secure IP Verification Flag */
-#define ROM_VERION_STRING                               "Bee3Plus Boot ROM: 0x%08x%08x%08x%08x"
+#define ROM_VERION_STRING                               "rtl8752h Boot ROM: 0x%08x%08x%08x%08x"
 
 //#define MAX_PAYLOAD_SIZE                                0x0800000 //8MB
 #define BOOTPATCH_ADDRESS                               0x04003000
@@ -38,8 +38,8 @@
 #define PROPRIETARY_ROM_SIZE                            (TOTAL_ROM_SIZE - PLATFORM_ROM_SIZE - STACK_ROM_SIZE)
 #define VECTORS_TABLE_OFFSET                            0x2000  // boot rom header offset
 
-#define OUTPUT_PLATROM_NAME                             "bee3plus_platform"
-#define OUTPUT_UPPERSTACK_NAME                          "bee3plus_upperstack"
+#define OUTPUT_PLATROM_NAME                             "rtl8752h_platform"
+#define OUTPUT_UPPERSTACK_NAME                          "rtl8752h_upperstack"
 #define XO_OFFSET                                       0x2000
 #define OS_MINIMAL_SECURE_STACK_SIZE                    1024
 
@@ -57,4 +57,4 @@
 // #define FOR_SIMULATION
 //#define FAKE_UART_ADDRESS                               0x200000
 //#define _DLPS_SIMU_TEST_
-#endif /* _BEE3PLUS_ROM_DEFINE_H_ */
+#endif /* _RTL8752H_ROM_DEFINE_H_ */

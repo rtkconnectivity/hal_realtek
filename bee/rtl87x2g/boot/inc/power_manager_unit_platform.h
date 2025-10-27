@@ -31,11 +31,11 @@ extern "C" {
 
 typedef enum
 {
-    //PLATFORM_POWEROFF       = 0,   /**< Power off  */     // Bee4 not support
+    //PLATFORM_POWEROFF       = 0,   /**< Power off  */     // rtl87x2g not support
     PLATFORM_POWERDOWN      = 1,   /**< Power down */
     PLATFORM_DLPS_PFM       = 2,   /**< DLPS (PFM) */
     PLATFORM_DLPS_RET       = 3,   /**< DLPS (RET) */
-    //PLATFORM_LPS_PFM        = 4,   /**< LPS        */     // Bee4 not support
+    //PLATFORM_LPS_PFM        = 4,   /**< LPS        */     // rtl87x2g not support
     PLATFORM_ACTIVE         = 5,   /**< Active     */
     PLATFORM_POWER_MODE_MAX = 6
 } PlatformPowerMode;

@@ -10,7 +10,7 @@
 
 /* ================================================================================ */
 /* ================                PCC Register               ================ */
-/* ===========     Reference: Bee4_PERI-ON_20221201_v1.xlsx     =========== */
+/* ===========     Reference: rtl87x2g_PERI-ON_20221201_v1.xlsx     =========== */
 /* ================================================================================ */
 typedef struct
 {
@@ -1488,7 +1488,7 @@ typedef struct
 
 } PERI_BLKCTRL_PERI_CLK_TypeDef;
 
-/* reference: Bee4_PERI-ON_20221017_v2.xlsx */
+/* reference: rtl87x2g_PERI-ON_20221017_v2.xlsx */
 typedef struct
 {
     /* 0x700        0x4000_2700
@@ -1629,7 +1629,7 @@ typedef struct
 
 } PERIBLKCTRL_AUDIO_TypeDef;
 
-/* reference: Bee4_PERI-ON_20221017_v2.xlsx */
+/* reference: rtl87x2g_PERI-ON_20221017_v2.xlsx */
 typedef struct
 {
     /* 0xA00        0x4000_2a00
@@ -2826,7 +2826,7 @@ typedef struct
 
 } PERI_BLKCTRL_INTERNAL_TypeDef;
 
-/* reference: Bee4_PERI-ON_20221017_v2.xlsx */
+/* reference: rtl87x2g_PERI-ON_20221017_v2.xlsx */
 typedef struct
 {
     union

@@ -38,10 +38,10 @@ extern "C" {
 
 typedef enum
 {
-    //PLATFORM_POWEROFF       = 0,   /**< Power off  */     // Bee3Plus not support
+    //PLATFORM_POWEROFF       = 0,   /**< Power off  */     // rtl8752h not support
     PLATFORM_POWERDOWN      = 1,   /**< Power down */
     PLATFORM_DLPS           = 2,   /**< DLPS */
-    //PLATFORM_DLPS_RET       = 3,   /**< DLPS (RET) */     // Bee3Plus not support
+    //PLATFORM_DLPS_RET       = 3,   /**< DLPS (RET) */     // rtl8752h not support
     PLATFORM_LPS            = 4,   /**< LPS        */
     PLATFORM_ACTIVE         = 5,   /**< Active     */
     PLATFORM_POWER_MODE_MAX = 6
