@@ -44,7 +44,6 @@
 #define SIGNATURE_APP_CB              0x0e85d101 /**< patch callback app signature definition*/
 #define UUID_SIZE                     16
 
-/*IC Type refer to WIKI: https://wiki.realtek.com/display/Bee1/BT+SOC+IC+Type*/
 #define IMG_IC_TYPE          0x10
 
 #define DFU_HEADER_SIZE          12  /*currently, first 12 byte only will be treated as image header*/

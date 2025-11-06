@@ -13,7 +13,7 @@
 #include "rtl876x_rcc.h"
 #include "rtl876x_adc.h"
 
-#define EFUSE_ON_RAM_BASE             0x00200f81UL   //bee3plus 
+#define EFUSE_ON_RAM_BASE             0x00200f81UL
 #define EFUSE_FT_VER_OFFSET              0x1C8
 
 #define SYSTEM_CALL_PMU_REQUEST_LDO_AUDIO_REF   0x0A
@@ -427,7 +427,7 @@ void ADC_SchIndexConfig(ADC_TypeDef *ADCx, uint8_t adcMode, uint16_t index)
 }
 
 /**
-  * @brief  Same as function ADC_SchIndexConfig,this function is version bee2.
+  * @brief  Same as function ADC_SchIndexConfig,this function is version RTL8762C.
   * @param  ADCx: selected ADC peripheral.
   * @param  adcMode: ADC mode.
   *     This parameter can be one of the following values:

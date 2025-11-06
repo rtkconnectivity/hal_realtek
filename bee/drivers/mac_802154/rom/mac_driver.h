@@ -425,7 +425,7 @@ typedef struct
     void (*bt_hci_reset_start)(void);
     void (*bt_hci_reset_end)(void);
 
-    // added after BEE4 B-Cut
+    // added after RTL87X2G B-Cut
     void (*grant_phy_req)(uint8_t slot_offset);
     uint32_t (*fifo_base_addr)(mac_fifo_id_t fifo_id);
     uint8_t (*LoadTxNPayload)(uint8_t HdrL, uint8_t FrmL, uint8_t *TxFIFO);

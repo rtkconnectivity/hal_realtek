@@ -90,7 +90,7 @@ typedef enum _SW_RESET_REASON
     RESET_REASON_FLASH_LAYOUT_OVERFLOW      = 0x16,
     RESET_REASON_DFU_UPDATE_COMPRESSED_IMG  = 0x17,
 
-    //Compatible for Bee2 B-cut
+    //Compatible for RTL8762C B-cut
     SW_RESET_APP_START              = 0xD0,
     SWITCH_HCI_MODE                 = 0xD1,
     SWITCH_TEST_MODE                = 0xD2,

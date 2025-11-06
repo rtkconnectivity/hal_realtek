@@ -225,7 +225,7 @@ uint32_t GPIO_GetPin(uint8_t Pin_num)
     {
         return BIT(Pin_num);
     }
-#if (IC_TYPE == IC_TYPE_BEE3)
+#if (IC_TYPE == IC_TYPE_RTL8762E)
     else if (Pin_num == P4_0)
     {
         return BIT(13);
@@ -265,7 +265,7 @@ uint8_t GPIO_GetNum(uint8_t Pin_num)
     {
         return (Pin_num);
     }
-#if (IC_TYPE == IC_TYPE_BEE3)
+#if (IC_TYPE == IC_TYPE_RTL8762E)
     else if (Pin_num == P4_0)
     {
         return 13;
