@@ -43,7 +43,7 @@ extern "C" {
 
 /**
  * \cond
- * \brief Bee3Plus LCD8080 PINMUX OFFSET
+ * \brief RTL8752H LCD8080 PINMUX OFFSET
  * \{
  */
 #define REG_MUX_LCD 0x2A8

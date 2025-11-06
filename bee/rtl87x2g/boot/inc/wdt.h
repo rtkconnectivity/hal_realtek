@@ -99,7 +99,7 @@ typedef enum
     RESET_REASON_DLPS                       = 0x1A,
     RESET_REASON_POWER_DOWN                 = 0x1B,
 
-    //Compatible for Bee2 B-cut
+    //Compatible for RTL8762C B-cut
     SW_RESET_APP_START              = 0xD0,
     SWITCH_HCI_MODE                 = 0xD1,
     SWITCH_TEST_MODE                = 0xD2,

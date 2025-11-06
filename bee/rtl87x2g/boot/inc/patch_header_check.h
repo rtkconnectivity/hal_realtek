@@ -32,7 +32,7 @@
 #define OTA_HEADER_SIZE                     0x1000
 #define UUID_SIZE                           16
 #define DEFAULT_HEADER_SIZE                 (0x400 + 256)
-/*IC Type refer to WIKI: https://wiki.realtek.com/display/Bee1/BT+SOC+IC+Type*/
+
 #define IMG_IC_TYPE                         0xF
 #define FLASH_NOR_TABLE_MAGIC_PATTERN       (0x5A5A12A5)
 

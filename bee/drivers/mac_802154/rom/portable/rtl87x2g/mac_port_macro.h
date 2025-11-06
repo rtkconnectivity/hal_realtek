@@ -35,7 +35,7 @@
 #include "rtl876x.h"                           /*!< ARM Cortex-M4 processor and core peripherals                              */
 
 #define PORT_CATEGORY_BT_SOC
-#define PORT_PLATFORM_BEE4
+#define PORT_PLATFORM_RTL87X2G
 
 #define DEFAULT_RF_MODE     RF_TPM
 #ifndef _IS_ASIC_   // FPGA, use external RF board

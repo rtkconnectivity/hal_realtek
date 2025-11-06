@@ -310,7 +310,7 @@ void SDHC_SetHostDataWidth(SDHC_TypeDef *SDHCx, DataWidth_t Width)
     case DATAWIDTH_4BIT_DDR:
         SDHCx->CTYPE = 1;
         break;
-    case DATAWIDTH_8BIT: // Only 4 pins is available in Bee4.
+    case DATAWIDTH_8BIT: // Only 4 pins is available in RTL87X2G.
     case DATAWIDTH_8BIT_DDR:
         SDHCx->CTYPE = 1 << 16;
         break;
@@ -944,7 +944,7 @@ static uint8_t GetPinCnt(DataWidth_t DataWidth)
     case DATAWIDTH_4BIT:
     case DATAWIDTH_4BIT_DDR:
         return 6;
-    case DATAWIDTH_8BIT: // Only 4 pins is available in Bee4.
+    case DATAWIDTH_8BIT: // Only 4 pins is available in RTL87X2G.
     case DATAWIDTH_8BIT_DDR:
         return 10;
     default:

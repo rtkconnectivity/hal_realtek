@@ -956,7 +956,7 @@ __STATIC_INLINE void UART_ClearRxBreak(UART_TypeDef *UARTx)
 }
 
 
-/* reference: Bee3Plus_ALL_register_table_20221116.xlsx
+/* reference: RTL8752H_ALL_register_table_20221116.xlsx
    r_PMUX_1_WIRE_UART_EN[0] is log uart0 1-wire mode enable
    r_PMUX_1_WIRE_UART_EN[1] is data uart0 1-wire mode enable
 */
