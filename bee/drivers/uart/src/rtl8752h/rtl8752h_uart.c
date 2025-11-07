@@ -81,6 +81,11 @@ void UART_DLPSExit(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_UART2, APBPeriph_UART2_CLOCK, ENABLE);
     }
 
+    UARTx->LCR &= (~(1 << 7));
+    UARTx->DLH_INTCR =  0;
+    (void)UARTx->LSR;
+    UARTx->INTID_FCR |= (FCR_CLEAR_RX_FIFO_Set | FCR_CLEAR_TX_FIFO_Set);
+
     //access DLH and DLL
     UARTx->LCR |= (1 << 7);
     UARTx->STSR = store_buf->uart_reg[7];
