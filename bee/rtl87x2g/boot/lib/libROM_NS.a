@@ -447,3 +447,4 @@ bt_clk_offset = 0x0013ded8 ;
 set_zigbee_priority = 0x00043719 ;
 patch_SystemCall_Zigbee_Stack = 0x0013e3d4 ;
 mac_memcpy_rom = 0x0002685d ;
+platform_pm_register_schedule_bottom_half_callback_func = 0x00029c39 ;

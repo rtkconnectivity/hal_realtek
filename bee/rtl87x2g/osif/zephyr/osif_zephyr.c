@@ -1410,7 +1410,6 @@ void os_timer_init_zephyr(void)
 /*dlps restore os kernel scheduler processing                               */
 /****************************************************************************/
 /* from realtek */
-extern void os_pm_restore_tickcount(void);
 extern void os_pm_store_tickcount(void);
 extern PMCheckResult os_pm_check(uint32_t *wakeup_time_diff);
 extern T_OS_QUEUE lpm_excluded_handle[PLATFORM_PM_EXCLUDED_TYPE_MAX];
@@ -1463,7 +1462,7 @@ void os_pm_store_zephyr(void)
 
 void os_pm_restore_zephyr(void)
 {
-    os_pm_restore_tickcount();
+    //os_pm_restore_tickcount();
 
     os_sched_restore_zephyr();
 }
@@ -1570,17 +1569,46 @@ uint32_t os_pm_next_timeout_value_get_zephyr(void)
     }
 
     return timeout_tick_res;
+}
 
+#define RTK_PM_WORKQ_STACK_SIZE 768
+#define RTK_PM_WORKQ_PRIORITY   K_HIGHEST_THREAD_PRIO
+
+K_THREAD_STACK_DEFINE(rtk_pm_workq_stack_area, RTK_PM_WORKQ_STACK_SIZE);
+
+struct k_work_q rtk_pm_workq;
+static struct pend_call pc;
+
+void pendcall_handler(struct k_work *item)
+{
+    struct pend_call *pc = CONTAINER_OF(item, struct pend_call, work);
+    pc->pend_func(pc->para1, pc->para2);
+}
+
+void os_pm_bottom_half_zephyr(void (*pend_func)(void))
+{
+    pc.pend_func = (pend_func_t)pend_func;
+    pc.para1 = NULL;
+    pc.para2 = 0;
+    k_work_init(&pc.work, pendcall_handler);
+    k_work_submit_to_queue(&rtk_pm_workq, &pc.work);
 }
 
 void os_pm_init_zephyr(void)
 {
     power_manager_slave_register_function_to_return(os_pm_return_to_idle_task_zephyr);
 
+    platform_pm_register_schedule_bottom_half_callback_func(os_pm_bottom_half_zephyr);
+
     platform_pm_register_callback_func_with_priority((void *)os_pm_check, PLATFORM_PM_CHECK, 1);
     platform_pm_register_callback_func_with_priority((void *)os_pm_store_zephyr, PLATFORM_PM_STORE, 1);
     platform_pm_register_callback_func_with_priority((void *)os_pm_restore_zephyr, PLATFORM_PM_RESTORE,
                                                      1);
+
+    k_work_queue_init(&rtk_pm_workq);
+    k_work_queue_start(&rtk_pm_workq, rtk_pm_workq_stack_area,
+                       K_THREAD_STACK_SIZEOF(rtk_pm_workq_stack_area), RTK_PM_WORKQ_PRIORITY,
+                       NULL);
     return;
 }
 

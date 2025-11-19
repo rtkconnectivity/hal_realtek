@@ -27,6 +27,8 @@ typedef void (*PMFuncToReturn)(void);
 extern void power_manager_slave_register_function_to_return(PMFuncToReturn func);
 extern void (*platform_pm_register_callback_func_with_priority)(void *, PlatformPMStage, int8_t);
 extern struct k_thread *z_swap_next_thread(void);
+extern void platform_pm_register_schedule_bottom_half_callback_func(PlatformPMScheduleBottomHalfFunc
+                                                                    cb_func);
 // extern variable
 extern T_OS_QUEUE lpm_excluded_handle[PLATFORM_PM_EXCLUDED_TYPE_MAX];
 
@@ -1409,9 +1411,31 @@ void os_pm_store_zephyr(void)
 
 void os_pm_restore_zephyr(void)
 {
-    os_pm_restore_tickcount();
+    //os_pm_restore_tickcount();
 }
 
+#define RTK_PM_WORKQ_STACK_SIZE 768
+#define RTK_PM_WORKQ_PRIORITY   K_HIGHEST_THREAD_PRIO
+
+K_THREAD_STACK_DEFINE(rtk_pm_workq_stack_area, RTK_PM_WORKQ_STACK_SIZE);
+
+struct k_work_q rtk_pm_workq;
+static struct pend_call pc;
+
+void pendcall_handler(struct k_work *item)
+{
+    struct pend_call *pc = CONTAINER_OF(item, struct pend_call, work);
+    pc->pend_func(pc->para1, pc->para2);
+}
+
+void os_pm_bottom_half_zephyr(void (*pend_func)(void))
+{
+    pc.pend_func = (pend_func_t)pend_func;
+    pc.para1 = NULL;
+    pc.para2 = 0;
+    k_work_init(&pc.work, pendcall_handler);
+    k_work_submit_to_queue(&rtk_pm_workq, &pc.work);
+}
 
 /* ************************************************* OSIF PATCH ************************************************* */
 void osif_mem_func_init_zephyr()
@@ -1424,6 +1448,7 @@ void osif_mem_func_init_zephyr()
     patch_osif_os_mem_peek                 = (BOOL_PATCH_FUNC)os_mem_peek_zephyr;
     patch_osif_os_mem_check_heap_usage     = (BOOL_PATCH_FUNC)os_mem_check_heap_usage_zephyr;
 }
+
 void osif_msg_func_init_zephyr()
 {
     patch_osif_os_msg_queue_create_intern = (BOOL_PATCH_FUNC)os_msg_queue_create_intern_zephyr;
@@ -1432,6 +1457,7 @@ void osif_msg_func_init_zephyr()
     patch_osif_os_msg_send_intern = (BOOL_PATCH_FUNC)os_msg_send_intern_zephyr;
     patch_osif_os_msg_recv_intern = (BOOL_PATCH_FUNC)os_msg_recv_intern_zephyr;
 }
+
 void osif_sched_func_init_zephyr(void)
 {
     patch_osif_os_init = os_init_zephyr;
@@ -1494,13 +1520,16 @@ void os_pm_init_zephyr(void)
 {
     power_manager_slave_register_function_to_return(os_task_dlps_return_idle_task_zephyr);
 
-    /* Since syswork queue (priority -1) < lowstack thread(priority -15), so we cannot use syswork q to process DLPS pend call. */
-    // platform_pm_register_schedule_bottom_half_callback_func(os_pm_bottom_half_zephyr);
+    platform_pm_register_schedule_bottom_half_callback_func(os_pm_bottom_half_zephyr);
 
     platform_pm_register_callback_func_with_priority((void *)os_pm_check, PLATFORM_PM_CHECK, 1);
     platform_pm_register_callback_func_with_priority((void *)os_pm_store_zephyr, PLATFORM_PM_STORE, 1);
     platform_pm_register_callback_func_with_priority((void *)os_pm_restore_zephyr, PLATFORM_PM_RESTORE,
                                                      1);
+    k_work_queue_init(&rtk_pm_workq);
+    k_work_queue_start(&rtk_pm_workq, rtk_pm_workq_stack_area,
+                       K_THREAD_STACK_SIZEOF(rtk_pm_workq_stack_area), RTK_PM_WORKQ_PRIORITY,
+                       NULL);
     return;
 }
 

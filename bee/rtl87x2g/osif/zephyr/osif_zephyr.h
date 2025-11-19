@@ -34,4 +34,14 @@ typedef struct timer_info
     uint32_t timer_id;
 } Timer_Info;
 
+typedef void (*pend_func_t)(void *para1, uint32_t para2);
+
+struct pend_call
+{
+    struct k_work work;
+    pend_func_t pend_func;
+    void *para1;
+    uint32_t para2;
+};
+
 #endif

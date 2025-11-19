@@ -32,3 +32,14 @@ typedef struct
     void *task_handle;
     void *sem_handle;
 } task_sem_item;
+
+typedef void (*pend_func_t)(void *para1, uint32_t para2);
+
+struct pend_call
+{
+    struct k_work work;
+    pend_func_t pend_func;
+    void *para1;
+    uint32_t para2;
+};
+
