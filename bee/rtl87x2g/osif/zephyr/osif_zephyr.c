@@ -300,6 +300,11 @@ bool os_task_delete_zephyr(void *p_handle)
 
     obj = (struct k_thread *)p_handle;
 
+    if (obj == NULL)
+    {
+        k_thread_abort(_current);
+    }
+
     k_thread_abort(obj);
     //task signal todo
     return true;
