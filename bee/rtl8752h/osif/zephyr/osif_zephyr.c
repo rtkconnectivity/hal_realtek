@@ -715,6 +715,11 @@ bool os_task_delete_zephyr(void *p_handle, bool *p_result)
 
     obj = (struct k_thread *)p_handle;
 
+    if (obj == NULL)
+    {
+        k_thread_abort(_current);
+    }
+
     k_thread_abort(obj);
 
     *p_result = true;
