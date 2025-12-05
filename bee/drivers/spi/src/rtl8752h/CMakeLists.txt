@@ -5,4 +5,7 @@ zephyr_library()
 
 zephyr_library_sources(rtl876x_spi.c)
 
+if (CONFIG_PM_DEVICE)
 zephyr_library_sources(rtl8752h_spi.c)
+zephyr_code_relocate(FILES rtl8752h_spi.c LOCATION RAM)
+endif()

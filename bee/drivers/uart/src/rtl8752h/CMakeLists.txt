@@ -5,4 +5,7 @@ zephyr_library()
 
 zephyr_library_sources(rtl876x_uart.c)
 
+if (CONFIG_PM_DEVICE)
 zephyr_library_sources(rtl8752h_uart.c)
+zephyr_code_relocate(FILES rtl8752h_uart.c LOCATION RAM)
+endif()

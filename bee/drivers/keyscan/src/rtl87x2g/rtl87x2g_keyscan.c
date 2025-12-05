@@ -51,7 +51,7 @@ void KEYSCAN_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \return None
   */
 RAM_FUNCTION
-void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf)
+void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf, uint32_t scanmode, uint32_t manual_sel)
 {
     KEYSCANStoreReg_Typedef *store_buf = (KEYSCANStoreReg_Typedef *)StoreBuf;
 
@@ -60,12 +60,14 @@ void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf)
     /* Set FSM to idle state */
     KEYSCAN->KEYSCAN_CONFIG2 &= ~BIT31;
     KEYSCAN->KEYSCAN_CLK_DIV = store_buf->keyscan_reg[0];
-    KEYSCAN->KEYSCAN_CONFIG2 = (store_buf->keyscan_reg[2] & (~(BIT31)));
+    KEYSCAN->KEYSCAN_CONFIG2 = (store_buf->keyscan_reg[2] & (~(BIT31 | BIT11 | BIT30))) |
+                               (!!scanmode << 30) | (!!manual_sel << 11);
     KEYSCAN->KEYSCAN_CONFIG1 = store_buf->keyscan_reg[1];
     KEYSCAN->KEYSCAN_COLUMN_CONFIG = store_buf->keyscan_reg[3];
     KEYSCAN->KEYSCAN_ROW_CONFIG = store_buf->keyscan_reg[4];
     KEYSCAN->KEYSCAN_INT_MASK = store_buf->keyscan_reg[6];
-    KEYSCAN->KEYSCAN_CONFIG2 |= (store_buf->keyscan_reg[2] & ((BIT31)));
+    KEYSCAN->KEYSCAN_CONFIG2 |= (store_buf->keyscan_reg[2] & (~(BIT11 | BIT30))) | BIT31 |
+                                (!!scanmode << 30) | (!!manual_sel << 11);
 
     return;
 }
