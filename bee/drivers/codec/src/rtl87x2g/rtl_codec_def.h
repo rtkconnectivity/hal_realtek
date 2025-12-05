@@ -76,9 +76,34 @@ typedef struct
 /*============================================================================*
  *                          CODEC Declaration
  *============================================================================*/
-#define CODEC       ((CODEC_TypeDef     *)0x40022100UL)
-#define CODEC_ANA   ((CODEC_ANA_TypeDef *)(SPI_CODEC_REG_BASE ))
+/** \defgroup CODEC       CODEC
+  * \brief
+  * \{
+  */
 
+/** \defgroup CODEC_Exported_Constants CODEC Exported Constants
+  * \brief
+  * \{
+  */
+
+/** \defgroup CODEC_Declaration CODEC Declaration
+  * \{
+  * \ingroup  CODEC_Exported_Constants
+  */
+#define CODEC       ((CODEC_TypeDef     *)0x40022100UL)         //!< CODEC base address.
+#define CODEC_ANA   ((CODEC_ANA_TypeDef *)(SPI_CODEC_REG_BASE ))//!< CODEC analog base address.
+
+/** End of CODEC_Declaration
+  * \}
+  */
+
+/** End of CODEC_Exported_Constants
+  * \}
+  */
+
+/** End of CODEC
+  * \}
+  */
 /*============================================================================*
  *                          CODEC Private Types
  *============================================================================*/
