@@ -41,7 +41,7 @@ void KEYSCAN_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore KEYSCAN register data.
   * \return None
   */
-void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf)
+void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf, uint32_t scanmode, uint32_t manual_sel)
 {
     KEYSCANStoreReg_Typedef *store_buf = (KEYSCANStoreReg_Typedef *)StoreBuf;
 
@@ -50,12 +50,12 @@ void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf)
     /* Set FSM to idle state */
     KEYSCAN->CR &= ~BIT31;
     KEYSCAN->CLKDIV = store_buf->keyscan_reg[0];
-    KEYSCAN->CR = (store_buf->keyscan_reg[2] & (~(BIT31)));
+    KEYSCAN->CR      = (store_buf->keyscan_reg[2] & (~(BIT31 | BIT11 | BIT30))) | scanmode | manual_sel;
     KEYSCAN->TIMERCR = store_buf->keyscan_reg[1];
     KEYSCAN->COLCR = store_buf->keyscan_reg[3];
     KEYSCAN->ROWCR = store_buf->keyscan_reg[4];
     KEYSCAN->INTMASK = store_buf->keyscan_reg[6];
-    KEYSCAN->CR |= (store_buf->keyscan_reg[2] & ((BIT31)));
+    KEYSCAN->CR |= (store_buf->keyscan_reg[2] & (~(BIT11 | BIT30))) | BIT31 | scanmode | manual_sel;
 
     return;
 }
