@@ -9,6 +9,7 @@ config REALTEK_CODEC
 	select USE_HAL_REALTEK_RCC
 	select USE_HAL_REALTEK_PINMUX
 	select USE_HAL_REALTEK_NVIC
+	select REALTEK_USING_SDK_LIB
 
 	help
 	  This option enables the codec driver for REALTEK MCU.

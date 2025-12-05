@@ -3,4 +3,4 @@
 
 zephyr_library()
 
-zephyr_library_sources(rtl87x2g_codec.c)
+zephyr_library_sources(rtl_codec.c)
