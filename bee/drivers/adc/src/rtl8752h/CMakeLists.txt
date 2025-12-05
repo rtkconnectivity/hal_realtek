@@ -7,4 +7,9 @@ zephyr_library_sources(rtl876x_adc.c)
 
 zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/libadc.a)
 
-zephyr_library_sources_ifdef(CONFIG_REALTEK_ADC rtl8752h_adc.c)
+if (CONFIG_PM_DEVICE)
+if(CONFIG_REALTEK_ADC)
+zephyr_library_sources(rtl8752h_adc.c)
+zephyr_code_relocate(FILES rtl8752h_adc.c LOCATION RAM)
+endif()
+endif()
