@@ -139,7 +139,9 @@ void UART_ClkDivConfig(UART_TypeDef *UARTx, UARTClockDiv_TypeDef ClockDiv)
 }
 
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void UART_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     UART_TypeDef *UARTx = (UART_TypeDef *)PeriReg;
@@ -197,7 +199,9 @@ void UART_DLPSEnter(void *PeriReg, void *StoreBuf)
 }
 
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void UART_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     UART_TypeDef *UARTx = (UART_TypeDef *)PeriReg;

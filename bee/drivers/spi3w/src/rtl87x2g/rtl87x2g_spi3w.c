@@ -27,7 +27,9 @@
   * \param  StoreBuf: Store buffer to store SPI3W register data.
   * \return None.
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void SPI3W_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     SPI3WStoreReg_Typedef *store_buf = (SPI3WStoreReg_Typedef *)StoreBuf;
@@ -43,7 +45,9 @@ void SPI3W_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore SPI3W register data.
   * \return None
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void SPI3W_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     SPI3WStoreReg_Typedef *store_buf = (SPI3WStoreReg_Typedef *)StoreBuf;

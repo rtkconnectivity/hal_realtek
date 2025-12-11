@@ -285,7 +285,9 @@ void TIM_PWMChangeDZClockSrc(PWM_TypeDef *PWMx, PWMDZClockSrc_TypeDef PWM_Deazon
     }
 }
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     TIMStoreReg_Typedef *store_buf = (TIMStoreReg_Typedef *)StoreBuf;
@@ -332,7 +334,9 @@ void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
     store_buf->tim_reg[28] = PERIBLKCTRL_PERI_CLK->u_33C.REG_TIMER_PWM_WRAP_1_CFG;
 }
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void TIM_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     TIMStoreReg_Typedef *store_buf = (TIMStoreReg_Typedef *)StoreBuf;
