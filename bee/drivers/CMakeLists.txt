@@ -38,6 +38,7 @@ endif()
 add_subdirectory_ifdef(CONFIG_REALTEK_CAN can)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_SPI spi)
+add_subdirectory_ifdef(CONFIG_REALTEK_SPI3W spi3w)
 add_subdirectory_ifdef(CONFIG_REALTEK_SDHC sdhc)
 
 add_subdirectory_ifdef(CONFIG_REALTEK_USB usb)
