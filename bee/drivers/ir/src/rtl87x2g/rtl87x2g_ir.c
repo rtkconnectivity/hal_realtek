@@ -73,7 +73,9 @@ bool IR_ClkGet(IRClockSrc_TypeDef *ClockSrc, IRClockDiv_TypeDef *ClockDiv)
   * \param  StoreBuf: Store buffer to store IR register data.
   * \return None.
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void IR_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     IRStoreReg_Typedef *store_buf = (IRStoreReg_Typedef *)StoreBuf;
@@ -94,7 +96,9 @@ void IR_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore IR register data.
   * \return None
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void IR_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     IRStoreReg_Typedef *store_buf = (IRStoreReg_Typedef *)StoreBuf;

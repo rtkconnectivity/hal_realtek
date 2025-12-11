@@ -27,7 +27,9 @@
   * \param  StoreBuf: Store buffer to store KEYSCAN register data.
   * \return None.
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void KEYSCAN_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     KEYSCANStoreReg_Typedef *store_buf = (KEYSCANStoreReg_Typedef *)StoreBuf;
@@ -50,7 +52,9 @@ void KEYSCAN_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore KEYSCAN register data.
   * \return None
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf, uint32_t scanmode, uint32_t manual_sel)
 {
     KEYSCANStoreReg_Typedef *store_buf = (KEYSCANStoreReg_Typedef *)StoreBuf;

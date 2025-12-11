@@ -208,7 +208,9 @@ void ENHTIM_PWMSrcSelect(ENHTIM_TypeDef *ENHTIMx, ENHTIMPWMDZRef_TypeDef PWMSrcS
 #endif
 
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void ENHTIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     ENHTIMStoreReg_Typedef *store_buf = (ENHTIMStoreReg_Typedef *)StoreBuf;
@@ -259,7 +261,9 @@ void ENHTIM_DLPSEnter(void *PeriReg, void *StoreBuf)
     store_buf->enhpwm_reg[3] = ENH_TIM3_PWM->ENHTIMER_PWM_CFG;
 }
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void ENHTIM_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     ENHTIMStoreReg_Typedef *store_buf = (ENHTIMStoreReg_Typedef *)StoreBuf;

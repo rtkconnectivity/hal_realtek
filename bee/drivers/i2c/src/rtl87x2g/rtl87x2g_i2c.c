@@ -119,7 +119,9 @@ void I2C_ClkDivConfig(I2C_TypeDef *I2Cx, I2CClockDiv_TypeDef ClockDiv)
   * \param  StoreBuf: Store buffer to store I2C register data.
   * \return None.
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void I2C_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     I2C_TypeDef *I2Cx = (I2C_TypeDef *)PeriReg;
@@ -171,7 +173,9 @@ void I2C_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore I2C register data.
   * \return None
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void I2C_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     I2C_TypeDef *I2Cx = (I2C_TypeDef *)PeriReg;

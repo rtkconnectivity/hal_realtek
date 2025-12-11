@@ -170,7 +170,9 @@ void SPI_ConfigAPHBridge(SPI_TypeDef *SPIx)
 }
 
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void SPI_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     SPI_TypeDef *SPIx = (SPI_TypeDef *)PeriReg;
@@ -204,7 +206,9 @@ void SPI_DLPSEnter(void *PeriReg, void *StoreBuf)
 }
 
 
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void SPI_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     SPI_TypeDef *SPIx = (SPI_TypeDef *)PeriReg;

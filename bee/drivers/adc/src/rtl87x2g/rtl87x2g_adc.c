@@ -116,7 +116,9 @@ void ADC_BypassRegConfig(uint8_t ChannelNum, FunctionalState NewState)
   * \param  StoreBuf: Store buffer to store ADC register data.
   * \return None.
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void ADC_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     ADCStoreReg_TypeDef *store_buf = (ADCStoreReg_TypeDef *)StoreBuf;
@@ -158,7 +160,9 @@ void ADC_DLPSEnter(void *PeriReg, void *StoreBuf)
   * \param  StoreBuf: Restore buffer to restore ADC register data.
   * \return None
   */
+#if defined(CONFIG_REALTEK_DRIVER_DLPS_CALLBACK_ON_RAM)
 RAM_FUNCTION
+#endif
 void ADC_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     ADCStoreReg_TypeDef *store_buf = (ADCStoreReg_TypeDef *)StoreBuf;
