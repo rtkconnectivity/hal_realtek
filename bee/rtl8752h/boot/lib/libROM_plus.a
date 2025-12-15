@@ -30,3 +30,6 @@ thermal_meter_read = 0x00200ce0;
 flash_sem_init = 0x000010af;
 secure_boot_failed_line = 0x00200e98;
 platform_pm_register_schedule_bottom_half_callback_func = 0x000098cd;
+clk_cnt_diff = 0x0000670b ;
+power_manager_slave_feature_cfg = 0x002005f4 ;
+power_manager_master_feature_cfg = 0x00201248 ;
