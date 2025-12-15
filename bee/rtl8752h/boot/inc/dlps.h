@@ -198,13 +198,12 @@ typedef union _PlatformPMFeatureConfig
     uint8_t value[1];
     struct
     {
-        uint8_t platform_check_dbg1: 1;
-        uint8_t platform_check_dbg2: 1;
+        uint8_t platform_check_dbg: 1;
         uint8_t platform_enter_dbg: 1;
         uint8_t platform_exit_dbg: 1;
         uint8_t platform_stage_time: 1;
         uint8_t platform_statistics: 1;
-        uint8_t rsvd: 2;
+        uint8_t rsvd1: 3;
     };
 } PlatformPMFeatureConfig;
 
