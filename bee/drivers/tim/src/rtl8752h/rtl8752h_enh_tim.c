@@ -26,14 +26,15 @@
   */
 void ENHTIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
+    ENHTIM_TypeDef *ENH_TIMx = (ENHTIM_TypeDef *)PeriReg;
     ENHTIMStoreReg_Typedef *store_buf = (ENHTIMStoreReg_Typedef *)StoreBuf;
 
     RCC_PeriphClockCmd(APBPeriph_ENHTIMER, APBPeriph_ENHTIMER_CLOCK, ENABLE);
 
-    store_buf->enhtim_reg[0] = ENH_TIM0->CR;
-    store_buf->enhtim_reg[1] = ENH_TIM0->MAX_CNT;
-    store_buf->enhtim_reg[2] = ENH_TIM0->CCR;
-    store_buf->enhtim_reg[3] = ENH_TIM0->CCR_FIFO;
+    store_buf->enhtim_reg[0] = ENH_TIMx->CR;
+    store_buf->enhtim_reg[1] = ENH_TIMx->MAX_CNT;
+    store_buf->enhtim_reg[2] = ENH_TIMx->CCR;
+    store_buf->enhtim_reg[3] = ENH_TIMx->CCR_FIFO;
 
     store_buf->enhtim_reg[4] = ENH_TIM_SHARE->FIFO_CLR;
     store_buf->enhtim_reg[5] = ENH_TIM_SHARE->CMD;
@@ -61,6 +62,7 @@ void ENHTIM_DLPSEnter(void *PeriReg, void *StoreBuf)
   */
 void ENHTIM_DLPSExit(void *PeriReg, void *StoreBuf)
 {
+    ENHTIM_TypeDef *ENH_TIMx = (ENHTIM_TypeDef *)PeriReg;
     ENHTIMStoreReg_Typedef *store_buf = (ENHTIMStoreReg_Typedef *)StoreBuf;
 
     /* Enable timer IP clock and function */
@@ -69,10 +71,10 @@ void ENHTIM_DLPSExit(void *PeriReg, void *StoreBuf)
     *((volatile uint32_t *)0x40000360UL) = store_buf->enhtim_reg[12];
     *((volatile uint32_t *)0x40000368UL) = store_buf->enhtim_reg[13];
 
-    ENH_TIM0->CR        = store_buf->enhtim_reg[0];
-    ENH_TIM0->MAX_CNT   = store_buf->enhtim_reg[1];
-    ENH_TIM0->CCR       = store_buf->enhtim_reg[2];
-    ENH_TIM0->CCR_FIFO  = store_buf->enhtim_reg[3];
+    ENH_TIMx->CR        = store_buf->enhtim_reg[0];
+    ENH_TIMx->MAX_CNT   = store_buf->enhtim_reg[1];
+    ENH_TIMx->CCR       = store_buf->enhtim_reg[2];
+    ENH_TIMx->CCR_FIFO  = store_buf->enhtim_reg[3];
 
     ENH_TIM_SHARE->FIFO_CLR = store_buf->enhtim_reg[4];
     ENH_TIM_SHARE->CMD      = store_buf->enhtim_reg[5] ;
