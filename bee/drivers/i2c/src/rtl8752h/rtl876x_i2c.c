@@ -511,31 +511,6 @@ I2C_Status I2C_RepeatRead(I2C_TypeDef *I2Cx, uint8_t *pWriteBuf, uint16_t Writel
   * @brief mask the specified I2C interrupt.
   * @param  I2Cx: where x can be 0 or 1
   * @param  I2C_INT
-  * This parameter can be one of the following values:
-  *     @arg I2C_INT_GEN_CALL: Set only when a General Call address is received and it is
-  acknowledged.
-  *     @arg I2C_INT_START_DET: Indicates whether a START or RESTART condition has occurred on the
-  I2C interface regardless of whether I2C is operating in slave or master mode.
-  *     @arg I2C_INT_STOP_DET:  Indicates whether a STOP condition has occurred on the I2C interface
-  regardless of whether I2C is operating in slave or master mode
-  *     @arg I2C_INT_ACTIVITY:  This bit captures I2C activity and stays set until it is cleared.
-  *     @arg I2C_INT_RX_DONE:   When the I2C is acting as a slave-transmitter, this bit is set to 1
-  if the master does not acknowledge a transmitted byte. This occurs on the last byte of the
-  transmission, indicating that the transmission is done.
-  *     @arg I2C_INT_TX_ABRT:   This bit indicates if I2C as an I2C transmitter, is unable to
-  complete the intended actions on the contents of the transmit FIFO.
-  *     @arg I2C_INT_RD_REQ:    This bit is set to 1 when acting as a slave and another I2C master
-                              is attempting to read data.
-  *     @arg I2C_INT_TX_EMPTY:  This bit is set to 1 when the transmit buffer is at or below the
-  threshold value set in the IC_TX_TL register.
-  *     @arg I2C_INT_TX_OVER:   Set during transmit if the transmit buffer is filled to
-  IC_TX_BUFFER_DEPTH and the processor attempts to issue another I2C command.
-  *     @arg I2C_INT_RX_FULL:   Set when the receive buffer reaches or goes above the RX_TL
-  threshold in the IC_RX_TL register
-  *     @arg I2C_INT_RX_OVER:   Set if the receive buffer is completely filled to IC_RX_BUFFER_DEPTH
-  and an additional byte is received from an external I2C device.
-  *     @arg I2C_INT_RX_UNDER:   Set if the processor attempts to read the receive buffer when it is
-  empty by reading.
   * @retval None.
   */
 void I2C_INTConfig(I2C_TypeDef *I2Cx, uint16_t I2C_INT, FunctionalState NewState)
