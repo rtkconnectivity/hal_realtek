@@ -846,19 +846,6 @@ __STATIC_INLINE void SPI_GDMACmd(SPI_TypeDef *SPIx, uint16_t SPI_GDMAReq, Functi
  * \brief  Change SPI speed daynamically.
  * \param[in]  SPIx: Where x can be 0 or 1.
  * \param[in]  precalser: Value of prescaler.
- *      This parameter can be one of the following values:
- *      \arg  SPI_BaudRatePrescaler_2
- *      \arg  SPI_BaudRatePrescaler_4
- *      \arg  SPI_BaudRatePrescaler_6
- *      \arg  SPI_BaudRatePrescaler_8
- *      \arg  SPI_BaudRatePrescaler_10
- *      \arg  SPI_BaudRatePrescaler_12
- *      \arg  SPI_BaudRatePrescaler_14
- *      \arg  SPI_BaudRatePrescaler_16
- *      \arg  SPI_BaudRatePrescaler_32
- *      \arg  SPI_BaudRatePrescaler_64
- *      \arg  SPI_BaudRatePrescaler_128
- *      \arg  SPI_BaudRatePrescaler_256
  * \return None.
  *
  * <b>Example usage</b>
@@ -866,7 +853,7 @@ __STATIC_INLINE void SPI_GDMACmd(SPI_TypeDef *SPIx, uint16_t SPI_GDMAReq, Functi
  *
  * void spi_demo(void)
  * {
- *     SPI_Change_CLK(SPI0, SPI_BaudRatePrescaler_2);
+ *     SPI_Change_CLK(SPI0, 2);
  * }
  * \endcode
  */

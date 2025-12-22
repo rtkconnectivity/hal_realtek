@@ -194,18 +194,6 @@ typedef enum
  * \{
  * \ingroup     SPI_Exported_Constants
  */
-#define SPI_BaudRatePrescaler_2      0x02
-#define SPI_BaudRatePrescaler_4      0x04
-#define SPI_BaudRatePrescaler_6      0x06
-#define SPI_BaudRatePrescaler_8      0x08
-#define SPI_BaudRatePrescaler_10     0x0A
-#define SPI_BaudRatePrescaler_12     0x0C
-#define SPI_BaudRatePrescaler_14     0x0E
-#define SPI_BaudRatePrescaler_16     0x10
-#define SPI_BaudRatePrescaler_32     0x20
-#define SPI_BaudRatePrescaler_64     0x40
-#define SPI_BaudRatePrescaler_128    0x80
-#define SPI_BaudRatePrescaler_256    0x100
 
 #define IS_SPI_BAUDRATE_PRESCALER(PRESCALER) ((PRESCALER) <= 0xFFFF)
 

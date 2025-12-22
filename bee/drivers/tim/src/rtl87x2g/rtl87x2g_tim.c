@@ -295,8 +295,8 @@ void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     /* Enable timer IP clock and function */
     RCC_PeriphClockCmd(APBPeriph_TIMER, APBPeriph_TIMER_CLOCK, ENABLE);
-    store_buf->tim_reg[0] = TIM0->TIMER_LOADCOUNT;
-    store_buf->tim_reg[1] = TIM0->TIMER_CONTROLREG;
+    store_buf->tim_reg[0] = TIMx->TIMER_LOADCOUNT;
+    store_buf->tim_reg[1] = TIMx->TIMER_CONTROLREG;
     store_buf->tim_reg[2] = *(volatile uint32_t *)((uint32_t)&TIMER0_LOAD_COUNT2 +
                                                    4 * ((uint32_t)TIMx - (uint32_t)TIMER_0_REG_BASE) / sizeof(TIM_TypeDef));
 
@@ -323,8 +323,8 @@ void TIM_DLPSExit(void *PeriReg, void *StoreBuf)
     PERIBLKCTRL_PERI_CLK->u_330.REG_TIMER_2_CLOCK_CTRL = store_buf->tim_reg[5];
     PERIBLKCTRL_PERI_CLK->u_334.REG_TIMER_3_CLOCK_CTRL = store_buf->tim_reg[6];
 
-    TIM0->TIMER_LOADCOUNT  = store_buf->tim_reg[0];
-    TIM0->TIMER_CONTROLREG = store_buf->tim_reg[1];
+    TIMx->TIMER_LOADCOUNT  = store_buf->tim_reg[0];
+    TIMx->TIMER_CONTROLREG = store_buf->tim_reg[1];
     *(volatile uint32_t *)((uint32_t)&TIMER0_LOAD_COUNT2 +
                            4 * ((uint32_t)TIMx - (uint32_t)TIMER_0_REG_BASE) / sizeof(TIM_TypeDef))
         = store_buf->tim_reg[2];

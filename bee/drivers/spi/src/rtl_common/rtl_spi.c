@@ -831,19 +831,6 @@ void SPI_GDMACmd(SPI_TypeDef *SPIx, SPIGdmaTransferRequests_TypeDef SPI_GDMAReq,
   * \brief  Change SPI speed daynamically.
   * \param  SPIx: Select the SPI peripheral. \ref SPI_Declaration
   * \param  precalser: Value of prescaler.
-  *         This parameter can be one of the following values:
-  *         \arg  SPI_BaudRatePrescaler_2
-  *         \arg  SPI_BaudRatePrescaler_4
-  *         \arg  SPI_BaudRatePrescaler_6
-  *         \arg  SPI_BaudRatePrescaler_8
-  *         \arg  SPI_BaudRatePrescaler_10
-  *         \arg  SPI_BaudRatePrescaler_12
-  *         \arg  SPI_BaudRatePrescaler_14
-  *         \arg  SPI_BaudRatePrescaler_16
-  *         \arg  SPI_BaudRatePrescaler_32
-  *         \arg  SPI_BaudRatePrescaler_64
-  *         \arg  SPI_BaudRatePrescaler_128
-  *         \arg  SPI_BaudRatePrescaler_256
   * \return None.
   */
 void SPI_ChangeClock(SPI_TypeDef *SPIx, uint32_t prescaler)
