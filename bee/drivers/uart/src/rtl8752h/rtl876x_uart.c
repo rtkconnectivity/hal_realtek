@@ -100,19 +100,19 @@ void UART_Init(UART_TypeDef *UARTx, UART_InitTypeDef *UART_InitStruct)
 
     if (UART_InitStruct->UART_DmaEn == UART_DMA_ENABLE)
     {
+        UARTx->MISCR &= ~(0x1f << 3);
+        UARTx->MISCR &= ~(0x3f << 8);
+        UARTx->MISCR |= ((UART_InitStruct->UART_TxWaterLevel) << 3);
+        UARTx->MISCR |= (UART_InitStruct->UART_RxWaterLevel << 8);
         /* Config UART Tx dma parameter */
         if (UART_InitStruct->UART_TxDmaEn != DISABLE)
         {
-            /* Mask uart TX threshold value */
-            UARTx->MISCR &= ~(0x1f << 3);
-            UARTx->MISCR |= ((UART_InitStruct->UART_TxWaterLevel) << 3) | BIT(1);
+            UARTx->MISCR |= BIT(1);
         }
         /* Config UART Rx dma parameter */
         if (UART_InitStruct->UART_RxDmaEn != DISABLE)
         {
-            /* Mask uart RX threshold value */
-            UARTx->MISCR &= ~(0x3f << 8);
-            UARTx->MISCR |= (UART_InitStruct->UART_RxWaterLevel << 8) | BIT(2);
+            UARTx->MISCR |= BIT(2);
         }
     }
 

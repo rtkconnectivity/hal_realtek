@@ -121,7 +121,7 @@ void GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_InitStruct)
 
         if (GPIO_InitStruct->GPIO_ITCmd == ENABLE)
         {
-            GPIOx->GPIO_INT_MASK_REG = ~GPIO_Pin_All;
+            GPIOx->GPIO_INT_MASK = ~GPIO_Pin_All;
 
             /* configure GPIO interrupt trigger type */
             if (GPIO_InitStruct->GPIO_ITTrigger == GPIO_INT_TRIGGER_LEVEL)
@@ -247,11 +247,11 @@ void GPIO_MaskINTConfig(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin, FunctionalState 
 
     if (NewState != DISABLE)
     {
-        GPIOx->GPIO_INT_MASK_REG |= GPIO_Pin;
+        GPIOx->GPIO_INT_MASK |= GPIO_Pin;
     }
     else
     {
-        GPIOx->GPIO_INT_MASK_REG &= ~(GPIO_Pin);
+        GPIOx->GPIO_INT_MASK &= ~(GPIO_Pin);
     }
 }
 
@@ -488,6 +488,32 @@ void GPIO_SetPolarity(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin,
                      GPIO_Pin, int_type);
 #endif
 }
+
+GPIOITPolarity_TypeDef GPIO_GetPolarity(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
+{
+    /* Check the parameters */
+    assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
+
+    uint32_t GPIO_Pin_Swap =
+#if (GPIO_SUPPORT_SWAP_DEB_PINBIT == 1)
+        GPIO_SwapDebPinBit(GPIOx, GPIO_Pin);
+#else
+        GPIO_Pin;
+#endif
+
+    return GPIOx->GPIO_EXT_DEB_POL_CTL & GPIO_Pin_Swap ? GPIO_INT_POLARITY_ACTIVE_HIGH :
+           GPIO_INT_POLARITY_ACTIVE_LOW;
+
+}
+
+GPIOITTrigger_TypeDef GPIO_GetTrigger(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
+{
+    /* Check the parameters */
+    assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
+
+    return GPIOx->GPIO_INT_LV & GPIO_Pin ? GPIO_INT_TRIGGER_EDGE : GPIO_INT_TRIGGER_LEVEL;
+}
+
 
 /******************* (C) COPYRIGHT 2023 Realtek Semiconductor Corporation *****END OF FILE****/
 

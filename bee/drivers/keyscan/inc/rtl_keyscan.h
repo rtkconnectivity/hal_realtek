@@ -688,6 +688,8 @@ FlagStatus KeyScan_GetFlagState(KEYSCAN_TypeDef *KeyScan, uint32_t KeyScan_FLAG)
  */
 uint16_t KeyScan_ReadFifoData(KEYSCAN_TypeDef *KeyScan);
 
+#define KeyScan_SetPreGuadTime(KeyScan, time) \
+    ((KEYSCAN_TypeDef *)(keyscan))->KEYSCAN_CLK_DIV = (((KEYSCAN_TypeDef *)(keyscan))->KEYSCAN_CLK_DIV & ~(0x7 << 26)) | (time << 26)
 
 #if (KEYSCAN_SUPPORT_RAP_FUNCTION == 1)
 

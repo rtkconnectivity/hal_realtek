@@ -159,15 +159,15 @@ void UART_Init(UART_TypeDef *UARTx, UART_InitTypeDef *UART_InitStruct)
         {
             /* Mask uart TX threshold value */
             uart_0x28.b.txdma_en = ENABLE;
-            uart_0x28.b.txdma_burstsize = UART_InitStruct->UART_TxWaterLevel;
         }
         /* Config UART Rx dma parameter */
         if (UART_InitStruct->UART_RxDmaEn != DISABLE)
         {
             /* Mask uart RX threshold value */
             uart_0x28.b.rxdma_en = ENABLE;
-            uart_0x28.b.rxdma_burstsize = UART_InitStruct->UART_RxWaterLevel;
         }
+        uart_0x28.b.txdma_burstsize = UART_InitStruct->UART_TxWaterLevel;
+        uart_0x28.b.rxdma_burstsize = UART_InitStruct->UART_RxWaterLevel;
         UARTx->UART_MISCR = uart_0x28.d32;
     }
 

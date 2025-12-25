@@ -639,6 +639,9 @@ __STATIC_INLINE FlagStatus TIM_GetPWMOutputStatus(TIM_TypeDef *TIMx)
     return bitstatus;
 }
 
+#define TIM_GetCurrentControl(TIMx)      (((TIM_TypeDef *)(TIMx))->ControlReg)
+#define TIM_GetCurrentLoadCnt(TIMx)      (((TIM_TypeDef *)(TIMx))->LoadCount)
+
 /** End of TIM_Exported_Functions
   * \}
   */

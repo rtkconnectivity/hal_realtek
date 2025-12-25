@@ -1027,6 +1027,12 @@ void GDMA_SetLLPMode(GDMA_ChannelTypeDef *GDMA_Channelx, uint32_t mode);
  */
 bool GDMA_SafeSuspend(GDMA_ChannelTypeDef *GDMA_Channelx);
 
+void GDMA_ResetBlockTransfer(GDMA_ChannelTypeDef *GDMA_Channelx);
+
+ITStatus GDMA_GetErrorINTStatus(uint8_t GDMA_ChannelNum);
+
+ITStatus GDMA_GetBlockINTStatus(uint8_t GDMA_ChannelNum);
+
 /** End of GDMA_Exported_Functions
   * \}
   */

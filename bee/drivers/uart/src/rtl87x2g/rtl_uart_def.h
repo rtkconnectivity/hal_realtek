@@ -118,6 +118,9 @@ typedef struct
                                  ((PERIPH) == UART4) || \
                                  ((PERIPH) == UART5))
 
+#define UART_TX_FIFO_ADDR(UARTx)    (uint32_t)(&(((UART_TypeDef *)(UARTx))->UART_RBR_THR))
+#define UART_RX_FIFO_ADDR(UARTx)    (uint32_t)(&(((UART_TypeDef *)(UARTx))->UART_RBR_THR))
+
 /** End of UART_Declaration
   * \}
   */

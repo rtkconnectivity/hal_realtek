@@ -624,6 +624,9 @@ void TIM_PWMChangeDZClockSrc(PWM_TypeDef *PWMx, PWMDZClockSrc_TypeDef PWM_Deazon
 void TIM_ClkConfig(TIM_TypeDef *TIMx, TIMClockSrc_TypeDef ClockSrc,
                    TIMClockDiv_TypeDef ClockDiv);
 
+#define TIM_GetCurrentControl(TIMx)      (((TIM_TypeDef *)(TIMx))->TIMER_CONTROLREG)
+#define TIM_GetCurrentLoadCnt(TIMx)      (((TIM_TypeDef *)(TIMx))->TIMER_LOADCOUNT)
+
 /**
  * \brief  Get the specified TIMx clock config.
  *

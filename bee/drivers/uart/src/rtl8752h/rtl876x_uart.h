@@ -102,7 +102,8 @@ typedef struct
 
 #define UART_TX_FIFO_SIZE           16
 #define UART_RX_FIFO_SIZE           32
-
+#define UART_TX_FIFO_ADDR(UARTx)    (uint32_t)(&(((UART_TypeDef *)(UARTx))->RB_THR))
+#define UART_RX_FIFO_ADDR(UARTx)    (uint32_t)(&(((UART_TypeDef *)(UARTx))->RB_THR))
 /**
  * \defgroup    UART BAUD RATE define
  *
@@ -955,6 +956,35 @@ __STATIC_INLINE void UART_ClearRxBreak(UART_TypeDef *UARTx)
     return;
 }
 
+__STATIC_INLINE void UART_TxDmaCmd(UART_TypeDef *UARTx, FunctionalState NewState)
+{
+    /* Check the parameters */
+    assert_param(IS_UART_PERIPH(UARTx));
+
+    if (NewState != DISABLE)
+    {
+        UARTx->MISCR |= BIT(1);
+    }
+    else
+    {
+        UARTx->MISCR &= !BIT(1);
+    }
+}
+
+__STATIC_INLINE void UART_RxDmaCmd(UART_TypeDef *UARTx, FunctionalState NewState)
+{
+    /* Check the parameters */
+    assert_param(IS_UART_PERIPH(UARTx));
+
+    if (NewState != DISABLE)
+    {
+        UARTx->MISCR |= BIT(2);
+    }
+    else
+    {
+        UARTx->MISCR &= !BIT(2);
+    }
+}
 
 /* reference: RTL8752H_ALL_register_table_20221116.xlsx
    r_PMUX_1_WIRE_UART_EN[0] is log uart0 1-wire mode enable
