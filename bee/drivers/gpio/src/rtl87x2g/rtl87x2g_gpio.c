@@ -253,7 +253,7 @@ void GPIO_DLPSEnter(void *PeriReg, void *StoreBuf)
     store_buf->gpio_reg[0] = GPIOx->GPIO_DR;
     store_buf->gpio_reg[1] = GPIOx->GPIO_DDR;
     store_buf->gpio_reg[3] = GPIOx->GPIO_INT_EN;
-    store_buf->gpio_reg[4] = GPIOx->GPIO_INT_MASK_REG;
+    store_buf->gpio_reg[4] = GPIOx->GPIO_INT_MASK;
     store_buf->gpio_reg[5] = GPIOx->GPIO_INT_LV;
     store_buf->gpio_reg[6] = GPIOx->GPIO_LS_SYNC;
     store_buf->gpio_reg[7] = GPIOx->GPIO_OUT_MODE;
@@ -291,7 +291,7 @@ void GPIO_DLPSExit(void *PeriReg, void *StoreBuf)
     GPIOx->GPIO_OUT_MODE          = store_buf->gpio_reg[7];
     GPIOx->GPIO_DR                = store_buf->gpio_reg[0];
 
-    GPIOx->GPIO_INT_MASK_REG          = 0xFFFFFFFF;
+    GPIOx->GPIO_INT_MASK          = 0xFFFFFFFF;
     GPIOx->GPIO_INT_LV            = store_buf->gpio_reg[5];
     GPIOx->GPIO_LS_SYNC           = store_buf->gpio_reg[6];
     GPIOx->GPIO_EXT_DEB_POL_CTL   = store_buf->gpio_reg[8];
@@ -304,7 +304,7 @@ void GPIO_DLPSExit(void *PeriReg, void *StoreBuf)
 
     GPIOx->GPIO_INT_EN            = store_buf->gpio_reg[3];
     GPIOx->GPIO_INT_CLR           = ~(store_buf->gpio_reg[1]);
-    GPIOx->GPIO_INT_MASK_REG          = store_buf->gpio_reg[4];
+    GPIOx->GPIO_INT_MASK          = store_buf->gpio_reg[4];
 
     return;
 }

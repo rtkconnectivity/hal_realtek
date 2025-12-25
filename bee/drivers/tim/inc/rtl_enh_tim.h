@@ -922,6 +922,9 @@ ITStatus ENHTIM_GetLCFIFOStatus(ENHTIM_TypeDef *ENHTIMx);
 void ENHTIM_PWMChangeFreqAndDuty(ENHTIM_TypeDef *ENHTIMx, uint16_t enhtim_mode, uint32_t max_count,
                                  uint32_t high_count);
 
+#define ENHTIM_GetCurrentControl(ENHTIMx)     (((ENHTIM_TypeDef *)(ENHTIMx))->ENHTIM_CONFIGURE)
+#define ENHTIM_GetCurrentMAXCNT(ENHTIMx)      (((ENHTIM_TypeDef *)(ENHTIMx))->ENHTIM_MAX_CNT)
+
 #if ENHTIM_SUPPORT_CLOCK_SOURCE_CONFIG
 /**
  * \brief  ENHTIM clock config.

@@ -631,6 +631,9 @@ __STATIC_INLINE uint16_t KeyScan_ReadFifoData(KEYSCAN_TypeDef *KeyScan)
     return (uint16_t)(KeyScan->FIFODATA);
 }
 
+#define KeyScan_SetPreGuadTime(KeyScan, time) \
+    ((KEYSCAN_TypeDef *)(keyscan))->CLKDIV = (((KEYSCAN_TypeDef *)(keyscan))->CLKDIV & ~(0x7 << 26)) | (time << 26)
+
 /** End of KeyScan_Exported_Functions
   * \}
   */

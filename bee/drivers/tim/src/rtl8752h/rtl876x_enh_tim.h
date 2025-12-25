@@ -923,6 +923,9 @@ void ENHTIM_PWMDZBypassCmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState);
   * \}
   */
 
+#define ENHTIM_GetCurrentControl(ENHTIMx)     (((ENHTIM_TypeDef *)(ENHTIMx))->CR)
+#define ENHTIM_GetCurrentMAXCNT(ENHTIMx)      (((ENHTIM_TypeDef *)(ENHTIMx))->MAX_CNT)
+
 #ifdef __cplusplus
 }
 #endif

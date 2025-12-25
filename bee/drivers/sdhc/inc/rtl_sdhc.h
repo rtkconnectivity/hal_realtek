@@ -183,6 +183,11 @@ typedef enum
   * \}
   */
 
+typedef struct
+{
+    uint32_t sdhc_reg[15];
+} SDHCStoreReg_Typedef;
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
@@ -382,9 +387,12 @@ SDHCRes_t SDHC_WaitData0Idle(SDHC_TypeDef *SDHCx, uint32_t Timeout_ms);
   */
 void DisableIntrByNvic(SDHC_TypeDef *SDHCx);
 
-
 void ResetAll(SDHC_TypeDef *SDHCx);
 void InitClk(SDHC_TypeDef *SDHCx);
+
+void SDHC_DLPSEnter(void *PeriReg, void *StoreBuf);
+
+void SDHC_DLPSExit(void *PeriReg, void *StoreBuf);
 
 /* pParm is shallow copied, and must keep valid during the whole SDHC session. */
 

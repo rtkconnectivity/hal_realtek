@@ -316,6 +316,9 @@ typedef struct
   * \}
   */
 
+#define SPI_TX_FIFO_ADDR(SPIx)    (uint32_t)(&(((SPI_TypeDef *)(SPIx))->DR[0]))
+#define SPI_RX_FIFO_ADDR(SPIx)    (uint32_t)(&(((SPI_TypeDef *)(SPIx))->DR[0]))
+
 /*============================================================================*
  *                         Functions
  *============================================================================*/

@@ -65,7 +65,7 @@ typedef struct
     __IO uint32_t GPIO_DDR;             /*!< 0x04 */
     __IO uint32_t RSVD[10];
     __IO uint32_t GPIO_INT_EN;          /*!< 0x30 */
-    __IO uint32_t GPIO_INT_MASK_REG;        /*!< 0x34 */
+    __IO uint32_t GPIO_INT_MASK;        /*!< 0x34 */
     __IO uint32_t GPIO_INT_LV;          /*!< 0x38 */
     __IO uint32_t RSVD1;
     __I  uint32_t GPIO_INT_STS;         /*!< 0x40 */
