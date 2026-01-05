@@ -1085,6 +1085,7 @@ bool GPIO_GetINTEnable(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin);
 
 #define GPIO_GetPortIntStatus(GPIOx) (((GPIO_TypeDef *)(GPIOx))->GPIO_INT_STS)
 #define GPIO_GetPortDirection(GPIOx) (((GPIO_TypeDef *)(GPIOx))->GPIO_DDR)
+#define GPIO_GetPortPolarity(GPIOx) (((GPIO_TypeDef *)(GPIOx))->GPIO_EXT_DEB_POL_CTL)
 #define GPIO_GetINTEnable(GPIOx, GPIO_Pin) \
     (((GPIO_TypeDef *)(GPIOx))->GPIO_INT_EN & (uint32_t )(GPIO_Pin) ? true : false)
 
