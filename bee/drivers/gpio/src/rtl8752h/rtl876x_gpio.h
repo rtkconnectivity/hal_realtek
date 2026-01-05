@@ -815,6 +815,7 @@ __STATIC_INLINE void GPIO_SetPolarity(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin,
 }
 #define GPIO_GetPortIntStatus(GPIOx) (((GPIO_TypeDef *)(GPIOx))->INTSTATUS)
 #define GPIO_GetPortDirection(GPIOx) (((GPIO_TypeDef *)(GPIOx))->DATADIR)
+#define GPIO_GetPortPolarity(GPIOx) (((GPIO_TypeDef *)(GPIOx))->INTPOLARITY)
 #define GPIO_GetINTEnable(GPIOx, GPIO_Pin) \
     (((GPIO_TypeDef *)(GPIOx))->INTEN & (uint32_t )(GPIO_Pin) ? true : false)
 
