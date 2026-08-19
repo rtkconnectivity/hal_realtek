@@ -40,7 +40,11 @@ psa_status_t bee_psa_init(void) {
     return PSA_ERROR_HARDWARE_FAILURE;
   }
 
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  sha2_init();
+#else
   hw_sha256_init();
+#endif
   return PSA_SUCCESS;
 }
 
@@ -60,12 +64,17 @@ static psa_status_t bee_psa_status(int status) {
 psa_status_t bee_psa_hash_compute(psa_algorithm_t alg, const uint8_t *input,
                                   size_t input_length, uint8_t *hash,
                                   size_t hash_size, size_t *hash_length) {
-  size_t required_size = PSA_HASH_LENGTH(PSA_ALG_SHA_256);
+  size_t required_size;
   psa_status_t status;
 
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  if (alg != PSA_ALG_SHA_224 && alg != PSA_ALG_SHA_256) {
+#else
   if (alg != PSA_ALG_SHA_256) {
+#endif
     return PSA_ERROR_NOT_SUPPORTED;
   }
+  required_size = PSA_HASH_LENGTH(alg);
   if ((input == NULL && input_length != 0U) || hash_length == NULL) {
     return PSA_ERROR_INVALID_ARGUMENT;
   }
@@ -76,7 +85,8 @@ psa_status_t bee_psa_hash_compute(psa_algorithm_t alg, const uint8_t *input,
     return PSA_ERROR_INVALID_ARGUMENT;
   }
 
-  status = bee_psa_status(bee_sha256_hw_compute(input, input_length, hash));
+  status = bee_psa_status(
+      bee_sha2_hw_compute(input, input_length, hash, required_size));
   if (status == PSA_SUCCESS) {
     *hash_length = required_size;
   }
@@ -90,12 +100,21 @@ psa_status_t bee_psa_hash_setup(bee_psa_hash_operation_t *operation,
   if (operation == NULL) {
     return PSA_ERROR_INVALID_ARGUMENT;
   }
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  if (alg != PSA_ALG_SHA_224 && alg != PSA_ALG_SHA_256) {
+#else
   if (alg != PSA_ALG_SHA_256) {
+#endif
     return PSA_ERROR_NOT_SUPPORTED;
   }
 
   memset(operation, 0, sizeof(*operation));
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  status = bee_psa_status(bee_sha2_hw_start(
+      &operation->context, alg == PSA_ALG_SHA_224 ? SHA2_224 : SHA2_256));
+#else
   status = bee_psa_status(bee_sha256_hw_start(&operation->context));
+#endif
   if (status == PSA_SUCCESS) {
     operation->algorithm = alg;
   }
@@ -107,7 +126,12 @@ psa_status_t bee_psa_hash_clone(const bee_psa_hash_operation_t *source_operation
   if (source_operation == NULL || target_operation == NULL) {
     return PSA_ERROR_INVALID_ARGUMENT;
   }
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  if (source_operation->algorithm != PSA_ALG_SHA_224 &&
+      source_operation->algorithm != PSA_ALG_SHA_256) {
+#else
   if (source_operation->algorithm != PSA_ALG_SHA_256) {
+#endif
     return PSA_ERROR_BAD_STATE;
   }
 
@@ -120,26 +144,42 @@ psa_status_t bee_psa_hash_update(bee_psa_hash_operation_t *operation,
   if (operation == NULL || (input == NULL && input_length != 0U)) {
     return PSA_ERROR_INVALID_ARGUMENT;
   }
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  if (operation->algorithm != PSA_ALG_SHA_224 &&
+      operation->algorithm != PSA_ALG_SHA_256) {
+#else
   if (operation->algorithm != PSA_ALG_SHA_256) {
+#endif
     return PSA_ERROR_BAD_STATE;
   }
 
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  return bee_psa_status(
+      bee_sha2_hw_update(&operation->context, input, input_length));
+#else
   return bee_psa_status(
       bee_sha256_hw_update(&operation->context, input, input_length));
+#endif
 }
 
 psa_status_t bee_psa_hash_finish(bee_psa_hash_operation_t *operation,
                                  uint8_t *hash, size_t hash_size,
                                  size_t *hash_length) {
-  size_t required_size = PSA_HASH_LENGTH(PSA_ALG_SHA_256);
+  size_t required_size;
   psa_status_t status;
 
   if (operation == NULL || hash_length == NULL) {
     return PSA_ERROR_INVALID_ARGUMENT;
   }
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  if (operation->algorithm != PSA_ALG_SHA_224 &&
+      operation->algorithm != PSA_ALG_SHA_256) {
+#else
   if (operation->algorithm != PSA_ALG_SHA_256) {
+#endif
     return PSA_ERROR_BAD_STATE;
   }
+  required_size = PSA_HASH_LENGTH(operation->algorithm);
   if (hash_size < required_size) {
     return PSA_ERROR_BUFFER_TOO_SMALL;
   }
@@ -147,7 +187,12 @@ psa_status_t bee_psa_hash_finish(bee_psa_hash_operation_t *operation,
     return PSA_ERROR_INVALID_ARGUMENT;
   }
 
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+  status = bee_psa_status(
+      bee_sha2_hw_finish(&operation->context, hash, required_size));
+#else
   status = bee_psa_status(bee_sha256_hw_finish(&operation->context, hash));
+#endif
   if (status == PSA_SUCCESS) {
     *hash_length = required_size;
   }
@@ -587,8 +632,8 @@ static psa_status_t bee_psa_validate_key(const psa_key_attributes_t *attributes,
 static psa_status_t bee_psa_ecb_crypt(const uint8_t *key, size_t key_length,
                                       const uint8_t *input, uint8_t *output,
                                       bool decrypt) {
-  return bee_psa_status(bee_aes_hw_crypt_block(key, key_length, AES_MODE_ECB,
-                                               input, output, NULL, decrypt));
+  return bee_psa_status(bee_aes_hw_crypt_block(
+      key, key_length, BEE_AES_MODE_ECB, input, output, NULL, decrypt));
 }
 
 static psa_status_t
@@ -862,9 +907,9 @@ static int bee_psa_cipher_cbc_block(bee_psa_cipher_operation_t *operation,
   if (operation->decrypt) {
     memcpy(next_iv, input, sizeof(next_iv));
   }
-  ret = bee_aes_hw_crypt_block(operation->key, operation->key_length,
-                               AES_MODE_CBC, input, output, operation->iv,
-                               operation->decrypt);
+  ret = bee_aes_hw_crypt_block(
+      operation->key, operation->key_length, BEE_AES_MODE_CBC, input, output,
+      operation->iv, operation->decrypt);
   if (ret != BEE_CRYPTO_SUCCESS) {
     return ret;
   }
