@@ -8,6 +8,10 @@
 #include <os_sync.h>
 #include <string.h>
 
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+#include <address_map.h>
+#endif
+
 #define BEE_CRYPTO_WAIT_FOREVER UINT32_MAX
 
 static void *bee_crypto_mutex;
@@ -37,6 +41,50 @@ void bee_crypto_unlock(void) {
   }
 }
 
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+int bee_aes_hw_crypt_block(const uint8_t *key, size_t key_len,
+                           bee_aes_mode_t mode, const uint8_t *in, uint8_t *out,
+                           const uint8_t *iv, bool decrypt) {
+  uint32_t in_hw[BEE_AES_BLOCK_SIZE / sizeof(uint32_t)];
+  uint32_t out_hw[BEE_AES_BLOCK_SIZE / sizeof(uint32_t)];
+  uint32_t key_hw[32U / sizeof(uint32_t)];
+  uint32_t iv_hw[BEE_AES_BLOCK_SIZE / sizeof(uint32_t)];
+  AES_CFG aes_config = {0};
+  AES_KEY_CFG key_config = {0};
+  bool ret;
+
+  if (key == NULL || in == NULL || out == NULL ||
+      (key_len != 16U && key_len != 32U) ||
+      (mode != BEE_AES_MODE_ECB && (mode != BEE_AES_MODE_CBC || iv == NULL))) {
+    return BEE_CRYPTO_ERROR_INVALID_ARGUMENT;
+  }
+
+  memcpy(in_hw, in, BEE_AES_BLOCK_SIZE);
+  memcpy(key_hw, key, key_len);
+  if (iv != NULL) {
+    memcpy(iv_hw, iv, BEE_AES_BLOCK_SIZE);
+  }
+
+  aes_config.input = in_hw;
+  aes_config.iv = iv == NULL ? NULL : iv_hw;
+  aes_config.byte_len = BEE_AES_BLOCK_SIZE;
+  aes_config.aes_mode = mode;
+  aes_config.access_mode = AES_CPU_MODE;
+  key_config.key = key_hw;
+  key_config.key_bits = key_len == 16U ? AES_KEY_BITS_128 : AES_KEY_BITS_256;
+  key_config.key_sel = AES_KEY_IRK;
+
+  ret = decrypt ? aes_decrypt(&aes_config, &key_config, out_hw)
+                : aes_encrypt(&aes_config, &key_config, out_hw);
+  *(volatile uint32_t *)AES_BASE &= decrypt ? ~0x2U : ~0x1U;
+  if (!ret) {
+    return BEE_CRYPTO_ERROR_HARDWARE;
+  }
+
+  memcpy(out, out_hw, BEE_AES_BLOCK_SIZE);
+  return BEE_CRYPTO_SUCCESS;
+}
+#else
 static void bee_aes_copy_to_hw(const uint8_t *src, uint32_t *dst, size_t len) {
 #if defined(BEE_CRYPTO_RTL8752H)
   swap_buf(src, (uint8_t *)dst, (uint16_t)len);
@@ -55,7 +103,7 @@ static void bee_aes_copy_from_hw(const uint32_t *src, uint8_t *dst,
 }
 
 int bee_aes_hw_crypt_block(const uint8_t *key, size_t key_len,
-                           T_HW_AES_MODE mode, const uint8_t *in, uint8_t *out,
+                           bee_aes_mode_t mode, const uint8_t *in, uint8_t *out,
                            const uint8_t *iv, bool decrypt) {
   uint32_t in_hw[BEE_AES_BLOCK_SIZE / sizeof(uint32_t)];
   uint32_t out_hw[BEE_AES_BLOCK_SIZE / sizeof(uint32_t)];
@@ -99,9 +147,118 @@ int bee_aes_hw_crypt_block(const uint8_t *key, size_t key_len,
   bee_aes_copy_from_hw(out_hw, out, BEE_AES_BLOCK_SIZE);
   return BEE_CRYPTO_SUCCESS;
 }
+#endif
 
-int bee_sha256_hw_compute(const uint8_t *input, size_t input_length,
-                          uint8_t *hash) {
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+int bee_sha2_hw_compute(const uint8_t *input, size_t input_length,
+                        uint8_t *hash, size_t hash_length) {
+  uint32_t result[8];
+  uint8_t empty = 0U;
+  SHA2_CFG sha2_config = {0};
+  int status;
+  bool ret;
+
+  if ((input == NULL && input_length != 0U) || hash == NULL ||
+      input_length > UINT32_MAX || (hash_length != 28U && hash_length != 32U)) {
+    return BEE_CRYPTO_ERROR_INVALID_ARGUMENT;
+  }
+
+  sha2_config.input = input_length == 0U ? &empty : (uint8_t *)input;
+  sha2_config.byte_len = (uint32_t)input_length;
+  sha2_config.algo = hash_length == 28U ? SHA2_224 : SHA2_256;
+  sha2_config.access_mode = SHA2_CPU_MODE;
+
+  status = bee_crypto_lock();
+  if (status != BEE_CRYPTO_SUCCESS) {
+    return status;
+  }
+  ret = sha2(&sha2_config, result);
+  bee_crypto_unlock();
+
+  if (!ret) {
+    return BEE_CRYPTO_ERROR_HARDWARE;
+  }
+  memcpy(hash, result, hash_length);
+  return BEE_CRYPTO_SUCCESS;
+}
+
+static void bee_sha2_hw_restore(const SHA2_CTX *ctx) {
+  uint32_t *state = NULL;
+
+  sha2_init();
+  if (ctx->total[0] >= sizeof(ctx->buffer) || ctx->total[1] != 0U) {
+    state = (uint32_t *)ctx->state;
+  }
+  sha2_iv_init(ctx->algo, state);
+}
+
+int bee_sha2_hw_start(SHA2_CTX *ctx, SHA2_ALGO algorithm) {
+  int status;
+
+  if (ctx == NULL || (algorithm != SHA2_224 && algorithm != SHA2_256)) {
+    return BEE_CRYPTO_ERROR_INVALID_ARGUMENT;
+  }
+
+  status = bee_crypto_lock();
+  if (status != BEE_CRYPTO_SUCCESS) {
+    return status;
+  }
+  sha2_init();
+  sha2_start(ctx, algorithm);
+  bee_crypto_unlock();
+  return BEE_CRYPTO_SUCCESS;
+}
+
+int bee_sha2_hw_update(SHA2_CTX *ctx, const uint8_t *input,
+                       size_t input_length) {
+  int status;
+  bool ret;
+
+  if (ctx == NULL || (input == NULL && input_length != 0U) ||
+      input_length > UINT32_MAX) {
+    return BEE_CRYPTO_ERROR_INVALID_ARGUMENT;
+  }
+  if (input_length == 0U) {
+    return BEE_CRYPTO_SUCCESS;
+  }
+
+  status = bee_crypto_lock();
+  if (status != BEE_CRYPTO_SUCCESS) {
+    return status;
+  }
+  bee_sha2_hw_restore(ctx);
+  ret = sha2_cpu_update(ctx, input, (uint32_t)input_length);
+  bee_crypto_unlock();
+  return ret ? BEE_CRYPTO_SUCCESS : BEE_CRYPTO_ERROR_HARDWARE;
+}
+
+int bee_sha2_hw_finish(SHA2_CTX *ctx, uint8_t *hash, size_t hash_length) {
+  uint32_t result[8];
+  int status;
+  bool ret;
+
+  if (ctx == NULL || hash == NULL ||
+      (hash_length != 28U && hash_length != 32U)) {
+    return BEE_CRYPTO_ERROR_INVALID_ARGUMENT;
+  }
+
+  status = bee_crypto_lock();
+  if (status != BEE_CRYPTO_SUCCESS) {
+    return status;
+  }
+  bee_sha2_hw_restore(ctx);
+  ret = sha2_cpu_finish(ctx, result);
+  bee_crypto_unlock();
+
+  if (!ret) {
+    return BEE_CRYPTO_ERROR_HARDWARE;
+  }
+  memcpy(hash, result, hash_length);
+  return BEE_CRYPTO_SUCCESS;
+}
+#else
+int bee_sha2_hw_compute(const uint8_t *input, size_t input_length,
+                        uint8_t *hash, size_t hash_length) {
   uint32_t result[8];
   uint8_t empty = 0U;
   int status;
@@ -110,6 +267,9 @@ int bee_sha256_hw_compute(const uint8_t *input, size_t input_length,
   if ((input == NULL && input_length != 0U) || hash == NULL ||
       input_length > UINT32_MAX) {
     return BEE_CRYPTO_ERROR_INVALID_ARGUMENT;
+  }
+  if (hash_length != sizeof(result)) {
+    return BEE_CRYPTO_ERROR_NOT_SUPPORTED;
   }
 
   status = bee_crypto_lock();
@@ -188,6 +348,7 @@ int bee_sha256_hw_finish(HW_SHA256_CTX *ctx, uint8_t *hash) {
   memcpy(hash, result, sizeof(result));
   return BEE_CRYPTO_SUCCESS;
 }
+#endif
 
 #if defined(BEE_CRYPTO_RTL87X2G)
 #define BEE_PKE_MMEM_ADDR 0x50090000U

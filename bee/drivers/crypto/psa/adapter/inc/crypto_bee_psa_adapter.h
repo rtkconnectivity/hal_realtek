@@ -11,13 +11,26 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#if defined(BEE_CRYPTO_RTL87X2G)
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+#include <aes_interface.h>
+#include <sha2_interface.h>
+#elif defined(BEE_CRYPTO_RTL87X2G)
 #include <crypto_engine_nsc.h>
 #elif defined(BEE_CRYPTO_RTL8752H)
 #include <hw_aes.h>
 #include <rtl876x_hw_sha256.h>
 #else
 #error "Unsupported Realtek Bee SoC"
+#endif
+
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+typedef AES_WORK_MODE bee_aes_mode_t;
+#define BEE_AES_MODE_CBC AES_CBC
+#define BEE_AES_MODE_ECB AES_ECB
+#else
+typedef T_HW_AES_MODE bee_aes_mode_t;
+#define BEE_AES_MODE_CBC AES_MODE_CBC
+#define BEE_AES_MODE_ECB AES_MODE_ECB
 #endif
 
 #ifdef __cplusplus
@@ -46,15 +59,22 @@ int bee_crypto_lock(void);
 void bee_crypto_unlock(void);
 
 int bee_aes_hw_crypt_block(const uint8_t *key, size_t key_len,
-                           T_HW_AES_MODE mode, const uint8_t *in, uint8_t *out,
+                           bee_aes_mode_t mode, const uint8_t *in, uint8_t *out,
                            const uint8_t *iv, bool decrypt);
 
-int bee_sha256_hw_compute(const uint8_t *input, size_t input_length,
-                          uint8_t *hash);
+int bee_sha2_hw_compute(const uint8_t *input, size_t input_length,
+                        uint8_t *hash, size_t hash_length);
+#if defined(CONFIG_SOC_SERIES_RTL87X2J)
+int bee_sha2_hw_start(SHA2_CTX *ctx, SHA2_ALGO algorithm);
+int bee_sha2_hw_update(SHA2_CTX *ctx, const uint8_t *input,
+                       size_t input_length);
+int bee_sha2_hw_finish(SHA2_CTX *ctx, uint8_t *hash, size_t hash_length);
+#else
 int bee_sha256_hw_start(HW_SHA256_CTX *ctx);
 int bee_sha256_hw_update(HW_SHA256_CTX *ctx, const uint8_t *input,
                          size_t input_length);
 int bee_sha256_hw_finish(HW_SHA256_CTX *ctx, uint8_t *hash);
+#endif
 
 int bee_ecc_p256_enable(void);
 void bee_ecc_p256_disable(void);
