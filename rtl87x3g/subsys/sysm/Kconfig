@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek Subsys System Manager"
+config REALTEK_SUBSYS_SYSM
+    bool "Enable Realtek System Manager lib"
+    default n
+    help
+       Realtek system manager lib support.
+endmenu

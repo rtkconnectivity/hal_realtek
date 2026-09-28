@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek Subsys System Manager"
+config REALTEK_SUBSYS_MAC_802154
+    bool "Enable Realtek mac 802154"
+    default n
+    help
+       Realtek mac 802154 support.
+endmenu

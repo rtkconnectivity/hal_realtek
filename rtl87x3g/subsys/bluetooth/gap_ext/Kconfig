@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek Subsys GAP"
+    config REALTEK_SUBSYS_GAP
+        bool "Enable Realtek GAP lib"
+        default y
+        help
+            Realtek GAP lib support.
+endmenu

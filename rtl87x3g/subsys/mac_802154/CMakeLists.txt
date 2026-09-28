@@ -1,0 +1,21 @@
+zephyr_library()
+zephyr_include_directories(mac_driver)
+zephyr_include_directories(mac_driver/portable/rtl87x3g)
+zephyr_include_directories(mac_driver/private)
+zephyr_include_directories(mac_driver/private/rtl87x3g)
+zephyr_library_sources(mac_driver/mac_802154_frame_parser.c)
+zephyr_library_sources(mac_driver/mac_stats.c)
+zephyr_library_sources(mac_driver/private/mac_driver_ext.c)
+zephyr_library_sources(mac_driver/private/rtl87x3g/patch.c)
+zephyr_code_relocate(FILES mac_driver/mac_802154_frame_parser.c LOCATION ITCM_TEXT)
+zephyr_code_relocate(FILES mac_driver/mac_802154_frame_parser.c LOCATION SRAM_BSS)
+zephyr_code_relocate(FILES mac_driver/mac_stats.c LOCATION ITCM_TEXT)
+zephyr_code_relocate(FILES mac_driver/mac_stats.c LOCATION SRAM_BSS)
+zephyr_code_relocate(FILES mac_driver/private/mac_driver_ext.c LOCATION ITCM_TEXT)
+zephyr_code_relocate(FILES mac_driver/private/mac_driver_ext.c LOCATION SRAM_BSS)
+zephyr_code_relocate(FILES mac_driver/private/rtl87x3g/patch.c LOCATION ITCM_TEXT)
+zephyr_code_relocate(FILES mac_driver/private/rtl87x3g/patch.c LOCATION SRAM_BSS)
+target_link_libraries(app PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/mac_driver/portable/rtl87x3g_bcut/rtl87x3g-internal.axf
+    ${CMAKE_CURRENT_SOURCE_DIR}/mac_driver/portable/rtl87x3g_bcut/rtl87x3g-internal-zephyr.axf
+)

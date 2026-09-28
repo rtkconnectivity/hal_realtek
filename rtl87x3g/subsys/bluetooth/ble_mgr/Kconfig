@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek Subsys Bluetooth LE Manager"
+config REALTEK_SUBSYS_BLE_MGR
+    bool "Enable Realtek Bluetooth LE Manager lib"
+    default n
+    help
+       Realtek Bluetooth LE manager lib support.
+endmenu

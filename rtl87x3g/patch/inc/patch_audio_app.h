@@ -1,0 +1,112 @@
+/**
+ * Copyright (c) 2015, Realsil Semiconductor Corporation. All rights reserved.
+ */
+
+#ifndef _PATCH_APP_H_
+#define _PATCH_APP_H_
+
+#include <patch.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern BOOL_PATCH_FUNC patch_au_state_machine;
+extern BOOL_PATCH_FUNC patch_au_state_enter;
+extern BOOL_PATCH_FUNC patch_au_link_back_sm;
+extern BOOL_PATCH_FUNC patch_au_handle_acl_status_info;
+extern BOOL_PATCH_FUNC patch_au_legacy_cb;
+extern BOOL_PATCH_FUNC patch_au_timeout_cb;
+extern BOOL_PATCH_FUNC patch_au_judge_active_a2dp_index_and_qos;
+extern BOOL_PATCH_FUNC patch_au_get_link_info;
+extern BOOL_PATCH_FUNC patch_au_get_au_param;
+extern BOOL_PATCH_FUNC patch_au_set_dsp_decrypt_param;
+extern BOOL_PATCH_FUNC patch_au_handle_mmi_message;
+extern BOOL_PATCH_FUNC patch_au_push_ringtone;
+extern BOOL_PATCH_FUNC patch_au_pop_ringtone;
+extern BOOL_PATCH_FUNC patch_au_init;
+extern BOOL_PATCH_FUNC patch_au_universal_api;
+extern BOOL_PATCH_FUNC patch_au_put_usb_audio_data;
+extern BOOL_PATCH_FUNC patch_au_pull_usb_audio_data;
+extern BOOL_PATCH_FUNC patch_au_put_audio_file_data;
+extern BOOL_PATCH_FUNC patch_au_handle_app_event;
+extern BOOL_PATCH_FUNC patch_au_save_sdk_data;
+extern BOOL_PATCH_FUNC patch_au_load_sdk_data;
+extern BOOL_PATCH_FUNC patch_au_set_clk_freq_cpu;
+extern BOOL_PATCH_FUNC patch_au_sd_playback_config;
+extern BOOL_PATCH_FUNC patch_au_sd_playback_downstream;
+extern BOOL_PATCH_FUNC patch_au_control_mac_sco_links_behavior;
+extern BOOL_PATCH_FUNC patch_au_legacy_cfg_acl_link_policy;
+extern BOOL_PATCH_FUNC patch_au_legacy_vendor_cb;
+extern BOOL_PATCH_FUNC patch_au_role_switch_to_master;
+extern BOOL_PATCH_FUNC patch_au_link_back;
+extern BOOL_PATCH_FUNC patch_au_downstream_vp_data;
+extern BOOL_PATCH_FUNC patch_au_switch_next_voice_prompt_language;
+extern BOOL_PATCH_FUNC patch_au_resume_a2dp_link_stream;
+extern BOOL_PATCH_FUNC patch_au_check_rws_voice_latency;
+
+extern BOOL_PATCH_FUNC patch_dsp_check_vendor_algorithm;
+extern BOOL_PATCH_FUNC patch_dsp_cfg_vendor_a2dp;
+extern BOOL_PATCH_FUNC patch_dsp_cfg_vendor_sco;
+extern BOOL_PATCH_FUNC patch_dsp_cfg_i2s_param;
+extern BOOL_PATCH_FUNC patch_dsp_boot;
+extern BOOL_PATCH_FUNC patch_dsp_adj_decode_speed;
+extern BOOL_PATCH_FUNC patch_dsp_update_hw_asrc_timer;
+extern BOOL_PATCH_FUNC patch_dsp_shut_down;
+extern BOOL_PATCH_FUNC patch_dsp_config_pad;
+extern BOOL_PATCH_FUNC patch_dsp_state_loader;
+extern BOOL_PATCH_FUNC patch_dsp_state_machine_start;
+extern BOOL_PATCH_FUNC patch_dsp_state_machine_end;
+extern BOOL_PATCH_FUNC patch_dsp_downstream_a2dp;
+extern BOOL_PATCH_FUNC patch_dsp_downstream_usb_audio;
+extern BOOL_PATCH_FUNC patch_dsp_downstream_sd_playback;
+extern BOOL_PATCH_FUNC patch_dsp_load_algorithm_code;
+extern BOOL_PATCH_FUNC patch_dsp_initiate_param;
+extern BOOL_PATCH_FUNC patch_dsp_cfg_setting;
+extern BOOL_PATCH_FUNC patch_dsp_timeout_cb;
+extern BOOL_PATCH_FUNC patch_dsp_d2h_cmd;
+extern BOOL_PATCH_FUNC patch_dsp_mailbox_event;
+extern BOOL_PATCH_FUNC patch_dsp_downstream_tts_data;
+extern BOOL_PATCH_FUNC patch_dsp_start_voice_prompt;
+extern BOOL_PATCH_FUNC patch_dsp_audio_resync;
+extern BOOL_PATCH_FUNC patch_dsp_media_remain_time;
+extern BOOL_PATCH_FUNC patch_dsp_rws_trigger_spk1_audio_resync_v2;
+extern BOOL_PATCH_FUNC patch_dsp_packet_loss;
+
+extern BOOL_PATCH_FUNC patch_au_profile_cb_a2dp;
+extern BOOL_PATCH_FUNC patch_au_profile_cb_spp;
+extern BOOL_PATCH_FUNC patch_au_profile_cb_hfp;
+extern BOOL_PATCH_FUNC patch_au_profile_cb_pbap;
+extern BOOL_PATCH_FUNC patch_au_profile_cb_avrcp;
+
+extern BOOL_PATCH_FUNC patch_hfp_app_process_button_evt;
+extern BOOL_PATCH_FUNC patch_hfp_app_judge_final_call_status;
+extern BOOL_PATCH_FUNC patch_hfp_resume_a2dp_link_stream;
+
+extern BOOL_PATCH_FUNC patch_jb_asrc_updated_offset_temp;
+extern BOOL_PATCH_FUNC patch_jb_state_machine_for_vendor_codec;
+extern BOOL_PATCH_FUNC patch_jb_check_boundary;
+
+extern BOOL_PATCH_FUNC patch_media_buffer_vendor_codec_pkt_handler;
+extern BOOL_PATCH_FUNC patch_media_buffer_state_enter;
+extern BOOL_PATCH_FUNC patch_media_buffer_prequeue;
+extern BOOL_PATCH_FUNC patch_media_buffer_rx;
+extern BOOL_PATCH_FUNC patch_media_buffer_rx_sd_playback1;
+extern BOOL_PATCH_FUNC patch_media_buffer_rx_sd_playback2;
+extern BOOL_PATCH_FUNC patch_media_buffer_rx2;
+extern BOOL_PATCH_FUNC patch_media_buffer_rws_tx;
+extern BOOL_PATCH_FUNC patch_media_buffer_reset;
+extern BOOL_PATCH_FUNC patch_media_buffer_reset_sd_playback;
+extern BOOL_PATCH_FUNC patch_media_buffer_reset_vendor;
+
+extern BOOL_PATCH_FUNC patch_app_cfg_factory_reset_rw_data;
+extern BOOL_PATCH_FUNC patch_dsp_param_save_rw_data;
+extern BOOL_PATCH_FUNC patch_dsp_param_load_rw_data;
+extern BOOL_PATCH_FUNC patch_fs_load_app_data_32;
+extern BOOL_PATCH_FUNC patch_fs_load_app_data_8;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _PATCH_APP_H_ */

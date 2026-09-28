@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek Subsys Remote"
+config REALTEK_SUBSYS_REMOTE
+    bool "Enable Realtek Remote lib"
+    default n
+    help
+       Realtek remote lib support.
+endmenu

@@ -1,0 +1,11 @@
+# Copyright (c) 2025 Realtek Semiconductor Corp.
+# SPDX-License-Identifier: Apache-2.0
+
+rsource "subsys/Kconfig"
+rsource "platform/hal_lib/Kconfig"
+
+config REALTEK_LIBS_NANDBOOT
+    bool 
+    default n
+    help
+        Compile hal lib code with NANDBOOT support.

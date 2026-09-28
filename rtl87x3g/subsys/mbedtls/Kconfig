@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek Subsys System Manager"
+config REALTEK_SUBSYS_MBEDTLS
+    bool "Enable Realtek mbedtls lib"
+    default n
+    help
+       Realtek mbedtls lib support.
+endmenu

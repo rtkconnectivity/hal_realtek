@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek Subsys BLE audio"
+config REALTEK_SUBSYS_BLE_AUDIO
+    bool "Enable Realtek BLE audio lib"
+    default n
+    help
+       Realtek BLE audio lib support.
+endmenu

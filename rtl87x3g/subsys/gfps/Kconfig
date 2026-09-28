@@ -1,0 +1,9 @@
+# Copyright(c) 2024, Realtek Semiconductor Corporation.
+
+menu "Realtek GFPS"
+config REALTEK_SUBSYS_GFPS
+    bool "Enable Realtek GFPS lib"
+    default n
+    help
+       Realtek GFPS support.
+endmenu
