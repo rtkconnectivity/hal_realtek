@@ -1,2 +1,2 @@
 # hal_realtek
-rtk hal repo
+rtk hal repo.
