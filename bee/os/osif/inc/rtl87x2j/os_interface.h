@@ -55,6 +55,7 @@ typedef struct _OS_INTERFACE_INFO
     bool (* os_timer_state_get)(void **pp_handle, uint32_t *p_timer_state);
     bool (* os_timer_auto_reload_get)(void **pp_handle, long *p_autoreload);
     bool (* os_timer_handle_get)(uint8_t timer_idx, void **pp_handle);
+    uint32_t (* os_timer_max_num_get)(void);
     bool (* os_timer_dump)(void);
     void (* os_timer_init)(void);
 
