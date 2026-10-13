@@ -119,10 +119,33 @@ typedef struct
 /*============================================================================*
  *                         GPIO Private Types
  *============================================================================*/
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. Slot values stay IC-local
+ * and compact; only the names are shared.
+ */
+typedef enum
+{
+    GPIO_DLPS_DR = 0x00,               //!< GPIO_DR, data output.
+    GPIO_DLPS_DDR = 0x01,              //!< GPIO_DDR, data direction. Also the source for GPIO_INT_CLR.
+    GPIO_DLPS_INT_EN = 0x02,           //!< GPIO_INT_EN, interrupt enable.
+    GPIO_DLPS_INT_MASK = 0x03,         //!< GPIO_INT_MASK, interrupt mask.
+    GPIO_DLPS_INT_LV = 0x04,           //!< GPIO_INT_LV, interrupt level/type.
+    GPIO_DLPS_LS_SYNC = 0x05,          //!< GPIO_LS_SYNC, level-sensitive synchronisation.
+    GPIO_DLPS_OUT_MODE = 0x06,         //!< GPIO_OUT_MODE, output mode. Not present on all ICs.
+    GPIO_DLPS_INT_POLARITY = 0x07,     //!< GPIO_EXT_DEB_POL_CTL on this IC. Carries the interrupt polarity.
+    GPIO_DLPS_EXT_DEB_CLK_CTL0 = 0x08, //!< GPIO_DEB_CLK_CTL[0], external debounce clock control, group 0/1.
+    GPIO_DLPS_EXT_DEB_CLK_CTL1 = 0x09, //!< GPIO_DEB_CLK_CTL[1], external debounce clock control, group 2/3.
+    GPIO_DLPS_EXT_DEB_CLK_CTL2 = 0x0A, //!< GPIO_DEB_CLK_CTL[2], external debounce clock control, group 4/5.
+    GPIO_DLPS_EXT_DEB_CLK_CTL3 = 0x0B, //!< GPIO_DEB_CLK_CTL[3], external debounce clock control, group 6/7.
+    GPIO_DLPS_EXT_DEB_FUN_CTL = 0x0C,  //!< GPIO_DEB_FUN_CTL, external debounce function control, four bits per pin.
+    GPIO_DLPS_MAX = 0x0D,              //!< Store buffer entry count.
+} GPIODLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t gpio_reg[15];
-} GPIOStoreReg_Typedef;
+    uint32_t gpio_reg[GPIO_DLPS_MAX];
+} GPIOStoreReg_TypeDef;
 
 /*============================================================================*
  *                         GPIO Registers and Field Descriptions

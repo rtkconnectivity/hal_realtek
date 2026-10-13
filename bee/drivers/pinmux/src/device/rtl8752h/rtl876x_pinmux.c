@@ -635,7 +635,7 @@ void Pinmux_DLPSEnter(void *PeriReg, void *StoreBuf)
     PINMUXStoreReg_TypeDef *store_buf = (PINMUXStoreReg_TypeDef *)StoreBuf;
     uint8_t i = 0;
 
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < PINMUX_DLPS_CFG_NUM; i++)
     {
         store_buf->pinmux_reg[i] = PINMUX->CFG[i];
     }
@@ -655,7 +655,7 @@ void Pinmux_DLPSExit(void *PeriReg, void *StoreBuf)
     PINMUXStoreReg_TypeDef *store_buf = (PINMUXStoreReg_TypeDef *)StoreBuf;
     uint8_t i;
 
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < PINMUX_DLPS_CFG_NUM; i++)
     {
         PINMUX->CFG[i] = store_buf->pinmux_reg[i];
     }

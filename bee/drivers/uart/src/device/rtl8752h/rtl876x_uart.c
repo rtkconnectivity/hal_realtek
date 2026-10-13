@@ -432,20 +432,20 @@ void UART_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     //access DLH and DLL
     UARTx->LCR |= (1 << 7);
-    store_buf->uart_reg[0] = UARTx->DLL;
-    store_buf->uart_reg[1] = UARTx->DLH_INTCR;
+    store_buf->uart_reg[UART_DLPS_DLL] = UARTx->DLL;
+    store_buf->uart_reg[UART_DLPS_DLM] = UARTx->DLH_INTCR;
     UARTx->LCR &= (~(1 << 7));
 
     //save other registers
-    store_buf->uart_reg[2]  = UARTx->DLH_INTCR;
-    store_buf->uart_reg[4]  = UARTx->LCR;
-    store_buf->uart_reg[5]  = UARTx->MCR;
-    store_buf->uart_reg[6]  = UARTx->SPR;
-    store_buf->uart_reg[7]  = UARTx->STSR;
-    store_buf->uart_reg[8]  = UARTx->RX_IDLE_TOCR;
-    store_buf->uart_reg[9]  = UARTx->RX_IDLE_INTCR;
-    store_buf->uart_reg[10] = UARTx->MISCR;
-    store_buf->uart_reg[11] = UARTx->INTMASK;
+    store_buf->uart_reg[UART_DLPS_IER]  = UARTx->DLH_INTCR;
+    store_buf->uart_reg[UART_DLPS_LCR]  = UARTx->LCR;
+    store_buf->uart_reg[UART_DLPS_CTRL0]  = UARTx->MCR;
+    store_buf->uart_reg[UART_DLPS_SCR]  = UARTx->SPR;
+    store_buf->uart_reg[UART_DLPS_STSR]  = UARTx->STSR;
+    store_buf->uart_reg[UART_DLPS_RX_TIMEOUT]  = UARTx->RX_IDLE_TOCR;
+    store_buf->uart_reg[UART_DLPS_RX_TIMEOUT_EN]  = UARTx->RX_IDLE_INTCR;
+    store_buf->uart_reg[UART_DLPS_MISCR] = UARTx->MISCR;
+    store_buf->uart_reg[UART_DLPS_INT_MASK] = UARTx->INTMASK;
 
     return;
 }
@@ -477,23 +477,23 @@ void UART_DLPSExit(void *PeriReg, void *StoreBuf)
 
     //access DLH and DLL
     UARTx->LCR          |= (1 << 7);
-    UARTx->STSR          = store_buf->uart_reg[7];
-    UARTx->SPR           = store_buf->uart_reg[6];
-    UARTx->DLL           = store_buf->uart_reg[0];
-    UARTx->DLH_INTCR     = store_buf->uart_reg[1];
+    UARTx->STSR          = store_buf->uart_reg[UART_DLPS_STSR];
+    UARTx->SPR           = store_buf->uart_reg[UART_DLPS_SCR];
+    UARTx->DLL           = store_buf->uart_reg[UART_DLPS_DLL];
+    UARTx->DLH_INTCR     = store_buf->uart_reg[UART_DLPS_DLM];
     UARTx->LCR &= (~(1 << 7));
 
     //access other registers
-    UARTx->INTID_FCR = (((store_buf->uart_reg[7] & BIT24) >> 21) | ((store_buf->uart_reg[7] &
-                                                                     0x7C000000) >> 18) |
+    UARTx->INTID_FCR = (((store_buf->uart_reg[UART_DLPS_STSR] & BIT24) >> 21) | \
+                        ((store_buf->uart_reg[UART_DLPS_STSR] & 0x7C000000) >> 18) | \
                         (1));
-    UARTx->LCR           = store_buf->uart_reg[4];
-    UARTx->MCR           = store_buf->uart_reg[5];
-    UARTx->DLH_INTCR     = store_buf->uart_reg[2];
-    UARTx->RX_IDLE_TOCR  = store_buf->uart_reg[8];
-    UARTx->RX_IDLE_INTCR = store_buf->uart_reg[9];
-    UARTx->MISCR         = store_buf->uart_reg[10];
-    UARTx->INTMASK       = store_buf->uart_reg[11];
+    UARTx->LCR           = store_buf->uart_reg[UART_DLPS_LCR];
+    UARTx->MCR           = store_buf->uart_reg[UART_DLPS_CTRL0];
+    UARTx->DLH_INTCR     = store_buf->uart_reg[UART_DLPS_IER];
+    UARTx->RX_IDLE_TOCR  = store_buf->uart_reg[UART_DLPS_RX_TIMEOUT];
+    UARTx->RX_IDLE_INTCR = store_buf->uart_reg[UART_DLPS_RX_TIMEOUT_EN];
+    UARTx->MISCR         = store_buf->uart_reg[UART_DLPS_MISCR];
+    UARTx->INTMASK       = store_buf->uart_reg[UART_DLPS_INT_MASK];
 
     return;
 }

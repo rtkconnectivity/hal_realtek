@@ -927,9 +927,35 @@ __STATIC_INLINE void SPI_SetRxSampleDly(SPI_TypeDef *SPIx, uint32_t delay)
   * \}
   */
 
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. Slot values stay IC-local
+ * and compact; only the names are shared. Names below follow the register
+ * naming of the newer SDK, so on this IC a few of them differ from the local
+ * register name (noted per entry).
+ */
+typedef enum
+{
+    SPI_DLPS_M_S_CTRL0 = 0x00,       //!< CTRLR0 on this IC, 0x00, control 0.
+    SPI_DLPS_M_CTRL1 = 0x01,         //!< CTRLR1 on this IC, 0x04, control 1.
+    SPI_DLPS_SPIENR = 0x02,          //!< SSIENR on this IC, 0x08, enable. Restored last.
+    SPI_DLPS_M_SER = 0x03,           //!< SER on this IC, 0x10, slave enable.
+    SPI_DLPS_M_BAUDR = 0x04,         //!< BAUDR on this IC, 0x14, baud rate.
+    SPI_DLPS_TXFTLR = 0x05,          //!< TXFTLR, 0x18, TX FIFO threshold.
+    SPI_DLPS_RXFTLR = 0x06,          //!< RXFTLR, 0x1C, RX FIFO threshold.
+    SPI_DLPS_M_S_IMR = 0x07,         //!< IMR on this IC, 0x2C, interrupt mask.
+    SPI_DLPS_DMACR = 0x08,           //!< DMACR, 0x4C, DMA control.
+    SPI_DLPS_DMATDLR = 0x09,         //!< DMATDLR, 0x50, DMA transmit data level.
+    SPI_DLPS_DMARDLR = 0x0A,         //!< DMARDLR, 0x54, DMA receive data level.
+    SPI_DLPS_RX_SAMPLE_DELAY = 0x0B, //!< RX_SAMPLE_DLY on this IC, 0xF0, RX sample delay.
+    SPI_DLPS_PERI_CTL0 = 0x0C,       //!< SPI0_MASTER_MODE_REG, 0x40000308, SPI0 master/slave mode. Not present on all ICs.
+    SPI_DLPS_PERI_CTL1 = 0x0D,       //!< CLK_SOURCE_REG_1, 0x4000035C, clock source and divider. Not present on all ICs.
+    SPI_DLPS_MAX = 0x0E,             //!< Store buffer entry count.
+} SPIDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t spi_reg[14];
+    uint32_t spi_reg[SPI_DLPS_MAX];
 } SPIStoreReg_TypeDef;
 
 #ifdef __cplusplus

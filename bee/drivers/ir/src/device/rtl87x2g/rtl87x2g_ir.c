@@ -69,14 +69,14 @@ bool IR_ClkGet(IRClockSrc_TypeDef *ClockSrc, IRClockDiv_TypeDef *ClockDiv)
 RAM_FUNCTION
 void IR_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
-    IRStoreReg_Typedef *store_buf = (IRStoreReg_Typedef *)StoreBuf;
+    IRStoreReg_TypeDef *store_buf = (IRStoreReg_TypeDef *)StoreBuf;
 
     RCC_PeriphClockCmd(APBPeriph_IR, APBPeriph_IR_CLOCK, ENABLE);
 
-    store_buf->ir_reg[0] = IR->IR_CLK_DIV;
-    store_buf->ir_reg[1] = IR->IR_TX_CONFIG;
-    store_buf->ir_reg[2] = IR->IR_RX_CONFIG;
-    store_buf->ir_reg[3] = IR->IR_RX_CNT_INT_SEL;
+    store_buf->ir_reg[IR_DLPS_CLK_DIV] = IR->IR_CLK_DIV;
+    store_buf->ir_reg[IR_DLPS_TX_CONFIG] = IR->IR_TX_CONFIG;
+    store_buf->ir_reg[IR_DLPS_RX_CONFIG] = IR->IR_RX_CONFIG;
+    store_buf->ir_reg[IR_DLPS_RX_CNT_INT_SEL] = IR->IR_RX_CNT_INT_SEL;
 
     return;
 }
@@ -90,22 +90,22 @@ void IR_DLPSEnter(void *PeriReg, void *StoreBuf)
 RAM_FUNCTION
 void IR_DLPSExit(void *PeriReg, void *StoreBuf)
 {
-    IRStoreReg_Typedef *store_buf = (IRStoreReg_Typedef *)StoreBuf;
+    IRStoreReg_TypeDef *store_buf = (IRStoreReg_TypeDef *)StoreBuf;
 
     RCC_PeriphClockCmd(APBPeriph_IR, APBPeriph_IR_CLOCK, ENABLE);
 
-    IR->IR_CLK_DIV = store_buf->ir_reg[0];
-    if (store_buf->ir_reg[1] & BIT31)
+    IR->IR_CLK_DIV = store_buf->ir_reg[IR_DLPS_CLK_DIV];
+    if (store_buf->ir_reg[IR_DLPS_TX_CONFIG] & BIT31)
     {
         /* RX MODE */
-        IR->IR_TX_CONFIG  = store_buf->ir_reg[1];
-        IR->IR_RX_CONFIG  = store_buf->ir_reg[2];
-        IR->IR_RX_CNT_INT_SEL  = store_buf->ir_reg[3];
+        IR->IR_TX_CONFIG  = store_buf->ir_reg[IR_DLPS_TX_CONFIG];
+        IR->IR_RX_CONFIG  = store_buf->ir_reg[IR_DLPS_RX_CONFIG];
+        IR->IR_RX_CNT_INT_SEL  = store_buf->ir_reg[IR_DLPS_RX_CNT_INT_SEL];
     }
     else
     {
         /* TX MODE */
-        IR->IR_TX_CONFIG  = store_buf->ir_reg[1];
+        IR->IR_TX_CONFIG  = store_buf->ir_reg[IR_DLPS_TX_CONFIG];
         /* If IR TX mode is idle, must write one data firstly */
         IR->IR_TX_FIFO = 0;
     }

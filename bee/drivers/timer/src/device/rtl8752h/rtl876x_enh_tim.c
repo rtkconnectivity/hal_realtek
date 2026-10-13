@@ -513,10 +513,10 @@ void ENHTIM_DLPSEnter(void *PeriReg, void *StoreBuf)
     ENHTIM_TypeDef *ENHTIMx = (ENHTIM_TypeDef *)PeriReg;
     ENHTIMStoreReg_TypeDef *store_buf = (ENHTIMStoreReg_TypeDef *)StoreBuf;
 
-    store_buf->enhtim_reg[0] = ENHTIMx->CR;
-    store_buf->enhtim_reg[1] = ENHTIMx->MAX_CNT;
-    store_buf->enhtim_reg[2] = ENHTIMx->CCR;
-    store_buf->enhtim_reg[3] = ENHTIMx->CCR_FIFO;
+    store_buf->enhtim_reg[ENHTIM_DLPS_CONFIGURE]      = ENHTIMx->CR;
+    store_buf->enhtim_reg[ENHTIM_DLPS_MAX_CNT]        = ENHTIMx->MAX_CNT;
+    store_buf->enhtim_reg[ENHTIM_DLPS_CCR]            = ENHTIMx->CCR;
+    store_buf->enhtim_reg[ENHTIM_DLPS_CCR_FIFO_ENTRY] = ENHTIMx->CCR_FIFO;
 }
 
 /**
@@ -532,18 +532,17 @@ void ENHTIMSHARE_DLPSEnter(void *StoreBuf)
 
     RCC_PeriphClockCmd(APBPeriph_ENHTIMER, APBPeriph_ENHTIMER_CLOCK, ENABLE);
 
-    store_buf->enhtimshare_reg[0]  = ENH_TIM_SHARE->FIFO_CLR;
-    store_buf->enhtimshare_reg[1]  = ENH_TIM_SHARE->CMD;
-    store_buf->enhtimshare_reg[2]  = ENH_TIM_SHARE->INT_CMD;
-    store_buf->enhtimshare_reg[3]  = ENH_TIM_SHARE->INT_SR;
-    store_buf->enhtimshare_reg[4]  = ENH_TIM_SHARE->LC_INT_CMD0;
-    store_buf->enhtimshare_reg[5]  = ENH_TIM_SHARE->LC_INT_CMD2;
-    store_buf->enhtimshare_reg[6]  = ENH_TIM_SHARE->LC_FIFO_LEVEL0;
-    store_buf->enhtimshare_reg[7]  = ENH_TIM_SHARE->LC_FIFO_LEVEL1;
-    store_buf->enhtimshare_reg[8]  = *((volatile uint32_t *)0x4000035CUL);
-    store_buf->enhtimshare_reg[9]  = *((volatile uint32_t *)0x40000360UL);
-    store_buf->enhtimshare_reg[10] = *((volatile uint32_t *)0x40000368UL);
-    store_buf->enhtimshare_reg[11] = ENHTIM_PWM_DEADZONE_CR;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_FIFO_CLR]       = ENH_TIM_SHARE->FIFO_CLR;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_CONTROL]            = ENH_TIM_SHARE->CMD;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_INT_CONTROL]        = ENH_TIM_SHARE->INT_CMD;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_INT_SR]         = ENH_TIM_SHARE->INT_SR;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LATCH_INT_CONTROL_0]    = ENH_TIM_SHARE->LC_INT_CMD0;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LATCH_INT_CONTROL_2]    = ENH_TIM_SHARE->LC_INT_CMD2;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LC_FIFO_LEVEL0] = ENH_TIM_SHARE->LC_FIFO_LEVEL0;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LC_FIFO_LEVEL1] = ENH_TIM_SHARE->LC_FIFO_LEVEL1;
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_CLK0] = *((volatile uint32_t *)0x4000035CUL);
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_CLK1] = *((volatile uint32_t *)0x40000360UL);
+    store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_PWM_DZ_CLK] = *((volatile uint32_t *)0x40000368UL);
 }
 
 /**
@@ -558,10 +557,13 @@ void ENHTIM_DLPSExit(void *PeriReg, void *StoreBuf)
     ENHTIM_TypeDef *ENHTIMx = (ENHTIM_TypeDef *)PeriReg;
     ENHTIMStoreReg_TypeDef *store_buf = (ENHTIMStoreReg_TypeDef *)StoreBuf;
 
-    ENHTIMx->CR             = store_buf->enhtim_reg[0];
-    ENHTIMx->MAX_CNT        = store_buf->enhtim_reg[1];
-    ENHTIMx->CCR            = store_buf->enhtim_reg[2];
-    ENHTIMx->CCR_FIFO       = store_buf->enhtim_reg[3];
+    /* Per-instance exit runs before share exit, so enable the IP clock here too */
+    RCC_PeriphClockCmd(APBPeriph_ENHTIMER, APBPeriph_ENHTIMER_CLOCK, ENABLE);
+
+    ENHTIMx->CR             = store_buf->enhtim_reg[ENHTIM_DLPS_CONFIGURE];
+    ENHTIMx->MAX_CNT        = store_buf->enhtim_reg[ENHTIM_DLPS_MAX_CNT];
+    ENHTIMx->CCR            = store_buf->enhtim_reg[ENHTIM_DLPS_CCR];
+    ENHTIMx->CCR_FIFO       = store_buf->enhtim_reg[ENHTIM_DLPS_CCR_FIFO_ENTRY];
 }
 
 /**
@@ -577,18 +579,19 @@ void ENHTIMSHARE_DLPSExit(void *StoreBuf)
 
     RCC_PeriphClockCmd(APBPeriph_ENHTIMER, APBPeriph_ENHTIMER_CLOCK, ENABLE);
 
-    *((volatile uint32_t *)0x4000035CUL) = store_buf->enhtimshare_reg[8];
-    *((volatile uint32_t *)0x40000360UL) = store_buf->enhtimshare_reg[9];
-    *((volatile uint32_t *)0x40000368UL) = store_buf->enhtimshare_reg[10];
-    ENH_TIM_SHARE->FIFO_CLR              = store_buf->enhtimshare_reg[0];
-    ENH_TIM_SHARE->CMD                   = store_buf->enhtimshare_reg[1] ;
-    ENH_TIM_SHARE->INT_CMD               = store_buf->enhtimshare_reg[2];
-    ENH_TIM_SHARE->INT_SR                = store_buf->enhtimshare_reg[3];
-    ENH_TIM_SHARE->LC_INT_CMD0           = store_buf->enhtimshare_reg[4];
-    ENH_TIM_SHARE->LC_INT_CMD2           = store_buf->enhtimshare_reg[5];
-    ENH_TIM_SHARE->LC_FIFO_LEVEL0        = store_buf->enhtimshare_reg[6];
-    ENH_TIM_SHARE->LC_FIFO_LEVEL1        = store_buf->enhtimshare_reg[7];
-    ENHTIM_PWM_DEADZONE_CR               = store_buf->enhtimshare_reg[11];
+    *((volatile uint32_t *)0x4000035CUL) = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_CLK0];
+    *((volatile uint32_t *)0x40000360UL) = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_CLK1];
+    *((volatile uint32_t *)0x40000368UL) = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_PWM_DZ_CLK];
+    ENH_TIM_SHARE->FIFO_CLR              = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_FIFO_CLR];
+    ENH_TIM_SHARE->CMD                   = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_CONTROL];
+    ENH_TIM_SHARE->INT_CMD               = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_INT_CONTROL];
+    ENH_TIM_SHARE->INT_SR                = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_INT_SR];
+    ENH_TIM_SHARE->LC_INT_CMD0           =
+        store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LATCH_INT_CONTROL_0];
+    ENH_TIM_SHARE->LC_INT_CMD2           =
+        store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LATCH_INT_CONTROL_2];
+    ENH_TIM_SHARE->LC_FIFO_LEVEL0        = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LC_FIFO_LEVEL0];
+    ENH_TIM_SHARE->LC_FIFO_LEVEL1        = store_buf->enhtimshare_reg[ENHTIMSHARE_DLPS_LC_FIFO_LEVEL1];
 }
 
 

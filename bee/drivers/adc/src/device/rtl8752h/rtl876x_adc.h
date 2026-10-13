@@ -984,11 +984,35 @@ __STATIC_INLINE uint8_t ADC_GetAllFlagStatus(ADC_TypeDef *ADCx)
   * \}
   */
 
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. Slot values stay IC-local
+ * and compact; only the names are shared.
+ */
+typedef enum
+{
+    ADC_DLPS_DIG_CTRL = 0x00,          //!< CR on this IC, 0x04, digital control. Restored without bits[1:0].
+    ADC_DLPS_SCHED_CTRL = 0x01,        //!< SCHCR on this IC, 0x08, schedule control.
+    ADC_DLPS_CTRL_INT = 0x02,          //!< INTCR on this IC, 0x0C, interrupt control. Restored last.
+    ADC_DLPS_POW_DATA_DLY_CTRL = 0x03, //!< PWRDLY on this IC, 0x50, power delay. Restored first.
+    ADC_DLPS_DATA_CLK_CTRL = 0x04,     //!< DATCLK on this IC, 0x54, data clock control.
+    ADC_DLPS_ANA_CTRL = 0x05,          //!< ANACTL, 0x58, analog control. Not present on all ICs.
+    ADC_DLPS_TIME_PERIOD = 0x06,       //!< SAMTIM on this IC, 0x5C, sample time period.
+    ADC_DLPS_MAX = 0x07,               //!< Store buffer entry count.
+} ADCDLPSReg_TypeDef;
+
+typedef enum
+{
+    ADC_DLPS_AON_0X110 = 0x00, //!< AON offset 0x110.
+    ADC_DLPS_AON_MAX = 0x01,   //!< Always-on store buffer entry count.
+} ADCDLPSAonReg_TypeDef;
+
+#define ADC_DLPS_SCHTAB_NUM 16
 typedef struct
 {
-    uint32_t adc_reg[7];
-    uint32_t adc_schtab_reg[8];
-    uint16_t aon_reg[1];
+    uint32_t adc_reg[ADC_DLPS_MAX];
+    uint16_t adc_schtab_reg[ADC_DLPS_SCHTAB_NUM];
+    uint16_t aon_reg[ADC_DLPS_AON_MAX];
 } ADCStoreReg_TypeDef;
 
 #ifdef __cplusplus

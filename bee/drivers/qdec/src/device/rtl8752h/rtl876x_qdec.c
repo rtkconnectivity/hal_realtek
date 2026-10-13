@@ -372,11 +372,11 @@ void QDEC_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     RCC_PeriphClockCmd(APBPeriph_QDEC, APBPeriph_QDEC_CLOCK, ENABLE);
 
-    store_buf->qdec_reg[0] = QDEC->REG_DIV;
-    store_buf->qdec_reg[1] = QDEC->REG_CR_X;
-    store_buf->qdec_reg[2] = QDEC->REG_CR_Y;
-    store_buf->qdec_reg[3] = QDEC->REG_CR_Z;
-    store_buf->qdec_reg[4] = QDEC->INT_MASK;
+    store_buf->qdec_reg[QDEC_DLPS_DIV]      = QDEC->REG_DIV;
+    store_buf->qdec_reg[QDEC_DLPS_CR_X]     = QDEC->REG_CR_X;
+    store_buf->qdec_reg[QDEC_DLPS_CR_Y]     = QDEC->REG_CR_Y;
+    store_buf->qdec_reg[QDEC_DLPS_CR_Z]     = QDEC->REG_CR_Z;
+    store_buf->qdec_reg[QDEC_DLPS_INT_MASK] = QDEC->INT_MASK;
 
     return;
 }
@@ -399,11 +399,11 @@ void QDEC_DLPSExit(void *PeriReg, void *StoreBuf)
     RCC_PeriphClockCmd(APBPeriph_QDEC, APBPeriph_QDEC_CLOCK, ENABLE);
 
     //clear flags
-    QDEC->REG_DIV  = store_buf->qdec_reg[0];
-    QDEC->REG_CR_X = store_buf->qdec_reg[1];
-    QDEC->REG_CR_Y = store_buf->qdec_reg[2];
-    QDEC->REG_CR_Z = store_buf->qdec_reg[3];
-    QDEC->INT_MASK = store_buf->qdec_reg[4];
+    QDEC->REG_DIV  = store_buf->qdec_reg[QDEC_DLPS_DIV];
+    QDEC->REG_CR_X = store_buf->qdec_reg[QDEC_DLPS_CR_X];
+    QDEC->REG_CR_Y = store_buf->qdec_reg[QDEC_DLPS_CR_Y];
+    QDEC->REG_CR_Z = store_buf->qdec_reg[QDEC_DLPS_CR_Z];
+    QDEC->INT_MASK = store_buf->qdec_reg[QDEC_DLPS_INT_MASK];
 
     return;
 }

@@ -298,14 +298,15 @@ void GPIO_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     store_buf->gpio_reg[GPIO_DLPS_DR] = GPIOx->DATAOUT;
     store_buf->gpio_reg[GPIO_DLPS_DDR] = GPIOx->DATADIR;
-    store_buf->gpio_reg[GPIO_DLPS_DSR] = GPIOx->DATASRC;
-    store_buf->gpio_reg[GPIO_DLPS_INTEN] = GPIOx->INTEN;
-    store_buf->gpio_reg[GPIO_DLPS_MASK] = GPIOx->INTMASK;
-    store_buf->gpio_reg[GPIO_DLPS_LEVEL] = GPIOx->INTTYPE;
-    store_buf->gpio_reg[GPIO_DLPS_POLARITY] = GPIOx->INTPOLARITY;
-    store_buf->gpio_reg[GPIO_DLPS_DEBEN] = GPIOx->DEBOUNCE;
-    store_buf->gpio_reg[GPIO_DLPS_DEBCFG] = *(__IO uint32_t *)(0x40000344UL);
-    store_buf->gpio_reg[GPIO_DLPS_BOTHEDGE] = GPIOx->INTBOTHEDGE;
+    store_buf->gpio_reg[GPIO_DLPS_DATA_SRC] = GPIOx->DATASRC;
+    store_buf->gpio_reg[GPIO_DLPS_INT_EN] = GPIOx->INTEN;
+    store_buf->gpio_reg[GPIO_DLPS_INT_MASK] = GPIOx->INTMASK;
+    store_buf->gpio_reg[GPIO_DLPS_INT_LV] = GPIOx->INTTYPE;
+    store_buf->gpio_reg[GPIO_DLPS_INT_POLARITY] = GPIOx->INTPOLARITY;
+    store_buf->gpio_reg[GPIO_DLPS_DEB_EN] = GPIOx->DEBOUNCE;
+    store_buf->gpio_reg[GPIO_DLPS_DEB_CLK_DIV] = *(__IO uint32_t *)(0x40000344UL);
+    store_buf->gpio_reg[GPIO_DLPS_INT_BOTHEDGE] = GPIOx->INTBOTHEDGE;
+    store_buf->gpio_reg[GPIO_DLPS_LS_SYNC] = GPIOx->LSSYNC;
 
     return;
 }
@@ -325,16 +326,17 @@ void GPIO_DLPSExit(void *PeriReg, void *StoreBuf)
     RCC_PeriphClockCmd(APBPeriph_GPIO, APBPeriph_GPIO_CLOCK, ENABLE);
 
     GPIOx->DATADIR       = store_buf->gpio_reg[GPIO_DLPS_DDR];
-    GPIOx->DATASRC       = store_buf->gpio_reg[GPIO_DLPS_DSR];
-    GPIOx->INTMASK       = store_buf->gpio_reg[GPIO_DLPS_MASK];
-    GPIOx->INTTYPE       = store_buf->gpio_reg[GPIO_DLPS_LEVEL];
-    GPIOx->INTPOLARITY   = store_buf->gpio_reg[GPIO_DLPS_POLARITY];
-    GPIOx->DEBOUNCE      = store_buf->gpio_reg[GPIO_DLPS_DEBEN];
+    GPIOx->DATASRC       = store_buf->gpio_reg[GPIO_DLPS_DATA_SRC];
+    GPIOx->INTMASK       = store_buf->gpio_reg[GPIO_DLPS_INT_MASK];
+    GPIOx->INTTYPE       = store_buf->gpio_reg[GPIO_DLPS_INT_LV];
+    GPIOx->LSSYNC        = store_buf->gpio_reg[GPIO_DLPS_LS_SYNC];
+    GPIOx->INTPOLARITY   = store_buf->gpio_reg[GPIO_DLPS_INT_POLARITY];
+    GPIOx->DEBOUNCE      = store_buf->gpio_reg[GPIO_DLPS_DEB_EN];
     GPIOx->DATAOUT       = store_buf->gpio_reg[GPIO_DLPS_DR];
     GPIOx->INTCLR        = ~(store_buf->gpio_reg[GPIO_DLPS_DDR]);
-    GPIOx->INTEN         = store_buf->gpio_reg[GPIO_DLPS_INTEN];
-    *(__IO uint32_t *)(0x40000344UL) = store_buf->gpio_reg[GPIO_DLPS_DEBCFG];
-    GPIOx->INTBOTHEDGE  = store_buf->gpio_reg[GPIO_DLPS_BOTHEDGE];
+    GPIOx->INTEN         = store_buf->gpio_reg[GPIO_DLPS_INT_EN];
+    *(__IO uint32_t *)(0x40000344UL) = store_buf->gpio_reg[GPIO_DLPS_DEB_CLK_DIV];
+    GPIOx->INTBOTHEDGE  = store_buf->gpio_reg[GPIO_DLPS_INT_BOTHEDGE];
 
     return;
 }

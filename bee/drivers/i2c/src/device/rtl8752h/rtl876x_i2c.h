@@ -869,9 +869,38 @@ __STATIC_INLINE void I2C_GDMACmd(I2C_TypeDef *I2Cx, uint16_t I2C_GDMAReq, Functi
   * \}
   */
 
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. The I2C register block is
+ * identical on all ICs covered so far, so both the names and the slot values
+ * match; keep them in step when adding an IC.
+ */
+typedef enum
+{
+    I2C_DLPS_CON = 0x00,                //!< 0x00, control.
+    I2C_DLPS_TAR = 0x01,                //!< 0x04, target address.
+    I2C_DLPS_SAR = 0x02,                //!< 0x08, slave address.
+    I2C_DLPS_FS_SPKLEN = 0x03,          //!< 0xA0, fast-speed spike suppression length.
+    I2C_DLPS_SS_SCL_HCNT = 0x04,        //!< 0x14, standard-speed SCL high count.
+    I2C_DLPS_SS_SCL_LCNT = 0x05,        //!< 0x18, standard-speed SCL low count.
+    I2C_DLPS_FS_SCL_HCNT = 0x06,        //!< 0x1C, fast-speed SCL high count.
+    I2C_DLPS_FS_SCL_LCNT = 0x07,        //!< 0x20, fast-speed SCL low count.
+    I2C_DLPS_INTR_MASK = 0x08,          //!< 0x30, interrupt mask.
+    I2C_DLPS_RX_TL = 0x09,              //!< 0x38, RX FIFO threshold.
+    I2C_DLPS_TX_TL = 0x0A,              //!< 0x3C, TX FIFO threshold.
+    I2C_DLPS_ENABLE = 0x0B,             //!< 0x6C, enable. Restored last.
+    I2C_DLPS_SDA_HOLD = 0x0C,           //!< 0x7C, SDA hold time.
+    I2C_DLPS_SLV_DATA_NACK_ONLY = 0x0D, //!< 0x84, slave data NACK only.
+    I2C_DLPS_DMA_CR = 0x0E,             //!< 0x88, DMA control.
+    I2C_DLPS_DMA_TDLR = 0x0F,           //!< 0x8C, DMA transmit data level.
+    I2C_DLPS_DMA_RDLR = 0x10,           //!< 0x90, DMA receive data level.
+    I2C_DLPS_SDA_SETUP = 0x11,          //!< 0x94, SDA setup time.
+    I2C_DLPS_MAX = 0x12,                //!< Store buffer entry count.
+} I2CDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t i2c_reg[18];
+    uint32_t i2c_reg[I2C_DLPS_MAX];
 } I2CStoreReg_TypeDef;
 
 #ifdef __cplusplus

@@ -319,14 +319,12 @@ void TIM_PWMChangeDZClockSrc(PWM_TypeDef *PWMx, FunctionalState NewState)
 DATA_RAM_FUNCTION
 void TIMSHARE_DLPSEnter(void *StoreBuf)
 {
-    TIMSHAREStoreReg_TypeDef *store_buf = (TIMSHAREStoreReg_TypeDef *)StoreBuf;
+    TIMShareStoreReg_TypeDef *store_buf = (TIMShareStoreReg_TypeDef *)StoreBuf;
     RCC_PeriphClockCmd(APBPeriph_TIMER, APBPeriph_TIMER_CLOCK, ENABLE);
 
-    store_buf->timshare_reg[0] = *((volatile uint32_t *)0x4000035CUL);
-    store_buf->timshare_reg[1] = *((volatile uint32_t *)0x40000360UL);
-    store_buf->timshare_reg[2] = *((volatile uint32_t *)0x40000364UL);
-    store_buf->timshare_reg[3] = *((volatile uint32_t *)0x40000368UL);
-    store_buf->timshare_reg[4] = TIMER_PWM2_CR;
+    store_buf->timshare_reg[TIMSHARE_DLPS_CLK0] = *((volatile uint32_t *)0x4000035CUL);
+    store_buf->timshare_reg[TIMSHARE_DLPS_CLK1] = *((volatile uint32_t *)0x40000360UL);
+    store_buf->timshare_reg[TIMSHARE_DLPS_PWM_DZ_CLK] = *((volatile uint32_t *)0x40000364UL);
 }
 
 /**
@@ -343,9 +341,10 @@ void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
     uint32_t timerid = (tempreg - TIM0_REG_BASE) / 20;
     TIMStoreReg_TypeDef *store_buf = (TIMStoreReg_TypeDef *)StoreBuf;
 
-    store_buf->tim_reg[0] = TIMx->LoadCount;
-    store_buf->tim_reg[1] = TIMx->ControlReg;
-    store_buf->tim_reg[2] = *(volatile uint32_t *)((uint32_t)(&TIMER0_LOAD_COUNT2) + timerid * 0x04);
+    store_buf->tim_reg[TIM_DLPS_LOADCOUNT]  = TIMx->LoadCount;
+    store_buf->tim_reg[TIM_DLPS_CONTROLREG] = TIMx->ControlReg;
+    store_buf->tim_reg[TIM_DLPS_LOADCOUNT2] = *(volatile uint32_t *)((uint32_t)(
+                                                                         &TIMER0_LOAD_COUNT2) + timerid * 0x04);
 }
 
 /**
@@ -357,14 +356,12 @@ void TIM_DLPSEnter(void *PeriReg, void *StoreBuf)
 DATA_RAM_FUNCTION
 void TIMSHARE_DLPSExit(void *StoreBuf)
 {
-    TIMSHAREStoreReg_TypeDef *store_buf = (TIMSHAREStoreReg_TypeDef *)StoreBuf;
+    TIMShareStoreReg_TypeDef *store_buf = (TIMShareStoreReg_TypeDef *)StoreBuf;
     RCC_PeriphClockCmd(APBPeriph_TIMER, APBPeriph_TIMER_CLOCK, ENABLE);
 
-    *((volatile uint32_t *)0x4000035CUL) = store_buf->timshare_reg[0];
-    *((volatile uint32_t *)0x40000360UL) = store_buf->timshare_reg[1];
-    *((volatile uint32_t *)0x40000364UL) = store_buf->timshare_reg[2];
-    *((volatile uint32_t *)0x40000368UL) = store_buf->timshare_reg[3];
-    TIMER_PWM2_CR                        = store_buf->timshare_reg[4];
+    *((volatile uint32_t *)0x4000035CUL) = store_buf->timshare_reg[TIMSHARE_DLPS_CLK0];
+    *((volatile uint32_t *)0x40000360UL) = store_buf->timshare_reg[TIMSHARE_DLPS_CLK1];
+    *((volatile uint32_t *)0x40000364UL) = store_buf->timshare_reg[TIMSHARE_DLPS_PWM_DZ_CLK];
 }
 
 /**
@@ -381,9 +378,10 @@ void TIM_DLPSExit(void *PeriReg, void *StoreBuf)
     uint32_t timerid = (tempreg - TIM0_REG_BASE) / 20;
     TIMStoreReg_TypeDef *store_buf = (TIMStoreReg_TypeDef *)StoreBuf;
 
-    TIMx->LoadCount  = store_buf->tim_reg[0];
-    TIMx->ControlReg = store_buf->tim_reg[1] ;
-    *(volatile uint32_t *)((uint32_t)(&TIMER0_LOAD_COUNT2) + timerid * 0x04) = store_buf->tim_reg[2];
+    TIMx->LoadCount  = store_buf->tim_reg[TIM_DLPS_LOADCOUNT];
+    TIMx->ControlReg = store_buf->tim_reg[TIM_DLPS_CONTROLREG];
+    *(volatile uint32_t *)((uint32_t)(&TIMER0_LOAD_COUNT2) + timerid * 0x04) =
+        store_buf->tim_reg[TIM_DLPS_LOADCOUNT2];
 }
 
 

@@ -167,7 +167,7 @@ RAM_FUNCTION
 void SPI_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     SPI_TypeDef *SPIx = (SPI_TypeDef *)PeriReg;
-    SPIStoreReg_Typedef *store_buf = (SPIStoreReg_Typedef *)StoreBuf;
+    SPIStoreReg_TypeDef *store_buf = (SPIStoreReg_TypeDef *)StoreBuf;
 
     if (SPIx == SPI0)
     {
@@ -182,18 +182,18 @@ void SPI_DLPSEnter(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_SPI1, APBPeriph_SPI1_CLOCK, ENABLE);
     }
 
-    store_buf->spi_reg[0] = SPIx->SPI_M_S_CTRL0;        /*!< 0x00 */
-    store_buf->spi_reg[1] = SPIx->SPI_M_CTRL1;          /*!< 0x04 */
-    store_buf->spi_reg[2] = SPIx->SPI_SPIENR;           /*!< 0x08 */
-    store_buf->spi_reg[3] = SPIx->SPI_M_SER;            /*!< 0x10 */
-    store_buf->spi_reg[4] = SPIx->SPI_M_BAUDR;          /*!< 0x14 */
-    store_buf->spi_reg[5] = SPIx->SPI_TXFTLR;           /*!< 0x18 */
-    store_buf->spi_reg[6] = SPIx->SPI_RXFTLR;           /*!< 0x1C */
-    store_buf->spi_reg[7] = SPIx->SPI_M_S_IMR;          /*!< 0x2C */
-    store_buf->spi_reg[8] = SPIx->SPI_DMACR;            /*!< 0x4C */
-    store_buf->spi_reg[9] = SPIx->SPI_DMATDLR;          /*!< 0x50 */
-    store_buf->spi_reg[10] = SPIx->SPI_DMARDLR;         /*!< 0x54 */
-    store_buf->spi_reg[11] = SPIx->SPI_M_RSDR;          /*!< 0xF0 */
+    store_buf->spi_reg[SPI_DLPS_M_S_CTRL0] = SPIx->SPI_M_S_CTRL0; /*!< 0x00 */
+    store_buf->spi_reg[SPI_DLPS_M_CTRL1] = SPIx->SPI_M_CTRL1;     /*!< 0x04 */
+    store_buf->spi_reg[SPI_DLPS_SPIENR] = SPIx->SPI_SPIENR;       /*!< 0x08 */
+    store_buf->spi_reg[SPI_DLPS_M_SER] = SPIx->SPI_M_SER;         /*!< 0x10 */
+    store_buf->spi_reg[SPI_DLPS_M_BAUDR] = SPIx->SPI_M_BAUDR;     /*!< 0x14 */
+    store_buf->spi_reg[SPI_DLPS_TXFTLR] = SPIx->SPI_TXFTLR;       /*!< 0x18 */
+    store_buf->spi_reg[SPI_DLPS_RXFTLR] = SPIx->SPI_RXFTLR;       /*!< 0x1C */
+    store_buf->spi_reg[SPI_DLPS_M_S_IMR] = SPIx->SPI_M_S_IMR;     /*!< 0x2C */
+    store_buf->spi_reg[SPI_DLPS_DMACR] = SPIx->SPI_DMACR;         /*!< 0x4C */
+    store_buf->spi_reg[SPI_DLPS_DMATDLR] = SPIx->SPI_DMATDLR;     /*!< 0x50 */
+    store_buf->spi_reg[SPI_DLPS_DMARDLR] = SPIx->SPI_DMARDLR;     /*!< 0x54 */
+    store_buf->spi_reg[SPI_DLPS_RX_SAMPLE_DELAY] = SPIx->SPI_M_RSDR;       /*!< 0xF0 */
 }
 
 
@@ -201,7 +201,7 @@ RAM_FUNCTION
 void SPI_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     SPI_TypeDef *SPIx = (SPI_TypeDef *)PeriReg;
-    SPIStoreReg_Typedef *store_buf = (SPIStoreReg_Typedef *)StoreBuf;
+    SPIStoreReg_TypeDef *store_buf = (SPIStoreReg_TypeDef *)StoreBuf;
 
     if (SPIx == SPI0)
     {
@@ -221,19 +221,19 @@ void SPI_DLPSExit(void *PeriReg, void *StoreBuf)
         SPI_SPI0AHBBridgeConfig(ENABLE);
     }
 
-    SPIx->SPI_M_S_CTRL0 = store_buf->spi_reg[0];
-    SPIx->SPI_M_CTRL1   = store_buf->spi_reg[1];
-    SPIx->SPI_M_SER     = store_buf->spi_reg[3];
-    SPIx->SPI_M_BAUDR   = store_buf->spi_reg[4];
-    SPIx->SPI_TXFTLR    = store_buf->spi_reg[5];
-    SPIx->SPI_RXFTLR    = store_buf->spi_reg[6];
-    SPIx->SPI_M_S_IMR   = store_buf->spi_reg[7];
-    SPIx->SPI_DMACR     = store_buf->spi_reg[8];
-    SPIx->SPI_DMATDLR   = store_buf->spi_reg[9];
-    SPIx->SPI_DMARDLR   = store_buf->spi_reg[10];
-    SPIx->SPI_M_RSDR    = store_buf->spi_reg[11];
+    SPIx->SPI_M_S_CTRL0 = store_buf->spi_reg[SPI_DLPS_M_S_CTRL0];
+    SPIx->SPI_M_CTRL1   = store_buf->spi_reg[SPI_DLPS_M_CTRL1];
+    SPIx->SPI_M_SER     = store_buf->spi_reg[SPI_DLPS_M_SER];
+    SPIx->SPI_M_BAUDR   = store_buf->spi_reg[SPI_DLPS_M_BAUDR];
+    SPIx->SPI_TXFTLR    = store_buf->spi_reg[SPI_DLPS_TXFTLR];
+    SPIx->SPI_RXFTLR    = store_buf->spi_reg[SPI_DLPS_RXFTLR];
+    SPIx->SPI_M_S_IMR   = store_buf->spi_reg[SPI_DLPS_M_S_IMR];
+    SPIx->SPI_DMACR     = store_buf->spi_reg[SPI_DLPS_DMACR];
+    SPIx->SPI_DMATDLR   = store_buf->spi_reg[SPI_DLPS_DMATDLR];
+    SPIx->SPI_DMARDLR   = store_buf->spi_reg[SPI_DLPS_DMARDLR];
+    SPIx->SPI_M_RSDR    = store_buf->spi_reg[SPI_DLPS_RX_SAMPLE_DELAY];
 
     /* Enable the selected SPI peripheral */
-    SPIx->SPI_SPIENR    = store_buf->spi_reg[2];
+    SPIx->SPI_SPIENR    = store_buf->spi_reg[SPI_DLPS_SPIENR];
 }
 

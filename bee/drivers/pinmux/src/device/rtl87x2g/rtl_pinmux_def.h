@@ -109,10 +109,13 @@ typedef struct                      /*!< Pinmux Structure */
 /*============================================================================*
  *                         PINMUX Private Types
  *============================================================================*/
+
+#define PINMUX_DLPS_CFG_NUM     (21) //!< The same as MAX_PIN_REG_NUM (TOTAL_PIN_NUM / 4).
+
 typedef struct
 {
-    uint32_t pinmux_reg[21];
-} PINMUXStoreReg_Typedef;
+    uint32_t pinmux_reg[PINMUX_DLPS_CFG_NUM];
+} PINMUXStoreReg_TypeDef;
 
 /*============================================================================*
  *                         PINMUX Constants

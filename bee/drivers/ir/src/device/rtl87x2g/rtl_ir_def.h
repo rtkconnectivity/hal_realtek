@@ -98,10 +98,24 @@ typedef struct
 /*============================================================================*
  *                         IR Private Types
  *============================================================================*/
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. Slot values stay IC-local
+ * and compact; only the names are shared.
+ */
+typedef enum
+{
+    IR_DLPS_CLK_DIV = 0x00,        //!< IR_CLK_DIV, 0x00, clock divider.
+    IR_DLPS_TX_CONFIG = 0x01,      //!< IR_TX_CONFIG, 0x04, TX configuration. BIT31 selects RX mode on restore.
+    IR_DLPS_RX_CONFIG = 0x02,      //!< IR_RX_CONFIG, 0x18, RX configuration. Only restored in RX mode.
+    IR_DLPS_RX_CNT_INT_SEL = 0x03, //!< IR_RX_CNT_INT_SEL, 0x24, RX counter interrupt select. Only restored in RX mode.
+    IR_DLPS_MAX = 0x04,            //!< Store buffer entry count.
+} IRDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t ir_reg[6];
-} IRStoreReg_Typedef;
+    uint32_t ir_reg[IR_DLPS_MAX];
+} IRStoreReg_TypeDef;
 
 /*============================================================================*
  *                         IR Registers and Field Descriptions

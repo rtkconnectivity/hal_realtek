@@ -877,9 +877,32 @@ __STATIC_INLINE void UART_ClearRxBreak(UART_TypeDef *UARTx)
   * \}
   */
 
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. Slot values stay IC-local
+ * and compact; only the names are shared. Names below follow the register
+ * naming of the newer SDK, so on this IC a few of them differ from the local
+ * register name (noted per entry).
+ */
+typedef enum
+{
+    UART_DLPS_DLL = 0x00,           //!< DLL, divisor latch low. Accessed with LCR bit[7] set.
+    UART_DLPS_DLM = 0x01,           //!< DLH_INTCR as divisor latch high. Accessed with LCR bit[7] set.
+    UART_DLPS_IER = 0x02,           //!< DLH_INTCR as interrupt enable. Same register as UART_DLPS_DLM, selected by LCR bit[7].
+    UART_DLPS_LCR = 0x03,           //!< LCR, line control.
+    UART_DLPS_CTRL0 = 0x04,         //!< MCR on this IC. Carries the hardware flow control setting.
+    UART_DLPS_SCR = 0x05,           //!< SPR on this IC. Carries the oversampling adjustment.
+    UART_DLPS_STSR = 0x06,          //!< STSR, status. Also the source for rebuilding INTID_FCR.
+    UART_DLPS_RX_TIMEOUT = 0x07,    //!< RX_IDLE_TOCR on this IC. RX idle timeout threshold.
+    UART_DLPS_RX_TIMEOUT_EN = 0x08, //!< RX_IDLE_INTCR on this IC. RX idle timeout enable.
+    UART_DLPS_MISCR = 0x09,         //!< MISCR, miscellaneous control.
+    UART_DLPS_INT_MASK = 0x0A,      //!< INTMASK, interrupt mask.
+    UART_DLPS_MAX = 0x0B,           //!< Store buffer entry count.
+} UARTDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t uart_reg[12];
+    uint32_t uart_reg[UART_DLPS_MAX];
 } UARTStoreReg_TypeDef;
 
 #ifdef __cplusplus

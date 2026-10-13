@@ -116,7 +116,7 @@ RAM_FUNCTION
 void I2C_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     I2C_TypeDef *I2Cx = (I2C_TypeDef *)PeriReg;
-    I2CStoreReg_Typedef *store_buf = (I2CStoreReg_Typedef *)StoreBuf;
+    I2CStoreReg_TypeDef *store_buf = (I2CStoreReg_TypeDef *)StoreBuf;
 
     if (I2Cx == I2C0)
     {
@@ -135,27 +135,27 @@ void I2C_DLPSEnter(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_I2C3, APBPeriph_I2C3_CLOCK, ENABLE);
     }
 
-    store_buf->i2c_reg[0] = I2Cx->IC_CON;                 /*!< 0x00 */
-    store_buf->i2c_reg[1] = I2Cx->IC_TAR;                 /*!< 0x04 */
-    store_buf->i2c_reg[2] = I2Cx->IC_SAR;                 /*!< 0x08 */
-    store_buf->i2c_reg[3] = I2Cx->IC_FS_SPKLEN;           /*!< 0xA0 */
+    store_buf->i2c_reg[I2C_DLPS_CON] = I2Cx->IC_CON;                 /*!< 0x00 */
+    store_buf->i2c_reg[I2C_DLPS_TAR] = I2Cx->IC_TAR;                 /*!< 0x04 */
+    store_buf->i2c_reg[I2C_DLPS_SAR] = I2Cx->IC_SAR;                 /*!< 0x08 */
+    store_buf->i2c_reg[I2C_DLPS_FS_SPKLEN] = I2Cx->IC_FS_SPKLEN;     /*!< 0xA0 */
 
-    store_buf->i2c_reg[4] = I2Cx->IC_SS_SCL_HCNT;         /*!< 0x14 */
-    store_buf->i2c_reg[5] = I2Cx->IC_SS_SCL_LCNT;         /*!< 0x18 */
-    store_buf->i2c_reg[6] = I2Cx->IC_FS_SCL_HCNT;         /*!< 0x1C */
-    store_buf->i2c_reg[7] = I2Cx->IC_FS_SCL_LCNT;         /*!< 0x20 */
+    store_buf->i2c_reg[I2C_DLPS_SS_SCL_HCNT] = I2Cx->IC_SS_SCL_HCNT; /*!< 0x14 */
+    store_buf->i2c_reg[I2C_DLPS_SS_SCL_LCNT] = I2Cx->IC_SS_SCL_LCNT; /*!< 0x18 */
+    store_buf->i2c_reg[I2C_DLPS_FS_SCL_HCNT] = I2Cx->IC_FS_SCL_HCNT; /*!< 0x1C */
+    store_buf->i2c_reg[I2C_DLPS_FS_SCL_LCNT] = I2Cx->IC_FS_SCL_LCNT; /*!< 0x20 */
 
-    store_buf->i2c_reg[8] = I2Cx->IC_INTR_MASK;           /*!< 0x30 */
-    store_buf->i2c_reg[9] = I2Cx->IC_RX_TL;               /*!< 0x38 */
-    store_buf->i2c_reg[10] = I2Cx->IC_TX_TL;              /*!< 0x3C */
-    store_buf->i2c_reg[11] = I2Cx->IC_ENABLE;             /*!< 0x6C */
-    store_buf->i2c_reg[12] = I2Cx->IC_SDA_HOLD;           /*!< 0x7C */
-    store_buf->i2c_reg[13] = I2Cx->IC_SLV_DATA_NACK_ONLY; /*!< 0x84 */
-    store_buf->i2c_reg[14] = I2Cx->IC_DMA_CR;             /*!< 0x88 */
-    store_buf->i2c_reg[15] = I2Cx->IC_DMA_TDLR;           /*!< 0x8C */
-    store_buf->i2c_reg[16] = I2Cx->IC_DMA_RDLR;           /*!< 0x90 */
+    store_buf->i2c_reg[I2C_DLPS_INTR_MASK] = I2Cx->IC_INTR_MASK;     /*!< 0x30 */
+    store_buf->i2c_reg[I2C_DLPS_RX_TL] = I2Cx->IC_RX_TL;             /*!< 0x38 */
+    store_buf->i2c_reg[I2C_DLPS_TX_TL] = I2Cx->IC_TX_TL;             /*!< 0x3C */
+    store_buf->i2c_reg[I2C_DLPS_ENABLE] = I2Cx->IC_ENABLE;           /*!< 0x6C */
+    store_buf->i2c_reg[I2C_DLPS_SDA_HOLD] = I2Cx->IC_SDA_HOLD;       /*!< 0x7C */
+    store_buf->i2c_reg[I2C_DLPS_SLV_DATA_NACK_ONLY] = I2Cx->IC_SLV_DATA_NACK_ONLY; /*!< 0x84 */
+    store_buf->i2c_reg[I2C_DLPS_DMA_CR] = I2Cx->IC_DMA_CR;           /*!< 0x88 */
+    store_buf->i2c_reg[I2C_DLPS_DMA_TDLR] = I2Cx->IC_DMA_TDLR;       /*!< 0x8C */
+    store_buf->i2c_reg[I2C_DLPS_DMA_RDLR] = I2Cx->IC_DMA_RDLR;       /*!< 0x90 */
 
-    store_buf->i2c_reg[17] = I2Cx->IC_SDA_SETUP;          /*!< 0x94 */
+    store_buf->i2c_reg[I2C_DLPS_SDA_SETUP] = I2Cx->IC_SDA_SETUP;     /*!< 0x94 */
 }
 
 /**
@@ -168,7 +168,7 @@ RAM_FUNCTION
 void I2C_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     I2C_TypeDef *I2Cx = (I2C_TypeDef *)PeriReg;
-    I2CStoreReg_Typedef *store_buf = (I2CStoreReg_Typedef *)StoreBuf;
+    I2CStoreReg_TypeDef *store_buf = (I2CStoreReg_TypeDef *)StoreBuf;
 
     if (I2Cx == I2C0)
     {
@@ -187,26 +187,26 @@ void I2C_DLPSExit(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_I2C3, APBPeriph_I2C3_CLOCK, ENABLE);
     }
 
-    I2Cx->IC_CON         = store_buf->i2c_reg[0];
-    I2Cx->IC_TAR         = store_buf->i2c_reg[1];
-    I2Cx->IC_SAR         = store_buf->i2c_reg[2];
-    I2Cx->IC_FS_SPKLEN   = store_buf->i2c_reg[3];
+    I2Cx->IC_CON         = store_buf->i2c_reg[I2C_DLPS_CON];
+    I2Cx->IC_TAR         = store_buf->i2c_reg[I2C_DLPS_TAR];
+    I2Cx->IC_SAR         = store_buf->i2c_reg[I2C_DLPS_SAR];
+    I2Cx->IC_FS_SPKLEN   = store_buf->i2c_reg[I2C_DLPS_FS_SPKLEN];
 
-    I2Cx->IC_SS_SCL_HCNT = store_buf->i2c_reg[4];
-    I2Cx->IC_SS_SCL_LCNT = store_buf->i2c_reg[5];
-    I2Cx->IC_FS_SCL_HCNT = store_buf->i2c_reg[6];
-    I2Cx->IC_FS_SCL_LCNT = store_buf->i2c_reg[7];
+    I2Cx->IC_SS_SCL_HCNT = store_buf->i2c_reg[I2C_DLPS_SS_SCL_HCNT];
+    I2Cx->IC_SS_SCL_LCNT = store_buf->i2c_reg[I2C_DLPS_SS_SCL_LCNT];
+    I2Cx->IC_FS_SCL_HCNT = store_buf->i2c_reg[I2C_DLPS_FS_SCL_HCNT];
+    I2Cx->IC_FS_SCL_LCNT = store_buf->i2c_reg[I2C_DLPS_FS_SCL_LCNT];
 
-    I2Cx->IC_INTR_MASK   = store_buf->i2c_reg[8];
-    I2Cx->IC_RX_TL       = store_buf->i2c_reg[9];
-    I2Cx->IC_RX_TL       = store_buf->i2c_reg[10];
-    I2Cx->IC_ENABLE      = store_buf->i2c_reg[11];
-    I2Cx->IC_SDA_HOLD    = store_buf->i2c_reg[12];
-    I2Cx->IC_SLV_DATA_NACK_ONLY = store_buf->i2c_reg[13];
-    I2Cx->IC_DMA_CR      = store_buf->i2c_reg[14];
-    I2Cx->IC_DMA_TDLR    = store_buf->i2c_reg[15];
-    I2Cx->IC_DMA_RDLR    = store_buf->i2c_reg[16];
+    I2Cx->IC_INTR_MASK   = store_buf->i2c_reg[I2C_DLPS_INTR_MASK];
+    I2Cx->IC_RX_TL       = store_buf->i2c_reg[I2C_DLPS_RX_TL];
+    I2Cx->IC_TX_TL       = store_buf->i2c_reg[I2C_DLPS_TX_TL];
+    I2Cx->IC_ENABLE      = store_buf->i2c_reg[I2C_DLPS_ENABLE];
+    I2Cx->IC_SDA_HOLD    = store_buf->i2c_reg[I2C_DLPS_SDA_HOLD];
+    I2Cx->IC_SLV_DATA_NACK_ONLY = store_buf->i2c_reg[I2C_DLPS_SLV_DATA_NACK_ONLY];
+    I2Cx->IC_DMA_CR      = store_buf->i2c_reg[I2C_DLPS_DMA_CR];
+    I2Cx->IC_DMA_TDLR    = store_buf->i2c_reg[I2C_DLPS_DMA_TDLR];
+    I2Cx->IC_DMA_RDLR    = store_buf->i2c_reg[I2C_DLPS_DMA_RDLR];
 
-    I2Cx->IC_SDA_SETUP   = store_buf->i2c_reg[17];
+    I2Cx->IC_SDA_SETUP   = store_buf->i2c_reg[I2C_DLPS_SDA_SETUP];
 }
 

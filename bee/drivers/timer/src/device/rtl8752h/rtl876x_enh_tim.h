@@ -851,14 +851,47 @@ void ENHTIM_PWMDZBypassCmd(ENHTIM_TypeDef *ENHTIMx, FunctionalState NewState);
   * \}
   */
 
+/** \brief  Slot index of the per-instance ENHTIM store buffer kept across DLPS.
+ *          Slot names are shared across ICs; the value of each slot is
+ *          IC-local and kept compact (no reserved holes).
+ */
+typedef enum
+{
+    ENHTIM_DLPS_CONFIGURE      = 0x00, //!< ENHTIMx->CR, control/config.
+    ENHTIM_DLPS_MAX_CNT        = 0x01, //!< ENHTIMx->MAX_CNT, max count value.
+    ENHTIM_DLPS_CCR            = 0x02, //!< ENHTIMx->CCR, capture/compare value.
+    ENHTIM_DLPS_CCR_FIFO_ENTRY = 0x03, //!< ENHTIMx->CCR_FIFO, FIFO entry.
+    ENHTIM_DLPS_MAX = 0x04,            //!< Store buffer entry count.
+} ENHTIMDLPSReg_TypeDef;
+
+/** \brief  Slot index of the ENHTIM share store buffer kept across DLPS.
+ *          Slot names are IC-local (the share registers differ per IC),
+ *          the value of each slot is kept compact (no reserved holes).
+ */
+typedef enum
+{
+    ENHTIMSHARE_DLPS_FIFO_CLR               = 0x00, //!< ENH_TIM_SHARE->FIFO_CLR.
+    ENHTIMSHARE_DLPS_CONTROL                = 0x01, //!< ENH_TIM_SHARE->CMD.
+    ENHTIMSHARE_DLPS_INT_CONTROL            = 0x02, //!< ENH_TIM_SHARE->INT_CMD.
+    ENHTIMSHARE_DLPS_INT_SR                 = 0x03, //!< ENH_TIM_SHARE->INT_SR. Not present on all ICs.
+    ENHTIMSHARE_DLPS_LATCH_INT_CONTROL_0    = 0x04, //!< ENH_TIM_SHARE->LC_INT_CMD0.
+    ENHTIMSHARE_DLPS_LATCH_INT_CONTROL_2    = 0x05, //!< ENH_TIM_SHARE->LC_INT_CMD2.
+    ENHTIMSHARE_DLPS_LC_FIFO_LEVEL0         = 0x06, //!< ENH_TIM_SHARE->LC_FIFO_LEVEL0. Not present on all ICs.
+    ENHTIMSHARE_DLPS_LC_FIFO_LEVEL1         = 0x07, //!< ENH_TIM_SHARE->LC_FIFO_LEVEL1. Not present on all ICs.
+    ENHTIMSHARE_DLPS_CLK0                   = 0x08, //!< 0x4000035C, REG_PERI_GTIMER_CLK_SRC1.
+    ENHTIMSHARE_DLPS_CLK1                   = 0x09, //!< 0x40000360, REG_PERI_GTIMER_CLK_SRC0.
+    ENHTIMSHARE_DLPS_PWM_DZ_CLK             = 0x0A, //!< 0x40000368, REG_PERI_ENHTIMER0_DZONE_CTRL (dead-zone cfg + dead-zone clk bits 16~19).
+    ENHTIMSHARE_DLPS_MAX = 0x0B,                    //!< Store buffer entry count.
+} ENHTIMShareDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t enhtim_reg[4];
+    uint32_t enhtim_reg[ENHTIM_DLPS_MAX];
 } ENHTIMStoreReg_TypeDef;
 
 typedef struct
 {
-    uint32_t enhtimshare_reg[12];
+    uint32_t enhtimshare_reg[ENHTIMSHARE_DLPS_MAX];
 } ENHTIMShareStoreReg_TypeDef;
 
 #define ENHTIM_GetCurrentControl(ENHTIMx)     (((ENHTIM_TypeDef *)(ENHTIMx))->CR)

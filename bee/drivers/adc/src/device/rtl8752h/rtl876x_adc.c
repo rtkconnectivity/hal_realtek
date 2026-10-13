@@ -613,22 +613,23 @@ void ADC_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     RCC_PeriphClockCmd(APBPeriph_ADC, APBPeriph_ADC_CLOCK, ENABLE);
 
-    store_buf->adc_reg[0]        = ADC->CR;          //0x04
-    store_buf->adc_reg[1]        = ADC->SCHCR;       //0x08
-    store_buf->adc_reg[2]        = ADC->INTCR;       //0x0C
-    store_buf->adc_schtab_reg[0] = ADC->SCHTAB0;     //0x10
-    store_buf->adc_schtab_reg[1] = ADC->SCHTAB1;     //0x14
-    store_buf->adc_schtab_reg[2] = ADC->SCHTAB2;     //0x18
-    store_buf->adc_schtab_reg[3] = ADC->SCHTAB3;     //0x1C
-    store_buf->adc_schtab_reg[4] = ADC->SCHTAB4;     //0x20
-    store_buf->adc_schtab_reg[5] = ADC->SCHTAB5;     //0x24
-    store_buf->adc_schtab_reg[6] = ADC->SCHTAB6;     //0x28
-    store_buf->adc_schtab_reg[7] = ADC->SCHTAB7;     //0x2C
-    store_buf->adc_reg[3]        = ADC->PWRDLY;
-    store_buf->adc_reg[4]        = ADC->DATCLK;
-    store_buf->adc_reg[5]        = ADC->ANACTL;
-    store_buf->adc_reg[6]        = ADC->SAMTIM;
-    store_buf->aon_reg[0]        = btaon_fast_read_safe(0x110);
+    store_buf->adc_reg[ADC_DLPS_DIG_CTRL]   = ADC->CR;          //0x04
+    store_buf->adc_reg[ADC_DLPS_SCHED_CTRL] = ADC->SCHCR;       //0x08
+    store_buf->adc_reg[ADC_DLPS_CTRL_INT]   = ADC->INTCR;       //0x0C
+
+    /* Schedule table: 16 half-word slots over 0x10 - 0x2C, two per word */
+    for (uint8_t i = 0; i < ADC_DLPS_SCHTAB_NUM; i += 2)
+    {
+        uint32_t sch_word = (&ADC->SCHTAB0)[i / 2];
+        store_buf->adc_schtab_reg[i]     = (uint16_t)(sch_word & 0xFFFF);
+        store_buf->adc_schtab_reg[i + 1] = (uint16_t)(sch_word >> 16);
+    }
+
+    store_buf->adc_reg[ADC_DLPS_POW_DATA_DLY_CTRL] = ADC->PWRDLY;   //0x50
+    store_buf->adc_reg[ADC_DLPS_DATA_CLK_CTRL]     = ADC->DATCLK;   //0x54
+    store_buf->adc_reg[ADC_DLPS_ANA_CTRL]          = ADC->ANACTL;   //0x58
+    store_buf->adc_reg[ADC_DLPS_TIME_PERIOD]       = ADC->SAMTIM;   //0x5C
+    store_buf->aon_reg[ADC_DLPS_AON_0X110]         = btaon_fast_read_safe(0x110);
 
     return;
 }
@@ -654,24 +655,23 @@ void ADC_DLPSExit(void *PeriReg, void *StoreBuf)
     ADC->INTCR &= (~0x1f);
 
     /* Set power mode first */
-    ADC->PWRDLY = store_buf->adc_reg[3];
+    ADC->PWRDLY = store_buf->adc_reg[ADC_DLPS_POW_DATA_DLY_CTRL];
 
     /* Disable schedule table */
     ADC->SCHCR &= (~0xffff);
 
-    ADC->SCHTAB0 = store_buf->adc_schtab_reg[0];
-    ADC->SCHTAB1 = store_buf->adc_schtab_reg[1];
-    ADC->SCHTAB2 = store_buf->adc_schtab_reg[2];
-    ADC->SCHTAB3 = store_buf->adc_schtab_reg[3];
-    ADC->SCHTAB4 = store_buf->adc_schtab_reg[4];
-    ADC->SCHTAB5 = store_buf->adc_schtab_reg[5];
-    ADC->SCHTAB6 = store_buf->adc_schtab_reg[6];
-    ADC->SCHTAB7 = store_buf->adc_schtab_reg[7];
-    ADC->SCHCR   = store_buf->adc_reg[1];
-    ADC->CR = (store_buf->adc_reg[0] & (~((uint32_t)0x03)));
-    ADC->DATCLK  = store_buf->adc_reg[4];
-    ADC->ANACTL  = store_buf->adc_reg[5];
-    ADC->SAMTIM  = store_buf->adc_reg[6];
+    /* Schedule table: write back as words, two half-word slots at a time */
+    for (uint8_t i = 0; i < ADC_DLPS_SCHTAB_NUM; i += 2)
+    {
+        (&ADC->SCHTAB0)[i / 2] = (uint32_t)store_buf->adc_schtab_reg[i] |
+                                 ((uint32_t)store_buf->adc_schtab_reg[i + 1] << 16);
+    }
+
+    ADC->SCHCR   = store_buf->adc_reg[ADC_DLPS_SCHED_CTRL];
+    ADC->CR = (store_buf->adc_reg[ADC_DLPS_DIG_CTRL] & (~((uint32_t)0x03)));
+    ADC->DATCLK  = store_buf->adc_reg[ADC_DLPS_DATA_CLK_CTRL];
+    ADC->ANACTL  = store_buf->adc_reg[ADC_DLPS_ANA_CTRL];
+    ADC->SAMTIM  = store_buf->adc_reg[ADC_DLPS_TIME_PERIOD];
 
     /*Clear ADC FIFO */
     ADC->CR |= BIT26;
@@ -679,9 +679,9 @@ void ADC_DLPSExit(void *PeriReg, void *StoreBuf)
     ADC->INTCR |= (0x1f << 8);
 
     /* Restore specify interrupt */
-    ADC->INTCR = store_buf->adc_reg[2];
+    ADC->INTCR = store_buf->adc_reg[ADC_DLPS_CTRL_INT];
 
-    btaon_fast_write(0x110, store_buf->aon_reg[0]);
+    btaon_fast_write(0x110, store_buf->aon_reg[ADC_DLPS_AON_0X110]);
 
     return;
 }

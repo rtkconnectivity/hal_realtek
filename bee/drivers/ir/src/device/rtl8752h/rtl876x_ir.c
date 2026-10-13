@@ -623,10 +623,10 @@ void IR_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     RCC_PeriphClockCmd(APBPeriph_IR, APBPeriph_IR_CLOCK, ENABLE);
 
-    store_buf->ir_reg[0] = IR->CLK_DIV;
-    store_buf->ir_reg[1] = IR->TX_CONFIG;
-    store_buf->ir_reg[2] = IR->RX_CONFIG;
-    store_buf->ir_reg[3] = IR->RX_CNT_INT_SEL;
+    store_buf->ir_reg[IR_DLPS_CLK_DIV] = IR->CLK_DIV;
+    store_buf->ir_reg[IR_DLPS_TX_CONFIG] = IR->TX_CONFIG;
+    store_buf->ir_reg[IR_DLPS_RX_CONFIG] = IR->RX_CONFIG;
+    store_buf->ir_reg[IR_DLPS_RX_CNT_INT_SEL] = IR->RX_CNT_INT_SEL;
 
     return;
 }
@@ -644,18 +644,18 @@ void IR_DLPSExit(void *PeriReg, void *StoreBuf)
 
     RCC_PeriphClockCmd(APBPeriph_IR, APBPeriph_IR_CLOCK, ENABLE);
 
-    IR->CLK_DIV = store_buf->ir_reg[0];
-    if (store_buf->ir_reg[1] & BIT31)
+    IR->CLK_DIV = store_buf->ir_reg[IR_DLPS_CLK_DIV];
+    if (store_buf->ir_reg[IR_DLPS_TX_CONFIG] & BIT31)
     {
         /* RX MODE */
-        IR->TX_CONFIG       = store_buf->ir_reg[1];
-        IR->RX_CONFIG       = store_buf->ir_reg[2];
-        IR->RX_CNT_INT_SEL  = store_buf->ir_reg[3];
+        IR->TX_CONFIG       = store_buf->ir_reg[IR_DLPS_TX_CONFIG];
+        IR->RX_CONFIG       = store_buf->ir_reg[IR_DLPS_RX_CONFIG];
+        IR->RX_CNT_INT_SEL  = store_buf->ir_reg[IR_DLPS_RX_CNT_INT_SEL];
     }
     else
     {
         /* TX MODE */
-        IR->TX_CONFIG  = store_buf->ir_reg[1];
+        IR->TX_CONFIG  = store_buf->ir_reg[IR_DLPS_TX_CONFIG];
         /* If IR TX mode is idle, must write one data firstly */
         IR->TX_FIFO = 0;
     }

@@ -369,20 +369,20 @@ void SPI_DLPSEnter(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_SPI1, APBPeriph_SPI1_CLOCK, ENABLE);
     }
 
-    store_buf->spi_reg[0]  = SPIx->CTRLR0;
-    store_buf->spi_reg[1]  = SPIx->CTRLR1;
-    store_buf->spi_reg[2]  = SPIx->SSIENR;
-    store_buf->spi_reg[3]  = SPIx->SER;
-    store_buf->spi_reg[4]  = SPIx->BAUDR;
-    store_buf->spi_reg[5]  = SPIx->TXFTLR;
-    store_buf->spi_reg[6]  = SPIx->RXFTLR;
-    store_buf->spi_reg[7]  = SPIx->IMR;
-    store_buf->spi_reg[8]  = SPIx->DMACR;
-    store_buf->spi_reg[9]  = SPIx->DMATDLR;
-    store_buf->spi_reg[10] = SPIx->DMARDLR;
-    store_buf->spi_reg[11] = SPIx->RX_SAMPLE_DLY;
-    store_buf->spi_reg[12] = *(volatile uint32_t *)0x40000308UL;
-    store_buf->spi_reg[13] = *(volatile uint32_t *)0x4000035CUL;
+    store_buf->spi_reg[SPI_DLPS_M_S_CTRL0]  = SPIx->CTRLR0;
+    store_buf->spi_reg[SPI_DLPS_M_CTRL1]  = SPIx->CTRLR1;
+    store_buf->spi_reg[SPI_DLPS_SPIENR]  = SPIx->SSIENR;
+    store_buf->spi_reg[SPI_DLPS_M_SER]  = SPIx->SER;
+    store_buf->spi_reg[SPI_DLPS_M_BAUDR]  = SPIx->BAUDR;
+    store_buf->spi_reg[SPI_DLPS_TXFTLR]  = SPIx->TXFTLR;
+    store_buf->spi_reg[SPI_DLPS_RXFTLR]  = SPIx->RXFTLR;
+    store_buf->spi_reg[SPI_DLPS_M_S_IMR]  = SPIx->IMR;
+    store_buf->spi_reg[SPI_DLPS_DMACR]  = SPIx->DMACR;
+    store_buf->spi_reg[SPI_DLPS_DMATDLR]  = SPIx->DMATDLR;
+    store_buf->spi_reg[SPI_DLPS_DMARDLR] = SPIx->DMARDLR;
+    store_buf->spi_reg[SPI_DLPS_RX_SAMPLE_DELAY] = SPIx->RX_SAMPLE_DLY;
+    store_buf->spi_reg[SPI_DLPS_PERI_CTL0] = *(volatile uint32_t *)0x40000308UL;
+    store_buf->spi_reg[SPI_DLPS_PERI_CTL1] = *(volatile uint32_t *)0x4000035CUL;
 }
 
 /**
@@ -397,8 +397,8 @@ void SPI_DLPSExit(void *PeriReg, void *StoreBuf)
     SPI_TypeDef *SPIx = (SPI_TypeDef *)PeriReg;
     SPIStoreReg_TypeDef *store_buf = (SPIStoreReg_TypeDef *)StoreBuf;
 
-    *(volatile uint32_t *)0x4000035CUL = store_buf->spi_reg[13];
-    *(volatile uint32_t *)0x40000308UL = store_buf->spi_reg[12];
+    *(volatile uint32_t *)0x4000035CUL = store_buf->spi_reg[SPI_DLPS_PERI_CTL1];
+    *(volatile uint32_t *)0x40000308UL = store_buf->spi_reg[SPI_DLPS_PERI_CTL0];
 
     if (SPIx == SPI0)
     {
@@ -409,20 +409,20 @@ void SPI_DLPSExit(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_SPI1, APBPeriph_SPI1_CLOCK, ENABLE);
     }
 
-    SPIx->CTRLR0        = store_buf->spi_reg[0];
-    SPIx->CTRLR1        = store_buf->spi_reg[1];
-    SPIx->SER           = store_buf->spi_reg[3];
-    SPIx->BAUDR         = store_buf->spi_reg[4];
-    SPIx->TXFTLR        = store_buf->spi_reg[5];
-    SPIx->RXFTLR        = store_buf->spi_reg[6];
-    SPIx->IMR           = store_buf->spi_reg[7];
-    SPIx->DMACR         = store_buf->spi_reg[8];
-    SPIx->DMATDLR       = store_buf->spi_reg[9];
-    SPIx->DMARDLR       = store_buf->spi_reg[10];
-    SPIx->RX_SAMPLE_DLY = store_buf->spi_reg[11];
+    SPIx->CTRLR0        = store_buf->spi_reg[SPI_DLPS_M_S_CTRL0];
+    SPIx->CTRLR1        = store_buf->spi_reg[SPI_DLPS_M_CTRL1];
+    SPIx->SER           = store_buf->spi_reg[SPI_DLPS_M_SER];
+    SPIx->BAUDR         = store_buf->spi_reg[SPI_DLPS_M_BAUDR];
+    SPIx->TXFTLR        = store_buf->spi_reg[SPI_DLPS_TXFTLR];
+    SPIx->RXFTLR        = store_buf->spi_reg[SPI_DLPS_RXFTLR];
+    SPIx->IMR           = store_buf->spi_reg[SPI_DLPS_M_S_IMR];
+    SPIx->DMACR         = store_buf->spi_reg[SPI_DLPS_DMACR];
+    SPIx->DMATDLR       = store_buf->spi_reg[SPI_DLPS_DMATDLR];
+    SPIx->DMARDLR       = store_buf->spi_reg[SPI_DLPS_DMARDLR];
+    SPIx->RX_SAMPLE_DLY = store_buf->spi_reg[SPI_DLPS_RX_SAMPLE_DELAY];
 
     /* Enable the selected SPI peripheral */
-    SPIx->SSIENR        = store_buf->spi_reg[2];
+    SPIx->SSIENR        = store_buf->spi_reg[SPI_DLPS_SPIENR];
 }
 
 

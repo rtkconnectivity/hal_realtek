@@ -129,10 +129,27 @@ typedef struct
 /*============================================================================*
  *                         UART Private Types
  *============================================================================*/
+typedef enum
+{
+    UART_DLPS_DLL = 0x00,           //!< Divisor latch low, accessed with UART_LCR bit[7] set.
+    UART_DLPS_DLM = 0x01,           //!< Divisor latch high, accessed with UART_LCR bit[7] set.
+    UART_DLPS_IER = 0x02,           //!< Interrupt enable, shares UART_DLM_IER with UART_DLPS_DLM.
+    UART_DLPS_LCR = 0x03,           //!< Line control.
+    UART_DLPS_CTRL0 = 0x04,         //!< Flow control and auto-flow configuration.
+    UART_DLPS_SCR = 0x05,           //!< Scratch pad.
+    UART_DLPS_STSR = 0x06,          //!< Status, also the source for rebuilding UART_IIR_FCR.
+    UART_DLPS_RX_TIMEOUT = 0x07,    //!< RX idle timeout threshold.
+    UART_DLPS_RX_TIMEOUT_EN = 0x08, //!< RX idle timeout enable.
+    UART_DLPS_MISCR = 0x09,         //!< Miscellaneous control.
+    UART_DLPS_INT_MASK = 0x0A,      //!< Interrupt mask.
+    UART_DLPS_PERI_CLK = 0x0B,      //!< Peripheral clock divider control.
+    UART_DLPS_MAX = 0x0C,           //!< Store buffer entry count.
+} UARTDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t uart_reg[13];
-} UARTStoreReg_Typedef;
+    uint32_t uart_reg[UART_DLPS_MAX];
+} UARTStoreReg_TypeDef;
 
 /*============================================================================*
  *                         UART Registers and Field Descriptions

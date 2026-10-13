@@ -658,9 +658,31 @@ __STATIC_INLINE uint16_t KeyScan_ReadFifoData(KEYSCAN_TypeDef *KeyScan)
   * \}
   */
 
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. Slot values stay IC-local
+ * and compact; only the names are shared. Names below follow the register
+ * naming of the newer SDK, so on this IC a few of them differ from the local
+ * register name (noted per entry); the KEYSCAN_ prefix is dropped because the
+ * enum already provides one.
+ *
+ * Slots are packed, not offset-indexed: the read-only FIFO data register at
+ * 0x14 is not stored, so there is no slot for it.
+ */
+typedef enum
+{
+    KEYSCAN_DLPS_CLK_DIV = 0x00,       //!< CLKDIV on this IC, 0x00, clock divider.
+    KEYSCAN_DLPS_CONFIG1 = 0x01,       //!< TIMERCR on this IC, 0x04, timer configuration.
+    KEYSCAN_DLPS_CONFIG2 = 0x02,       //!< CR on this IC, 0x08, control. BIT31 is the FSM enable, restored last.
+    KEYSCAN_DLPS_COLUMN_CONFIG = 0x03, //!< COLCR on this IC, 0x0C, column configuration.
+    KEYSCAN_DLPS_ROW_CONFIG = 0x04,    //!< ROWCR on this IC, 0x10, row configuration.
+    KEYSCAN_DLPS_INT_MASK = 0x05,      //!< INTMASK on this IC, 0x18, interrupt mask.
+    KEYSCAN_DLPS_MAX = 0x06,           //!< Store buffer entry count.
+} KEYSCANDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t keyscan_reg[7];
+    uint32_t keyscan_reg[KEYSCAN_DLPS_MAX];
 } KEYSCANStoreReg_TypeDef;
 
 #ifdef __cplusplus

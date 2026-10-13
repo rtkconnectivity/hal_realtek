@@ -140,30 +140,19 @@ void ADC_DLPSEnter(void *PeriReg, void *StoreBuf)
     /*Open 10M clock source*/
     RCC_PeriphClockCmd(APBPeriph_ADC, APBPeriph_ADC_CLOCK, ENABLE);
 
-    store_buf->adc_reg[0]         =  ADC->ADC_DIG_CTRL;         //0x04
-    store_buf->adc_reg[1]         =  ADC->ADC_SCHED_CTRL;       //0x08
-    store_buf->adc_reg[2]         =  ADC->ADC_CTRL_INT;         //0x0C
+    store_buf->adc_reg[ADC_DLPS_DIG_CTRL]   =  ADC->ADC_DIG_CTRL;         //0x04
+    store_buf->adc_reg[ADC_DLPS_SCHED_CTRL] =  ADC->ADC_SCHED_CTRL;       //0x08
+    store_buf->adc_reg[ADC_DLPS_CTRL_INT]   =  ADC->ADC_CTRL_INT;         //0x0C
 
-    store_buf->adc_schtab_reg[0]  =  ADC->ADC_SCHTAB0;          //0x10
-    store_buf->adc_schtab_reg[1]  =  ADC->ADC_SCHTAB1;
-    store_buf->adc_schtab_reg[2]  =  ADC->ADC_SCHTAB2;          //0x14
-    store_buf->adc_schtab_reg[3]  =  ADC->ADC_SCHTAB3;
-    store_buf->adc_schtab_reg[4]  =  ADC->ADC_SCHTAB4;          //0x18
-    store_buf->adc_schtab_reg[5]  =  ADC->ADC_SCHTAB5;
-    store_buf->adc_schtab_reg[6]  =  ADC->ADC_SCHTAB6;          //0x1C
-    store_buf->adc_schtab_reg[7]  =  ADC->ADC_SCHTAB7;
-    store_buf->adc_schtab_reg[8]  =  ADC->ADC_SCHTAB8;          //0x20
-    store_buf->adc_schtab_reg[9]  =  ADC->ADC_SCHTAB9;
-    store_buf->adc_schtab_reg[10] =  ADC->ADC_SCHTAB10;         //0x24
-    store_buf->adc_schtab_reg[11] =  ADC->ADC_SCHTAB11;
-    store_buf->adc_schtab_reg[12] =  ADC->ADC_SCHTAB12;         //0x28
-    store_buf->adc_schtab_reg[13] =  ADC->ADC_SCHTAB13;
-    store_buf->adc_schtab_reg[14] =  ADC->ADC_SCHTAB14;         //0x2C
-    store_buf->adc_schtab_reg[15] =  ADC->ADC_SCHTAB15;
+    /* Schedule table: 16 half-word slots over 0x10 - 0x2C */
+    for (uint8_t i = 0; i < ADC_DLPS_SCHTAB_NUM; i++)
+    {
+        store_buf->adc_schtab_reg[i] = (&ADC->ADC_SCHTAB0)[i];
+    }
 
-    store_buf->adc_reg[3]         =  ADC->ADC_POW_DATA_DLY_CTRL;//0x50
-    store_buf->adc_reg[4]         =  ADC->ADC_DATA_CLK_CTRL;    //0x54
-    store_buf->adc_reg[5]         =  ADC->ADC_TIME_PERIOD;      //0x5C
+    store_buf->adc_reg[ADC_DLPS_POW_DATA_DLY_CTRL] =  ADC->ADC_POW_DATA_DLY_CTRL;//0x50
+    store_buf->adc_reg[ADC_DLPS_DATA_CLK_CTRL]     =  ADC->ADC_DATA_CLK_CTRL;    //0x54
+    store_buf->adc_reg[ADC_DLPS_TIME_PERIOD]       =  ADC->ADC_TIME_PERIOD;      //0x5C
 
     return;
 }
@@ -186,32 +175,23 @@ void ADC_DLPSExit(void *PeriReg, void *StoreBuf)
     ADC->ADC_CTRL_INT &= (~0x1f);
 
     /* Set power mode first */
-    ADC->ADC_POW_DATA_DLY_CTRL = store_buf->adc_reg[3];
+    ADC->ADC_POW_DATA_DLY_CTRL = store_buf->adc_reg[ADC_DLPS_POW_DATA_DLY_CTRL];
 
     /* Disable schedule table */
     ADC->ADC_SCHED_CTRL &= (~0xffff);
 
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB0))  = store_buf->adc_schtab_reg[0] |
-                                                           (store_buf->adc_schtab_reg[1] << 16);
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB2))  = store_buf->adc_schtab_reg[2] |
-                                                           (store_buf->adc_schtab_reg[3] << 16);
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB4))  = store_buf->adc_schtab_reg[4] |
-                                                           (store_buf->adc_schtab_reg[5] << 16);
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB6))  = store_buf->adc_schtab_reg[6] |
-                                                           (store_buf->adc_schtab_reg[7] << 16);
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB8))  = store_buf->adc_schtab_reg[8] |
-                                                           (store_buf->adc_schtab_reg[9] << 16);
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB10))  = store_buf->adc_schtab_reg[10] |
-                                                            (store_buf->adc_schtab_reg[11] << 16);
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB12))  = store_buf->adc_schtab_reg[12] |
-                                                            (store_buf->adc_schtab_reg[13] << 16);
-    *(__IO uint32_t *)((uint32_t *)(&ADC->ADC_SCHTAB14))  = store_buf->adc_schtab_reg[14] |
-                                                            (store_buf->adc_schtab_reg[15] << 16);
+    /* Schedule table: write back as words, two half-word slots at a time */
+    for (uint8_t i = 0; i < ADC_DLPS_SCHTAB_NUM; i += 2)
+    {
+        ((volatile uint32_t *)(&ADC->ADC_SCHTAB0))[i / 2] =
+            ((uint32_t)store_buf->adc_schtab_reg[i]) |
+            ((uint32_t)store_buf->adc_schtab_reg[i + 1] << 16);
+    }
 
-    ADC->ADC_SCHED_CTRL     = store_buf->adc_reg[1];
-    ADC->ADC_DIG_CTRL       = (store_buf->adc_reg[0] & (~((uint32_t)0x03)));
-    ADC->ADC_DATA_CLK_CTRL  = store_buf->adc_reg[4];
-    ADC->ADC_TIME_PERIOD    = store_buf->adc_reg[5];
+    ADC->ADC_SCHED_CTRL     = store_buf->adc_reg[ADC_DLPS_SCHED_CTRL];
+    ADC->ADC_DIG_CTRL       = (store_buf->adc_reg[ADC_DLPS_DIG_CTRL] & (~((uint32_t)0x03)));
+    ADC->ADC_DATA_CLK_CTRL  = store_buf->adc_reg[ADC_DLPS_DATA_CLK_CTRL];
+    ADC->ADC_TIME_PERIOD    = store_buf->adc_reg[ADC_DLPS_TIME_PERIOD];
 
     /*Clear ADC FIFO */
     ADC->ADC_DIG_CTRL |= BIT26;
@@ -219,7 +199,7 @@ void ADC_DLPSExit(void *PeriReg, void *StoreBuf)
     ADC->ADC_CTRL_INT |= (0x1f << 8);
 
     /* Restore specify interrupt */
-    ADC->ADC_CTRL_INT = store_buf->adc_reg[2];
+    ADC->ADC_CTRL_INT = store_buf->adc_reg[ADC_DLPS_CTRL_INT];
 
     return;
 }

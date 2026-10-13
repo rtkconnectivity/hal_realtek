@@ -293,12 +293,12 @@ void KEYSCAN_DLPSEnter(void *PeriReg, void *StoreBuf)
 
     RCC_PeriphClockCmd(APBPeriph_KEYSCAN, APBPeriph_KEYSCAN_CLOCK, ENABLE);
 
-    store_buf->keyscan_reg[0] = KEYSCAN->CLKDIV;               /* 0x00 */
-    store_buf->keyscan_reg[1] = KEYSCAN->TIMERCR;              /* 0x04 */
-    store_buf->keyscan_reg[2] = KEYSCAN->CR;                   /* 0x08 */
-    store_buf->keyscan_reg[3] = KEYSCAN->COLCR;                /* 0x0C */
-    store_buf->keyscan_reg[4] = KEYSCAN->ROWCR;                /* 0x10 */
-    store_buf->keyscan_reg[6] = KEYSCAN->INTMASK;              /* 0x18 */
+    store_buf->keyscan_reg[KEYSCAN_DLPS_CLK_DIV] = KEYSCAN->CLKDIV;               /* 0x00 */
+    store_buf->keyscan_reg[KEYSCAN_DLPS_CONFIG1] = KEYSCAN->TIMERCR;              /* 0x04 */
+    store_buf->keyscan_reg[KEYSCAN_DLPS_CONFIG2] = KEYSCAN->CR;                   /* 0x08 */
+    store_buf->keyscan_reg[KEYSCAN_DLPS_COLUMN_CONFIG] = KEYSCAN->COLCR;                /* 0x0C */
+    store_buf->keyscan_reg[KEYSCAN_DLPS_ROW_CONFIG] = KEYSCAN->ROWCR;                /* 0x10 */
+    store_buf->keyscan_reg[KEYSCAN_DLPS_INT_MASK] = KEYSCAN->INTMASK;              /* 0x18 */
 
     return;
 }
@@ -322,13 +322,13 @@ void KEYSCAN_DLPSExit(void *PeriReg, void *StoreBuf)
 
     /* Set FSM to idle state */
     KEYSCAN->CR      &= ~BIT31;
-    KEYSCAN->CLKDIV  = store_buf->keyscan_reg[0];
-    KEYSCAN->CR      = (store_buf->keyscan_reg[2] & (~(BIT31)));
-    KEYSCAN->TIMERCR = store_buf->keyscan_reg[1];
-    KEYSCAN->COLCR   = store_buf->keyscan_reg[3];
-    KEYSCAN->ROWCR   = store_buf->keyscan_reg[4];
-    KEYSCAN->INTMASK = store_buf->keyscan_reg[6];
-    KEYSCAN->CR      |= (store_buf->keyscan_reg[2] & ((BIT31)));
+    KEYSCAN->CLKDIV  = store_buf->keyscan_reg[KEYSCAN_DLPS_CLK_DIV];
+    KEYSCAN->CR      = (store_buf->keyscan_reg[KEYSCAN_DLPS_CONFIG2] & (~(BIT31)));
+    KEYSCAN->TIMERCR = store_buf->keyscan_reg[KEYSCAN_DLPS_CONFIG1];
+    KEYSCAN->COLCR   = store_buf->keyscan_reg[KEYSCAN_DLPS_COLUMN_CONFIG];
+    KEYSCAN->ROWCR   = store_buf->keyscan_reg[KEYSCAN_DLPS_ROW_CONFIG];
+    KEYSCAN->INTMASK = store_buf->keyscan_reg[KEYSCAN_DLPS_INT_MASK];
+    KEYSCAN->CR      |= (store_buf->keyscan_reg[KEYSCAN_DLPS_CONFIG2] & ((BIT31)));
 
     return;
 }

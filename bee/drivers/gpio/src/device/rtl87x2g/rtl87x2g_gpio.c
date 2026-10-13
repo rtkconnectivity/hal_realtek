@@ -231,7 +231,7 @@ void GPIO_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
     GPIO_TypeDef *GPIOx = (GPIO_TypeDef *)PeriReg;
     GPIO_Debounce_TypeDef *GPIOx_DEB = GPIOx == GPIOA ? GPIOA_DEB : GPIOB_DEB;
-    GPIOStoreReg_Typedef *store_buf = (GPIOStoreReg_Typedef *)StoreBuf;
+    GPIOStoreReg_TypeDef *store_buf = (GPIOStoreReg_TypeDef *)StoreBuf;
 
     if (GPIOx == GPIOA)
     {
@@ -242,20 +242,20 @@ void GPIO_DLPSEnter(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_GPIOB, APBPeriph_GPIOB_CLOCK, ENABLE);
     }
 
-    store_buf->gpio_reg[0] = GPIOx->GPIO_DR;
-    store_buf->gpio_reg[1] = GPIOx->GPIO_DDR;
-    store_buf->gpio_reg[3] = GPIOx->GPIO_INT_EN;
-    store_buf->gpio_reg[4] = GPIOx->GPIO_INT_MASK;
-    store_buf->gpio_reg[5] = GPIOx->GPIO_INT_LV;
-    store_buf->gpio_reg[6] = GPIOx->GPIO_LS_SYNC;
-    store_buf->gpio_reg[7] = GPIOx->GPIO_OUT_MODE;
-    store_buf->gpio_reg[8] = GPIOx->GPIO_EXT_DEB_POL_CTL;
+    store_buf->gpio_reg[GPIO_DLPS_DR] = GPIOx->GPIO_DR;
+    store_buf->gpio_reg[GPIO_DLPS_DDR] = GPIOx->GPIO_DDR;
+    store_buf->gpio_reg[GPIO_DLPS_INT_EN] = GPIOx->GPIO_INT_EN;
+    store_buf->gpio_reg[GPIO_DLPS_INT_MASK] = GPIOx->GPIO_INT_MASK;
+    store_buf->gpio_reg[GPIO_DLPS_INT_LV] = GPIOx->GPIO_INT_LV;
+    store_buf->gpio_reg[GPIO_DLPS_LS_SYNC] = GPIOx->GPIO_LS_SYNC;
+    store_buf->gpio_reg[GPIO_DLPS_OUT_MODE] = GPIOx->GPIO_OUT_MODE;
+    store_buf->gpio_reg[GPIO_DLPS_INT_POLARITY] = GPIOx->GPIO_EXT_DEB_POL_CTL;
 
-    store_buf->gpio_reg[10] = GPIOx_DEB->GPIO_DEB_CLK_CTL[0];
-    store_buf->gpio_reg[11] = GPIOx_DEB->GPIO_DEB_CLK_CTL[1];
-    store_buf->gpio_reg[12] = GPIOx_DEB->GPIO_DEB_CLK_CTL[2];
-    store_buf->gpio_reg[13] = GPIOx_DEB->GPIO_DEB_CLK_CTL[3];
-    store_buf->gpio_reg[14] = GPIOx_DEB->GPIO_DEB_FUN_CTL;
+    store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL0] = GPIOx_DEB->GPIO_DEB_CLK_CTL[0];
+    store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL1] = GPIOx_DEB->GPIO_DEB_CLK_CTL[1];
+    store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL2] = GPIOx_DEB->GPIO_DEB_CLK_CTL[2];
+    store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL3] = GPIOx_DEB->GPIO_DEB_CLK_CTL[3];
+    store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_FUN_CTL] = GPIOx_DEB->GPIO_DEB_FUN_CTL;
 
     return;
 }
@@ -266,7 +266,7 @@ void GPIO_DLPSExit(void *PeriReg, void *StoreBuf)
 {
     GPIO_TypeDef *GPIOx = (GPIO_TypeDef *)PeriReg;
     GPIO_Debounce_TypeDef *GPIOx_DEB = GPIOx == GPIOA ? GPIOA_DEB : GPIOB_DEB;
-    GPIOStoreReg_Typedef *store_buf = (GPIOStoreReg_Typedef *)StoreBuf;
+    GPIOStoreReg_TypeDef *store_buf = (GPIOStoreReg_TypeDef *)StoreBuf;
 
     if (GPIOx == GPIOA)
     {
@@ -277,24 +277,24 @@ void GPIO_DLPSExit(void *PeriReg, void *StoreBuf)
         RCC_PeriphClockCmd(APBPeriph_GPIOB, APBPeriph_GPIOB_CLOCK, ENABLE);
     }
 
-    GPIOx->GPIO_DDR               = store_buf->gpio_reg[1];
-    GPIOx->GPIO_OUT_MODE          = store_buf->gpio_reg[7];
-    GPIOx->GPIO_DR                = store_buf->gpio_reg[0];
+    GPIOx->GPIO_DDR               = store_buf->gpio_reg[GPIO_DLPS_DDR];
+    GPIOx->GPIO_OUT_MODE          = store_buf->gpio_reg[GPIO_DLPS_OUT_MODE];
+    GPIOx->GPIO_DR                = store_buf->gpio_reg[GPIO_DLPS_DR];
 
     GPIOx->GPIO_INT_MASK          = 0xFFFFFFFF;
-    GPIOx->GPIO_INT_LV            = store_buf->gpio_reg[5];
-    GPIOx->GPIO_LS_SYNC           = store_buf->gpio_reg[6];
-    GPIOx->GPIO_EXT_DEB_POL_CTL   = store_buf->gpio_reg[8];
+    GPIOx->GPIO_INT_LV            = store_buf->gpio_reg[GPIO_DLPS_INT_LV];
+    GPIOx->GPIO_LS_SYNC           = store_buf->gpio_reg[GPIO_DLPS_LS_SYNC];
+    GPIOx->GPIO_EXT_DEB_POL_CTL   = store_buf->gpio_reg[GPIO_DLPS_INT_POLARITY];
 
-    GPIOx_DEB->GPIO_DEB_CLK_CTL[0] = store_buf->gpio_reg[10];
-    GPIOx_DEB->GPIO_DEB_CLK_CTL[1] = store_buf->gpio_reg[11];
-    GPIOx_DEB->GPIO_DEB_CLK_CTL[2] = store_buf->gpio_reg[12];
-    GPIOx_DEB->GPIO_DEB_CLK_CTL[3] = store_buf->gpio_reg[13];
-    GPIOx_DEB->GPIO_DEB_FUN_CTL   = store_buf->gpio_reg[14];
+    GPIOx_DEB->GPIO_DEB_CLK_CTL[0] = store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL0];
+    GPIOx_DEB->GPIO_DEB_CLK_CTL[1] = store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL1];
+    GPIOx_DEB->GPIO_DEB_CLK_CTL[2] = store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL2];
+    GPIOx_DEB->GPIO_DEB_CLK_CTL[3] = store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_CLK_CTL3];
+    GPIOx_DEB->GPIO_DEB_FUN_CTL   = store_buf->gpio_reg[GPIO_DLPS_EXT_DEB_FUN_CTL];
 
-    GPIOx->GPIO_INT_EN            = store_buf->gpio_reg[3];
-    GPIOx->GPIO_INT_CLR           = ~(store_buf->gpio_reg[1]);
-    GPIOx->GPIO_INT_MASK          = store_buf->gpio_reg[4];
+    GPIOx->GPIO_INT_EN            = store_buf->gpio_reg[GPIO_DLPS_INT_EN];
+    GPIOx->GPIO_INT_CLR           = ~(store_buf->gpio_reg[GPIO_DLPS_DDR]);
+    GPIOx->GPIO_INT_MASK          = store_buf->gpio_reg[GPIO_DLPS_INT_MASK];
 
     return;
 }

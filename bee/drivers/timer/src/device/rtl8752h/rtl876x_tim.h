@@ -651,15 +651,39 @@ __STATIC_INLINE FlagStatus TIM_GetPWMOutputStatus(TIM_TypeDef *TIMx)
   * \}
   */
 
+/** \brief  Slot index of the per-instance TIM store buffer kept across DLPS.
+ *          Slot names are shared across ICs; the value of each slot is
+ *          IC-local and kept compact (no reserved holes).
+ */
+typedef enum
+{
+    TIM_DLPS_LOADCOUNT  = 0x00, //!< TIMx->LoadCount, period/auto-reload value.
+    TIM_DLPS_CONTROLREG = 0x01, //!< TIMx->ControlReg, control register.
+    TIM_DLPS_LOADCOUNT2 = 0x02, //!< TIMERn_LOAD_COUNT2, PWM high count (per-instance).
+    TIM_DLPS_MAX = 0x03,        //!< Store buffer entry count.
+} TIMDLPSReg_TypeDef;
+
+/** \brief  Slot index of the TIM share store buffer kept across DLPS.
+ *          Slot names are IC-local (the share registers differ per IC),
+ *          the value of each slot is kept compact (no reserved holes).
+ */
+typedef enum
+{
+    TIMSHARE_DLPS_CLK0                  = 0x00, //!< 0x4000035C, REG_PERI_GTIMER_CLK_SRC1.
+    TIMSHARE_DLPS_CLK1                  = 0x01, //!< 0x40000360, REG_PERI_GTIMER_CLK_SRC0.
+    TIMSHARE_DLPS_PWM_DZ_CLK            = 0x02, //!< 0x40000364, REG_PERI_PWM2_DZONE_CTRL (dead-zone cfg + dead-zone clk bits 16~19).
+    TIMSHARE_DLPS_MAX = 0x03,                   //!< Store buffer entry count.
+} TIMShareDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t tim_reg[3];
+    uint32_t tim_reg[TIM_DLPS_MAX];
 } TIMStoreReg_TypeDef;
 
 typedef struct
 {
-    uint32_t timshare_reg[5];
-} TIMSHAREStoreReg_TypeDef;
+    uint32_t timshare_reg[TIMSHARE_DLPS_MAX];
+} TIMShareStoreReg_TypeDef;
 
 #ifdef __cplusplus
 }

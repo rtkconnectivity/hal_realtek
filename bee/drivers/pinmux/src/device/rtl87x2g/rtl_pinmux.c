@@ -254,10 +254,11 @@ void Pad_Config(uint8_t                 Pin_Num,
            DCUR  WKP   WKE   PULR  1111
            PULD  PULE  OUTE  OUTV  0000
          Clear reg value first. */
-        reg_value = (reg_value_raw & 0xFCF0FFFF) | SHDN << 16;
+        reg_value = (reg_value_raw & 0xFCF0FFFF) | (SHDN << 16);
 
         /* Power on first */
-        if (!(reg_value_raw & (SHDN << 16))) {
+        if (!(reg_value_raw & (SHDN << 16)))
+        {
             pad_aon_write(reg_addr, reg_value);
         }
 
@@ -307,7 +308,8 @@ void Pad_Config(uint8_t                 Pin_Num,
         reg_value = (reg_value_raw & 0xFFFFFCF0) | SHDN;
 
         /* Power on first */
-        if (!(reg_value_raw & SHDN)) {
+        if (!(reg_value_raw & SHDN))
+        {
             pad_aon_write(reg_addr, reg_value);
         }
 
@@ -1361,7 +1363,7 @@ void Pad_ClearAllWakeupINT(void)
   */
 void Pinmux_DLPSEnter(void *PeriReg, void *StoreBuf)
 {
-    PINMUXStoreReg_Typedef *store_buf = (PINMUXStoreReg_Typedef *)StoreBuf;
+    PINMUXStoreReg_TypeDef *store_buf = (PINMUXStoreReg_TypeDef *)StoreBuf;
 
     uint8_t i = 0;
 
@@ -1381,7 +1383,7 @@ void Pinmux_DLPSEnter(void *PeriReg, void *StoreBuf)
   */
 void Pinmux_DLPSExit(void *PeriReg, void *StoreBuf)
 {
-    PINMUXStoreReg_Typedef *store_buf = (PINMUXStoreReg_Typedef *)StoreBuf;
+    PINMUXStoreReg_TypeDef *store_buf = (PINMUXStoreReg_TypeDef *)StoreBuf;
 
     uint8_t i;
 

@@ -593,9 +593,23 @@ __STATIC_INLINE void QDEC_CounterPauseCmd(QDEC_TypeDef *QDECx, uint32_t QDEC_AXI
   * \}
   */
 
+/** \brief  Slot index of the QDEC store buffer kept across DLPS.
+ *          Slot names are shared across ICs; the value of each slot is
+ *          IC-local and kept compact (no reserved holes).
+ */
+typedef enum
+{
+    QDEC_DLPS_DIV      = 0x00, //!< QDEC->REG_DIV, clock divider.
+    QDEC_DLPS_CR_X     = 0x01, //!< QDEC->REG_CR_X, X-axis control register.
+    QDEC_DLPS_CR_Y     = 0x02, //!< QDEC->REG_CR_Y, Y-axis control register.
+    QDEC_DLPS_CR_Z     = 0x03, //!< QDEC->REG_CR_Z, Z-axis control register.
+    QDEC_DLPS_INT_MASK = 0x04, //!< QDEC->INT_MASK, interrupt mask register.
+    QDEC_DLPS_MAX = 0x05,      //!< Store buffer entry count.
+} QDECDLPSReg_TypeDef;
+
 typedef struct
 {
-    uint32_t qdec_reg[5];
+    uint32_t qdec_reg[QDEC_DLPS_MAX];
 } QDECStoreReg_TypeDef;
 
 #ifdef __cplusplus

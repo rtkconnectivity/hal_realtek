@@ -826,20 +826,26 @@ __STATIC_INLINE void GPIO_SetPolarity(uint32_t GPIO_Pin,
   * \}
   */
 
+/**
+ * DLPS store slot names are kept identical across ICs so that upper layers can
+ * address a slot without knowing which IC is built. Slot values stay IC-local
+ * and compact; only the names are shared.
+ */
 typedef enum
 {
-    GPIO_DLPS_DR   = 0x00,
-    GPIO_DLPS_DDR   = 0x01,
-    GPIO_DLPS_DSR   = 0x02,
-    GPIO_DLPS_INTEN   = 0x03,
-    GPIO_DLPS_MASK   = 0x04,
-    GPIO_DLPS_LEVEL   = 0x05,
-    GPIO_DLPS_POLARITY   = 0x06,
-    GPIO_DLPS_DEBEN   = 0x07,
-    GPIO_DLPS_DEBCFG   = 0x08,
-    GPIO_DLPS_BOTHEDGE   = 0x09,
-    GPIO_DLPS_MAX = 0xA0,
-} GPIODLPSREG_TypeDef;
+    GPIO_DLPS_DR            = 0x00, //!< DATAOUT, data output.
+    GPIO_DLPS_DDR           = 0x01, //!< DATADIR, data direction. Also the source for INTCLR.
+    GPIO_DLPS_DATA_SRC      = 0x02, //!< DATASRC, software mode data source. Not present on all ICs.
+    GPIO_DLPS_INT_EN        = 0x03, //!< INTEN, interrupt enable.
+    GPIO_DLPS_INT_MASK      = 0x04, //!< INTMASK, interrupt mask.
+    GPIO_DLPS_INT_LV        = 0x05, //!< INTTYPE, interrupt level/type.
+    GPIO_DLPS_INT_POLARITY  = 0x06, //!< INTPOLARITY, interrupt polarity.
+    GPIO_DLPS_DEB_EN        = 0x07, //!< DEBOUNCE, debounce enable, one bit per pin.
+    GPIO_DLPS_DEB_CLK_DIV   = 0x08, //!< GPIO_DBCLK_DIV, debounce clock divider.
+    GPIO_DLPS_INT_BOTHEDGE  = 0x09, //!< INTBOTHEDGE, both-edge interrupt. Not present on all ICs.
+    GPIO_DLPS_LS_SYNC       = 0x0A, //!< LSSYNC, level-sensitive synchronisation, one bit per pin.
+    GPIO_DLPS_MAX           = 0x0B, //!< Store buffer entry count.
+} GPIODLPSReg_TypeDef;
 
 typedef struct
 {

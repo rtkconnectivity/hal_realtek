@@ -871,9 +871,15 @@ void Spic1_control(uint8_t value);
   * \}
   */
 
+/**
+ * The pinmux store buffer holds the whole PINMUX->CFG[] array, four pins per
+ * 32-bit register, so it needs no per-slot names: slot N is simply CFG[N].
+ */
+#define PINMUX_DLPS_CFG_NUM     ((TOTAL_PIN_NUM / 4) + ((TOTAL_PIN_NUM % 4) != 0)) //!< Pinmux CFG register count, ceil(TOTAL_PIN_NUM / 4).
+
 typedef struct
 {
-    uint32_t pinmux_reg[10];
+    uint32_t pinmux_reg[PINMUX_DLPS_CFG_NUM];
 } PINMUXStoreReg_TypeDef;
 
 #ifdef __cplusplus
