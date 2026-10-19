@@ -70,12 +70,30 @@ typedef struct
 /*============================================================================*
  *                          GRTC Declaration
  *============================================================================*/
+/** @defgroup GRTC_DECLARATION GRTC Declaration
+  * @{
+  * @ingroup  GRTC_DRIVER
+  */
+
 #define GRTC_REG_BASE       (SYSON_BASE + AON_REG_GRTC_CTRL)
 #define GRTC                ((GRTC_TypeDef *) GRTC_REG_BASE)
 
-/*============================================================================*
- *                          GRTC Private Types
- *============================================================================*/
+/* Comparators reserved by system components. The HAL comparator allocator
+ * (hal_grtc.c) never hands these out, so only COMP3/COMP4/COMP5/COMP7 are
+ * available to applications.
+ *   COMP0 -- Non-OS OS tick
+ *   COMP1 -- 64-bit timestamp / low power system timer
+ *   COMP2 -- FreeRTOS tick (also taken over by the power manager as OS timer)
+ *   COMP6 -- OSC / thermal meter periodic calibration (RAP self reload)
+ */
+#define GRTC_COMP_OS_TICK_NONOS_RESERVED      (BIT0)
+#define GRTC_COMP_SYSTEM_TIMER_RESERVED       (BIT1)
+#define GRTC_COMP_OS_TICK_FREERTOS_RESERVED   (BIT2)
+#define GRTC_COMP_OSC_K_RESERVED              (BIT6)
+#define GRTC_COMP_RESERVED    (GRTC_COMP_OS_TICK_NONOS_RESERVED | GRTC_COMP_SYSTEM_TIMER_RESERVED | \
+                               GRTC_COMP_OS_TICK_FREERTOS_RESERVED | GRTC_COMP_OSC_K_RESERVED)
+
+/** @} */ /* End of group GRTC_DECLARATION */
 
 /*============================================================================*
  *                          GRTC Registers and Field Descriptions
@@ -705,12 +723,6 @@ typedef union
         const uint32_t grtc_comp_timeout_ov_err_clr_reserved31_8: 24;
     } b;
 } GRTC_COMP_TIMEOUT_OV_ERR_CLR_TypeDef;
-
-
-
-/*============================================================================*
- *                         GRTC Wrappers
- *============================================================================*/
 
 
 #ifdef  __cplusplus

@@ -51,10 +51,14 @@ static void LPWDT_Config(uint32_t cnt_limit, WDTMode_TypeDef wdt_mode)
  *                           Public Functions
  *============================================================================*/
 /**
-  * \brief  Start Watchdog. This function will enable watchdog clock, set and start watchdog.
-  * \param  Time_ms.
-  * \param  LPWDT_Mode \ref LPWDTMode_TypeDef.
-  * \return true or false.
+  * @brief  Start LPWDT. This function will enable LPWDT clock, set and start LPWDT.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
+  * @param  TimeMs  LPWDT Timeout Time. Unit: ms.
+  * @param  Mode    Refer to @ref WDTMode_TypeDef. If the Reset LPWDT operation is not performed within the Timeout period,
+  *                 the configured mode operation will be executed.
+  * @return LPWDT operating status.
+  * @retval true   LPWDT started successfully.
+  * @retval false  LPWDT start failed.
   */
 bool LPWDT_Start(LPWDT_TypeDef *LPWDTx, uint32_t TimeMs, WDTMode_TypeDef Mode)
 {
@@ -70,8 +74,8 @@ bool LPWDT_Start(LPWDT_TypeDef *LPWDTx, uint32_t TimeMs, WDTMode_TypeDef Mode)
 }
 
 /**
-  * \brief  Enable Watchdog.
-  * \return None.
+  * @brief  Enable LPWDT.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
   */
 void LPWDT_Enable(LPWDT_TypeDef *LPWDTx)
 {
@@ -81,8 +85,8 @@ void LPWDT_Enable(LPWDT_TypeDef *LPWDTx)
 }
 
 /**
-  * \brief  Disable Watchdog.
-  * \return None.
+  * @brief  Disable LPWDT.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
   */
 void LPWDT_Disable(LPWDT_TypeDef *LPWDTx)
 {
@@ -92,8 +96,8 @@ void LPWDT_Disable(LPWDT_TypeDef *LPWDTx)
 }
 
 /**
-  * \brief  Kick Watchdog to restart watchdog timer.
-  * \return None.
+  * @brief  Kick Watchdog to restart LPWDT.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
   */
 void LPWDT_Kick(LPWDT_TypeDef *LPWDTx)
 {
@@ -103,8 +107,11 @@ void LPWDT_Kick(LPWDT_TypeDef *LPWDTx)
 }
 
 /**
-  * \brief  Is watchdog enable.
-  * \return Is watchdog enable or not
+  * @brief  Check if the LPWDT is working.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
+  * @return LPWDT operating status.
+  * @retval true   LPWDT is enabled.
+  * @retval false  LPWDT is not enabled.
   */
 bool LPWDT_IsEnable(LPWDT_TypeDef *LPWDTx)
 {
@@ -114,8 +121,9 @@ bool LPWDT_IsEnable(LPWDT_TypeDef *LPWDTx)
 }
 
 /**
-  * \brief  Get LPWDT timeout_ms.
-  * \return LPWDT timeout_ms
+  * @brief  Get the current LPWDT timeout value in milliseconds.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
+  * @return LPWDT timeout duration in milliseconds.
   */
 uint32_t LPWDT_GetTimeoutMs(LPWDT_TypeDef *LPWDTx)
 {
@@ -127,8 +135,13 @@ uint32_t LPWDT_GetTimeoutMs(LPWDT_TypeDef *LPWDTx)
 }
 
 /**
-  * \brief  Get LPWDT mode.
-  * \return LPWDT mode
+  * @brief  Get LPWDT mode.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
+  * @return LPWDT mode.
+  * @retval RESET_ALL               Reset all.
+  * @retval RESET_ALL_EXCEPT_AON    Reset all except RTC and some AON register.
+  * @retval INTERRUPT_CPU           Interrupt CPU.
+  * @retval WDT_MODE_NUM            The maximum selectable value for WDT mode.
   */
 WDTMode_TypeDef LPWDT_GetMode(LPWDT_TypeDef *LPWDTx)
 {
@@ -138,8 +151,9 @@ WDTMode_TypeDef LPWDT_GetMode(LPWDT_TypeDef *LPWDTx)
 }
 
 /**
-  * \brief  Get LPWDT current Count.
-  * \return Current Count
+  * @brief  Get LPWDT current Count.
+  * @param  LPWDTx  Refer to @ref LPWDT_Declaration
+  * @return Current count.
   */
 uint32_t LPWDT_GetCurrentCount(LPWDT_TypeDef *LPWDTx)
 {

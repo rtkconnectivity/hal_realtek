@@ -37,36 +37,17 @@ typedef struct
 /*============================================================================*
  *                          WDT Declaration
  *============================================================================*/
-/** \defgroup WDT         WDT
-  * \brief
-  * \{
-  */
-
-/** \defgroup WDT_Exported_Constants WDT Exported Constants
-  * \brief
-  * \{
-  */
-
-/** \defgroup WDT_Declaration WDT Declaration
-  * \brief
-  * \{
+/** @defgroup WDT_DECLARATION WDT Declaration
+  * @{
+  * @ingroup  WDT_DRIVER
   */
 
 #define WDT_REG_BASE       (0x40006000 + PLATFORM_REG_WDT_CTL)
 #define WDT                ((WDT_TypeDef *) WDT_REG_BASE)
+#define WDT_INTERRUPT      WDT_IRQn
 
 
-/** End of WDT_Declaration
-  * \}
-  */
-
-/** End of WDT_Exported_Constants
-  * \}
-  */
-
-/** End of WDT
-  * \}
-  */
+/** @} */ /* End of group WDT_DECLARATION */
 
 /*============================================================================*
  *                          WDT Private Types

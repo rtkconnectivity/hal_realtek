@@ -16,11 +16,13 @@ extern "C" {
 #include "rap/src/device/rtl87x2j/rtl_rap_def.h"
 #elif defined (CONFIG_SOC_SERIES_RTL87X3J)
 #include "rap/src/device/rtl87x3j/rtl_rap_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL87X3K)
+#include "rap/src/device/rtl87x3k/rtl_rap_def.h"
 #endif
 
 /**
- * @defgroup RAP RAP
- * @ingroup PERIPH_DRIVER
+ * @defgroup RAP_DRIVER Driver
+ * @ingroup RAP
  * @brief Real Autonomous Peripheral (RAP) driver.
  *
  * @details The RAP is a hardware routing engine that links peripheral Events to
@@ -29,14 +31,9 @@ extern "C" {
  */
 
 /**
- * @defgroup RAP_Exported_Constants RAP Exported Constants
- * @{
- */
-
-/**
  * @defgroup    RAP_CHANNEL RAP Channel
+  * @brief RAP Channel.
  * @{
- * @ingroup     RAP_Exported_Constants
  */
 typedef enum
 {
@@ -73,8 +70,8 @@ typedef enum
 
 /**
  * @defgroup    RAP_INTERRUPTS RAP Interrupts
+  * @brief RAP Interrupts.
  * @{
- * @ingroup     RAP_Exported_Constants
  */
 #define RAP_INT_TRIGGER                   BIT9     /**< RAP channel trigger interrupt. */
 
@@ -85,8 +82,8 @@ typedef enum
 
 /**
  * @defgroup    RAP_WAKEUP RAP WakeUp
+  * @brief RAP WakeUp.
  * @{
- * @ingroup     RAP_Exported_Constants
  */
 #define RAP_WAKEUP_TRIGGER                BIT8     /**< RAP channel trigger wakeup. */
 
@@ -100,7 +97,6 @@ typedef enum
  * @defgroup    RAP_ACTION_EVENT RAP Action Event
  * @brief       Definitions of all supported peripheral Events and Actions.
  * @{
- * @ingroup     RAP_Exported_Constants
  *
  * @details
  * These macros generate the specific register-offset values required by the RAP routing APIs
@@ -111,28 +107,41 @@ typedef enum
  * the peripheral instance index, and `ch` represents the channel or pin index.
  *
  * <b>Valid Parameter Ranges:</b>
- * | Peripheral | Instance (`n`) | Channel / Pin (`ch`)                  |
- * |:-----------|:---------------|:--------------------------------------|
- * |    TIMER   | 1, 2           | 0 ~ 8 (for TIMER1), 0 (for TIMER2)    |
- * |    GPIO    | N/A            | 0 ~ 31 (for GPIOA), 0 ~ 17 (for GPIOB)|
- * |    DMA     | N/A            | 3, 4 (DMA channel index)              |
- * |    I2C     | 0, 1           | N/A                                   |
- * |    SPI     | 0, 1           | N/A                                   |
+ * The available peripherals, instances (`n`) and channels (`ch`) depend on the chip.
+ * Each valid combination has a matching RAP_<PERIPH>_xxx offset macro in the chip's
+ * rtl_rap_def.h; an unsupported combination fails to compile.
  */
 
+#if (RAP_SUPPORT_KEYSCAN == 1)
 /* KEYSCAN */
-#define RAP_EVENT_KEYSCAN_MANUAL_DONE           (RAP_KEYSCAN_EVENT_MANUAL_DONE)        /**< Event: KeyScan manual scan done. */
-#define RAP_ACTION_KEYSCAN_MANUAL               (RAP_KEYSCAN_ACTION_MANUAL)            /**< Action: start a KeyScan manual scan. */
+#define RAP_EVENT_KEYSCAN_MANUAL_DONE           (RAP_KEYSCAN_EVENT_MANUAL_DONE)        /**< Event: KEYSCAN manual scan done. */
+#define RAP_ACTION_KEYSCAN_MANUAL               (RAP_KEYSCAN_ACTION_MANUAL)            /**< Action: start a KEYSCAN manual scan. */
+#endif
 
+#if (RAP_SUPPORT_TIMER == 1)
 /* TIMER */
+#define RAP_EVENT_TIMER_TIMEOUT(n, ch)          (RAP_TIMER##n##_CH##ch##_EVENT_TIMEOUT)                 /**< Event: Timer n channel ch timeout. */
+#define RAP_ACTION_TIMER_STOP(n, ch)            (RAP_TIMER##n##_CH##ch##_ACTION_DISABLE)                /**< Action: disable (stop) Timer n channel ch. */
+#define RAP_ACTION_TIMER_START(n, ch)           (RAP_TIMER##n##_CH##ch##_ACTION_START)                  /**< Action: start Timer n channel ch. */
+
+#if (RAP_SUPPORT_TIMER_ACTIVE_STOP_EVENT == 1)
 #define RAP_EVENT_TIMER_ACTIVE(n, ch)           (RAP_TIMER##n##_CH##ch##_EVENT_ACTIVE)                  /**< Event: Timer n channel ch active. */
 #define RAP_EVENT_TIMER_STOP(n, ch)             (RAP_TIMER##n##_CH##ch##_EVENT_STOP)                    /**< Event: Timer n channel ch stopped. */
-#define RAP_EVENT_TIMER_TIMEOUT(n, ch)          (RAP_TIMER##n##_CH##ch##_EVENT_TIMEOUT)                 /**< Event: Timer n channel ch timeout. */
+#endif
+
+#if (RAP_SUPPORT_TIMER_LATCH_EVENT == 1)
 #define RAP_EVENT_TIMER_LATCH_FIFO_FULL(n, ch)  (RAP_TIMER##n##_CH##ch##_EVENT_LATCH_CNT0_FIFO_FULL)    /**< Event: Timer n channel ch latch FIFO full. */
 #define RAP_EVENT_TIMER_LATCH_FIFO_THRD(n, ch)  (RAP_TIMER##n##_CH##ch##_EVENT_LATCH_CNT0_FIFO_MET_TH)  /**< Event: Timer n channel ch latch FIFO met threshold. */
-#define RAP_ACTION_TIMER_STOP(n, ch)            (RAP_TIMER##n##_CH##ch##_ACTION_DISABLE)                /**< Action: disable (stop) Timer n channel ch. */
+#endif
+
+#if (RAP_SUPPORT_TIMER_PAUSE == 1)
 #define RAP_ACTION_TIMER_PAUSE(n, ch)           (RAP_TIMER##n##_CH##ch##_ACTION_PAUSE)                  /**< Action: pause Timer n channel ch. */
-#define RAP_ACTION_TIMER_START(n, ch)           (RAP_TIMER##n##_CH##ch##_ACTION_START)                  /**< Action: start Timer n channel ch. */
+#endif
+
+#if (RAP_SUPPORT_TIMER_CLEAR == 1)
+#define RAP_ACTION_TIMER_CLEAR(n, ch)           (RAP_TIMER##n##_CH##ch##_ACTION_CLEAR)                  /**< Action: clear Timer n channel ch counter. */
+#endif
+#endif /* RAP_SUPPORT_TIMER */
 
 /* GPIO */
 #define RAP_EVENT_GPIOA(ch)                     (RAP_GPIOA_##ch##_EVENT)                /**< Event: GPIOA pin ch triggered. */
@@ -144,11 +153,13 @@ typedef enum
 #define RAP_ACTION_GPIOA_DRTOGGLE(ch)           (RAP_GPIOA_##ch##_ACTION_DRTOGGLE)      /**< Action: toggle GPIOA pin ch output. */
 #define RAP_ACTION_GPIOB_DRTOGGLE(ch)           (RAP_GPIOB_##ch##_ACTION_DRTOGGLE)      /**< Action: toggle GPIOB pin ch output. */
 
+#if (RAP_SUPPORT_IR == 1)
 /* IR */
 #define RAP_EVENT_IR_TX_DONE                    (RAP_IR_EVENT_TXDONE)                   /**< Event: IR transmission done. */
 #define RAP_EVENT_IR_RX_DONE                    (RAP_IR_EVENT_RXDONE)                   /**< Event: IR reception done. */
 #define RAP_ACTION_IR_START_TX                  (RAP_IR_ACTION_START_TX)                /**< Action: start IR transmission. */
 #define RAP_ACTION_IR_START_RX                  (RAP_IR_ACTION_START_RX)                /**< Action: start IR reception. */
+#endif
 
 /* I2C */
 #define RAP_EVENT_I2C_ERROR(n)                  (RAP_I2C##n##_EVENT_ERROR)              /**< Event: I2C n error occurred. */
@@ -156,20 +167,37 @@ typedef enum
 #define RAP_EVENT_I2C_STOPPED(n)                (RAP_I2C##n##_EVENT_STOPPED)            /**< Event: I2C n stop condition detected. */
 #define RAP_ACTION_I2C_START(n)                 (RAP_I2C##n##_ACTION_START)             /**< Action: start I2C n transfer. */
 
+#if (RAP_SUPPORT_I3C == 1)
+/* I3C */
+#define RAP_EVENT_I3C_ERROR(n)                  (RAP_I3C##n##_EVENT_ERROR)              /**< Event: I3C n error occurred. */
+#define RAP_EVENT_I3C_STARTED(n)                (RAP_I3C##n##_EVENT_STARTED)            /**< Event: I3C n transfer started. */
+#define RAP_EVENT_I3C_STOPPED(n)                (RAP_I3C##n##_EVENT_STOPPED)            /**< Event: I3C n transfer stopped. */
+#define RAP_ACTION_I3C_START(n)                 (RAP_I3C##n##_ACTION_START)             /**< Action: start I3C n transfer. */
+#endif
+
+#if (RAP_SUPPORT_ADC == 1)
 /* ADC */
 #define RAP_EVENT_ADC_DONE                      (RAP_ADC_EVENT_DONE)                    /**< Event: ADC conversion done. */
 #define RAP_EVENT_ADC_RESULTDONE                (RAP_ADC_EVENT_RESULTDONE)              /**< Event: ADC result ready. */
 #define RAP_ACTION_ADC_SAMPLE                   (RAP_ADC_ACTION_ONE_SHOT_SAMPLE)        /**< Action: trigger a one-shot ADC sample. */
+#endif
 
+#if (RAP_SUPPORT_ADC_OK == 1)
+#define RAP_EVENT_ADC_OK                        (RAP_ADC_EVENT_OK)                      /**< Event: ADC conversion OK. */
+#endif
+
+#if (RAP_SUPPORT_SPI3W == 1)
 /* SPI3W */
 #define RAP_EVENT_SPI3W_END                     (RAP_SPI3WIRE_EVENT_END)                /**< Event: 3-wire SPI transfer end. */
 #define RAP_ACTION_SPI3W_START                  (RAP_SPI3WIRE_ACTION_START)             /**< Action: start 3-wire SPI transfer. */
+#endif
 
 /* SPI */
 #define RAP_EVENT_SPI_START(n)                  (RAP_SPI##n##_EVENT_START)              /**< Event: SPI n transfer start. */
 #define RAP_EVENT_SPI_END(n)                    (RAP_SPI##n##_EVENT_END)                /**< Event: SPI n transfer end. */
 #define RAP_ACTION_SPI_START(n)                 (RAP_SPI##n##_ACTION_START)             /**< Action: start SPI n transfer. */
 
+#if (RAP_SUPPORT_RTC == 1)
 /* RTC */
 #define RAP_EVENT_RTC_TICK                      (RAP_RTC_EVENT_TICK)                    /**< Event: RTC tick. */
 #define RAP_EVENT_RTC_OVERFLOW                  (RAP_RTC_EVENT_OVERFLOW)                /**< Event: RTC counter overflow. */
@@ -178,58 +206,82 @@ typedef enum
 #define RAP_ACTION_RTC_STOP                     (RAP_RTC_ACTION_STOP)                   /**< Action: stop the RTC counter. */
 #define RAP_ACTION_RTC_START                    (RAP_RTC_ACTION_START)                  /**< Action: start the RTC counter. */
 #define RAP_ACTION_RTC_RELOAD_COMP(ch)          (RAP_RTC_ACTION_RELOAD_CMP##ch)         /**< Action: reload RTC comparator ch. */
+#endif
 
+#if (RAP_SUPPORT_LPC == 1)
 /* LPC */
 #define RAP_EVENT_LPC_STATUS                    (RAP_LPC_EVENT_STATUS)                  /**< Event: LPC (low-power comparator) status met. */
 #define RAP_ACTION_LPC_START                    (RAP_LPC_ACTION_START)                  /**< Action: start the LPC. */
 #define RAP_ACTION_LPC_STOP                     (RAP_LPC_ACTION_STOP)                   /**< Action: stop the LPC. */
+#endif
 
 /* DMA */
 #define RAP_EVENT_DMA_TRANSFER(ch)              (RAP_DMA_EVENT_INT_TRANSFER##ch)        /**< Event: DMA channel ch transfer-complete interrupt. */
 #define RAP_EVENT_DMA_BLOCK(ch)                 (RAP_DMA_EVENT_INT_BLOCK##ch)           /**< Event: DMA channel ch block-complete interrupt. */
 #define RAP_ACTION_DMA_CHANNEL_EN(ch)           (RAP_DMA_ACTION_CHANNEL_EN##ch)         /**< Action: enable DMA channel ch. */
 
+#if (RAP_SUPPORT_GRTC == 1)
 /* GRTC */
 #define RAP_EVENT_GRTC_COMPARE(ch)              (RAP_GRTC_EVENT_COMPARE##ch)            /**< Event: GRTC comparator ch matched. */
 #define RAP_ACTION_GRTC_RELOAD_COMP(ch)         (RAP_GRTC_ACTION_RELOAD_CMP##ch)        /**< Action: reload GRTC comparator ch. */
+#endif
 
+#if (RAP_SUPPORT_SDMK == 1)
 /* SDMK */
 #define RAP_EVENT_SDMK_DONE                     (RAP_SDMK_EVENT_DONE)                   /**< Event: SDMK done. */
 #define RAP_ACTION_SDMK_START                   (RAP_SDMK_ACTION_START)                 /**< Action: start SDMK. */
+#endif
 
+#if (RAP_SUPPORT_OSC10M == 1)
 /* OSC10M */
 #define RAP_EVENT_OSC10M_CAL_DONE               (RAP_OSC10M_EVENT_CAL_DONE)             /**< Event: 10 MHz oscillator calibration done. */
 #define RAP_ACTION_OSC10M_CAL                   (RAP_OSC10M_ACTION_CAL)                 /**< Action: start 10 MHz oscillator calibration. */
+#endif
 
+#if (RAP_SUPPORT_OSC80M == 1)
 /* OSC80M */
 #define RAP_EVENT_OSC80M_CAL_DONE               (RAP_OSC80M_EVENT_CAL_DONE)             /**< Event: 80 MHz oscillator calibration done. */
 #define RAP_ACTION_OSC80M_CAL                   (RAP_OSC80M_ACTION_CAL)                 /**< Action: start 80 MHz oscillator calibration. */
+#endif
 
+#if (RAP_SUPPORT_OSC40M == 1)
+/* OSC40M */
+#define RAP_EVENT_OSC40M_CAL_DONE               (RAP_OSC40M_EVENT_CAL_DONE)             /**< Event: 40 MHz oscillator calibration done. */
+#define RAP_ACTION_OSC40M_CAL                   (RAP_OSC40M_ACTION_CAL)                 /**< Action: start 40 MHz oscillator calibration. */
+#endif
+
+#if (RAP_SUPPORT_OSC128K == 1)
+/* OSC128K */
+#define RAP_EVENT_OSC128K_DONE                  (RAP_OSC128K_EVENT_DONE)                /**< Event: 128 kHz oscillator calibration done. */
+#define RAP_ACTION_OSC128K_START                (RAP_OSC128K_ACTION_START)              /**< Action: start 128 kHz oscillator calibration. */
+#endif
+
+#if (RAP_SUPPORT_TMETER == 1)
 /* TMETER */
 #define RAP_EVENT_TMETER_DATARDY                (RAP_TMETER_EVENT_DATARDY)              /**< Event: Thermal meter data ready. */
 #define RAP_EVENT_TMETER_ABS_COMP(ch)           (RAP_TMETER_EVENT_ABS_CMP##ch)          /**< Event: Thermal meter absolute comparator ch matched. */
 #define RAP_EVENT_TMETER_REL_COMP(ch)           (RAP_TMETER_EVENT_REL_CMP##ch)          /**< Event: Thermal meter relative comparator ch matched. */
+#define RAP_EVENT_TMETER_FW_REL_COMP(ch)        (RAP_TMETER_EVENT_FW_REL_COMP##ch)      /**< Event: Thermal meter firmware relative comparator ch matched. */
 #define RAP_EVENT_TMETER_FW_REL_COMP3           (RAP_TMETER_EVENT_FW_REL_COMP3)         /**< Event: Thermal meter firmware relative comparator 3 matched. */
 #define RAP_ACTION_TMETER_ONESHOT               (RAP_TMETER_ACTION_ONESHOT)             /**< Action: trigger a one-shot thermal meter measurement. */
+#endif
+
+/* PAD */
+#define RAP_EVENT_PAD                           (RAP_PAD_EVENT)                         /**< Event: PAD wakeup detected. */
 
 /** @} */ /* End of group RAP_ACTION_EVENT */
 
+#if (RAP_SUPPORT_GET_STATUS == 1)
 /**
  * @defgroup    RAP_ACTION_EVENT_STATUS RAP Action Event Status
+  * @brief RAP Action Event Status.
  * @{
- * @ingroup     RAP_Exported_Constants
  */
 #define RAP_GetActionEventStatus(n)              ((n##_OFFSET & n##_BIT) == n##_BIT)    /**< Get the trigger status of the specified Action/Event. */
 #define RAP_ClearActionEventStatus(n)            (n##_OFFSET = n##_BIT)                 /**< Clear the trigger status of the specified Action/Event. */
 
 /** @} */ /* End of group RAP_ACTION_EVENT_STATUS */
-
-/** @} */ /* End of group RAP_Exported_Constants */
-
-/**
- * @defgroup RAP_Exported_Functions RAP Exported Functions
- * @{
- */
+#endif
 
 /**
  * @brief Deinitialize the RAP peripheral registers to their default reset values.
@@ -426,7 +478,7 @@ void RAP_ChannelFree(uint8_t Channel);
 /**
  * @brief Get the current mask of allocated RAP channels.
  *
- * @return  A bitmask in which each set bit indicates that the corresponding
+ * @return A bitmask in which each set bit indicates that the corresponding
  *          channel is currently allocated (BIT(n) for channel n).
  *
  * <b>Example usage</b>
@@ -520,7 +572,7 @@ void RAP_ActionBindClear(uint32_t Action, uint8_t Channel);
  *
  * @param[in] ActionEvent  Specifies the Action or Event offset macro. Refer to @ref RAP_ACTION_EVENT.
  *
- * @return  A bitmask in which each set bit indicates a channel bound to the
+ * @return A bitmask in which each set bit indicates a channel bound to the
  *          specified Action/Event (BIT(n) for channel n).
  *
  * <b>Example usage</b>
@@ -534,9 +586,7 @@ void RAP_ActionBindClear(uint32_t Action, uint8_t Channel);
  */
 uint32_t RAP_ActionEventChannelGet(uint32_t ActionEvent);
 
-/** @} */ /* End of group RAP_Exported_Functions */
-
-/** @} */ /* End of group RAP */
+/** @} */ /* End of group RAP_DRIVER */
 
 #ifdef __cplusplus
 }
