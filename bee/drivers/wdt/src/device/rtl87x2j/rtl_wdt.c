@@ -9,7 +9,7 @@
 *============================================================================*/
 #include "rtl_wdt.h"
 #include "rtl_rcc.h"
-#include "stdio.h"
+
 /*============================================================================*
  *                           Private Constants
  *============================================================================*/
@@ -51,15 +51,17 @@ static void WDT_Config(uint32_t cnt_limit, WDTMode_TypeDef wdt_mode)
  *                           Public Functions
  *============================================================================*/
 /**
-  * \brief  Start Watchdog. This function will enable watchdog clock, set and start watchdog.
-  * \param  Time_ms.
-  * \param  WDT_Mode \ref WDTMode_TypeDef.
-  * \return true or false.
+  * @brief  Start WDT. This function will enable WDT clock, set and start WDT.
+  * @param  TimeMs  WDT Timeout Time. Unit: ms.
+  * @param  Mode    Refer to @ref WDTMode_TypeDef. If the Reset WDT operation is not performed within the Timeout period,
+  *                 the configured mode operation will be executed.
+  * @return WDT operating status.
+  * @retval true   WDT mode set successfully, enabling the function.
+  * @retval false  WDT setting failed.
   */
 bool WDT_Start(uint32_t TimeMs, WDTMode_TypeDef Mode)
 {
     uint32_t cnt_limit;
-    printf("WDT start with timeout %u ms, mode %u\n", TimeMs, Mode);
     if (WDT_CalculateConfig(TimeMs, &cnt_limit))
     {
         WDT_ClockEnable();
@@ -72,8 +74,7 @@ bool WDT_Start(uint32_t TimeMs, WDTMode_TypeDef Mode)
 }
 
 /**
-  * \brief  Enable Watchdog.
-  * \return None.
+  * @brief  Enable WDT.
   */
 void WDT_Enable(void)
 {
@@ -84,8 +85,7 @@ void WDT_Enable(void)
 }
 
 /**
-  * \brief  Disable Watchdog.
-  * \return None.
+  * @brief  Disable WDT.
   */
 void WDT_Disable(void)
 {
@@ -96,8 +96,7 @@ void WDT_Disable(void)
 }
 
 /**
-  * \brief  Kick Watchdog to restart watchdog timer.
-  * \return None.
+  * @brief  Kick Watchdog to restart WDT.
   */
 void WDT_Kick(void)
 {
@@ -105,8 +104,7 @@ void WDT_Kick(void)
 }
 
 /**
-  * \brief  Clear WDT interrupt pending bit.
-  * \return None
+  * @brief  Clear WDT interrupt pending bit.
   */
 void WDT_ClearINTPendingBit(void)
 {
@@ -117,8 +115,10 @@ void WDT_ClearINTPendingBit(void)
 }
 
 /**
-  * \brief  Is watchdog enable.
-  * \return Is watchdog enable or not
+  * @brief  Check if the WDT is working.
+  * @return WDT operating status.
+  * @retval true   WDT is enabled.
+  * @retval false  WDT is not enabled.
   */
 bool WDT_IsEnable(void)
 {
@@ -128,8 +128,8 @@ bool WDT_IsEnable(void)
 }
 
 /**
-  * \brief  Get WDT timeout_ms.
-  * \return WDT timeout_ms
+  * @brief  Get the current WDT timeout value in milliseconds.
+  * @return WDT timeout duration in milliseconds.
   */
 uint32_t WDT_GetTimeoutMs(void)
 {
@@ -141,8 +141,8 @@ uint32_t WDT_GetTimeoutMs(void)
 }
 
 /**
-  * \brief  Get WDT current count.
-  * \return Current count
+  * @brief  Get WDT current count.
+  * @return Current count.
   */
 uint32_t WDT_GetCurrentCount(void)
 {
@@ -150,8 +150,12 @@ uint32_t WDT_GetCurrentCount(void)
 }
 
 /**
-  * \brief  Get WDT mode.
-  * \return WDT mode
+  * @brief  Get WDT mode.
+  * @return WDT mode.
+  * @retval RESET_ALL               Reset all.
+  * @retval RESET_ALL_EXCEPT_AON    Reset all except RTC and some AON register.
+  * @retval INTERRUPT_CPU           Interrupt CPU.
+  * @retval WDT_MODE_NUM            The maximum selectable value for WDT mode.
   */
 WDTMode_TypeDef WDT_GetMode(void)
 {
@@ -161,9 +165,8 @@ WDTMode_TypeDef WDT_GetMode(void)
 }
 
 /**
-  * \brief  Set Clock auto mode.
-  * \param  AutoMode: This parameter can ref to \ref Clock_Auto_Mode.
-  * \return Current count
+  * @brief  Enable or disable WDT clock auto mode.
+  * @param  Newstate  Enable or disable WDT clock auto mode.
   */
 void WDT_ClockAutoModeCmd(FunctionalState Newstate)
 {

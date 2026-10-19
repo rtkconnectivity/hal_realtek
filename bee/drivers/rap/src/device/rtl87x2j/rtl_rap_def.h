@@ -19,6 +19,27 @@ extern "C" {
  *                          RAP Defines
  *============================================================================*/
 #define RAP_SUPPORT_DISABE_RAP_FUNCTION              (0)
+#define RAP_SUPPORT_GET_STATUS                       (1)
+#define RAP_SUPPORT_KEYSCAN                          (1)
+#define RAP_SUPPORT_TIMER                            (1)
+#define RAP_SUPPORT_TIMER_ACTIVE_STOP_EVENT          (1)
+#define RAP_SUPPORT_TIMER_LATCH_EVENT                (1)
+#define RAP_SUPPORT_TIMER_PAUSE                      (1)
+#define RAP_SUPPORT_TIMER_CLEAR                      (0)
+#define RAP_SUPPORT_IR                               (1)
+#define RAP_SUPPORT_I3C                              (0)
+#define RAP_SUPPORT_ADC                              (1)
+#define RAP_SUPPORT_ADC_OK                           (0)
+#define RAP_SUPPORT_SPI3W                            (1)
+#define RAP_SUPPORT_RTC                              (1)
+#define RAP_SUPPORT_LPC                              (1)
+#define RAP_SUPPORT_GRTC                             (1)
+#define RAP_SUPPORT_SDMK                             (1)
+#define RAP_SUPPORT_OSC10M                           (1)
+#define RAP_SUPPORT_OSC80M                           (1)
+#define RAP_SUPPORT_OSC40M                           (0)
+#define RAP_SUPPORT_OSC128K                          (0)
+#define RAP_SUPPORT_TMETER                           (1)
 
 /*============================================================================*
  *                          RAP Registers Memory Map

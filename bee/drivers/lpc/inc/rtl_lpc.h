@@ -12,24 +12,26 @@ extern "C" {
 #endif
 
 #include "utils/rtl_utils.h"
-#if defined (CONFIG_SOC_SERIES_RTL87X2J)
+#if defined (CONFIG_SOC_SERIES_RTL87X2G)
+#include "lpc/src/device/rtl87x2g/rtl_lpc_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL87X2J)
 #include "lpc/src/device/rtl87x2j/rtl_lpc_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL87X3J)
+#include "lpc/src/device/rtl87x3j/rtl_lpc_def.h"
+#elif defined (CONFIG_SOC_SERIES_RTL87X3K)
+#include "lpc/src/device/rtl87x3k/rtl_lpc_def.h"
 #endif
 
 /**
- * @defgroup LPC LPC
- * @ingroup PERIPH_DRIVER
+ * @defgroup LPC_DRIVER Driver
+ * @ingroup LPC
  * @brief Low Power Comparator (LPC) driver.
  * @{
  */
 
 /**
- * @defgroup LPC_Exported_Constants LPC Exported Constants
- * @{
- */
-
-/**
  * @defgroup    LPC_CHANNEL LPC Channel
+  * @brief LPC channel.
  * @{
  */
 typedef enum
@@ -55,6 +57,7 @@ typedef enum
 
 /**
  * @defgroup    LPC_EDGE LPC Edge
+  * @brief LPC edge.
  * @{
  */
 typedef enum
@@ -72,6 +75,7 @@ typedef enum
 #if (LPC_SUPPORT_BYPASS_DIVIDE_MODE == 1)
 /**
  * @defgroup    LPC_MODE LPC Mode
+  * @brief LPC mode.
  * @{
  */
 typedef enum
@@ -90,6 +94,7 @@ typedef enum
 #if (LPC_SUPPORT_TRIGGER_MODE == 1)
 /**
  * @defgroup    LPC_TRIGGER_MODE LPC Trigger Mode
+  * @brief LPC trigger mode.
  * @{
  */
 typedef enum
@@ -113,6 +118,7 @@ typedef enum
 #if (LPC_SUPPORT_DEBOUNCE_MODE == 1)
 /**
  * @defgroup    LPC_DEBOUNCE_DIV LPC Debounce Div
+  * @brief LPC debounce div.
  * @{
  */
 typedef enum
@@ -142,6 +148,7 @@ typedef enum
 
 /**
  * @defgroup    LPC_DIVIDE_THRESHOLD LPC Divide Threshold
+  * @brief LPC divide threshold.
  * @{
  */
 typedef enum
@@ -156,6 +163,7 @@ typedef enum
 
 /**
  * @defgroup    LPC_BYPASS_THRESHOLD LPC Bypass Threshold
+  * @brief LPC bypass threshold.
  * @{
  */
 
@@ -172,6 +180,7 @@ LPCBypassThreshold_TypeDef;
 
 /**
  * @defgroup    LPC_INTERRUPTS LPC Interrupts
+  * @brief LPC interrupts.
  * @{
  */
 #define LPC_INT_VOLTAGE_DETECT              (BIT0)     /**< Voltage detection interrupt. */
@@ -194,6 +203,7 @@ LPCBypassThreshold_TypeDef;
 #if (LPC_SUPPORT_RAP_MODE == 1)
 /**
  * @defgroup    LPC_ACTION LPC Action
+  * @brief LPC action.
  * @{
  */
 typedef enum
@@ -206,6 +216,7 @@ typedef enum
 
 /**
  * @defgroup    LPC_EVENT LPC Event
+  * @brief LPC event.
  * @{
  */
 typedef enum
@@ -216,55 +227,51 @@ typedef enum
 /** @} */ /* End of group LPC_EVENT */
 
 #endif
-/** @} */ /* End of group LPC_Exported_Constants */
-
-/**
- * @defgroup LPC_Exported_Types LPC Exported Types
- * @{
- */
-
 /**
  * @brief LPC init structure definition.
  */
 typedef struct
 {
-    LPCChannel_TypeDef LPC_Channel;     /**< Specifies the LPC input channel.
-                                             This parameter can be a value of @ref LPC_CHANNEL. */
+    LPCChannel_TypeDef LPC_Channel;                  /**< Specifies the LPC input channel.
+                                                          This parameter can be a value of @ref LPC_CHANNEL. */
 
-    LPCEdge_TypeDef LPC_Edge;           /**< Specifies the LPC trigger edge.
-                                             This parameter can be a value of @ref LPC_EDGE. */
+    LPCEdge_TypeDef LPC_Edge;                        /**< Specifies the LPC trigger edge.
+                                                          This parameter can be a value of @ref LPC_EDGE. */
 
-    LPCThreshold_TypeDef LPC_Threshold; /**< Specifies the voltage threshold in divide mode.
-                                             This parameter can be a value of @ref LPC_DIVIDE_THRESHOLD. */
+    LPCThreshold_TypeDef
+    LPC_Threshold;                                   /**< Specifies the voltage threshold in divide mode.
+                                                          This parameter can be a value of @ref LPC_DIVIDE_THRESHOLD. */
 
 #if (LPC_SUPPORT_BYPASS_DIVIDE_MODE == 1)
-    LPCBypassThreshold_TypeDef LPC_BypassThreshold; /**< Specifies the voltage threshold in bypass mode.
-                                             This parameter can be a value of @ref LPC_BYPASS_THRESHOLD. */
+    LPCBypassThreshold_TypeDef
+    LPC_BypassThreshold;                             /**< Specifies the voltage threshold in bypass mode.
+                                                          This parameter can be a value of @ref LPC_BYPASS_THRESHOLD. */
 #endif
 
 #if (LPC_SUPPORT_DEBOUNCE_MODE == 1)
-    FunctionalState LPC_DebouncEn;      /**< Enable or disable the LPC debounce function.
-                                             This parameter can be a value of DISABLE or ENABLE. */
+    FunctionalState LPC_DebouncEn;                   /**< Enable or disable the LPC debounce function.
+                                                          This parameter can be a value of DISABLE or ENABLE. */
 
-    LPCDebDiv_TypeDef LPC_DebouncDiv;   /**< Specifies the LPC Debounce Divider.
-                                             This parameter can be a value of @ref LPC_DEBOUNCE_DIV. */
+    LPCDebDiv_TypeDef LPC_DebouncDiv;                /**< Specifies the LPC Debounce Divider.
+                                                          This parameter can be a value of @ref LPC_DEBOUNCE_DIV. */
 
-    uint32_t LPC_DebouncCnt;            /**< Specifies the LPC debounce count.
-                                             This value is used to configure the LPC debounce time, which is calculated as:
-                                             T_debounce = (1 / (LPC_CLOCK / LPC_DebouncDiv)) * (LPC_DebouncCnt + 1).
-                                             This parameter can be a value of 0 to 255. */
+    uint32_t LPC_DebouncCnt;                         /**< Specifies the LPC debounce count.
+                                                          This value is used to configure the LPC debounce time, which is calculated as:
+                                                          T_debounce = (1 / (LPC_CLOCK / LPC_DebouncDiv)) * (LPC_DebouncCnt + 1).
+                                                          This parameter can be a value of 0 to 255. */
 #endif
 
 #if (LPC_SUPPORT_BYPASS_DIVIDE_MODE == 1)
-    LPCMode_TypeDef LPC_Mode;           /**< Specifies the LPC mode.
-                                             If using @ref LPC_DIVIDE_MODE, please configure @ref LPC_Threshold or @ref LPC_ThresholdL.
-                                             If using @ref LPC_BYPASS_MODE, please configure @ref LPC_BypassThreshold or @ref LPC_BypassThresholdL.
-                                             This parameter can be a value of @ref LPC_MODE. */
+    LPCMode_TypeDef LPC_Mode;                        /**< Specifies the LPC mode.
+                                                          If using @ref LPC_DIVIDE_MODE, please configure @ref LPC_Threshold or @ref LPC_ThresholdL.
+                                                          If using @ref LPC_BYPASS_MODE, please configure @ref LPC_BypassThreshold or @ref LPC_BypassThresholdL.
+                                                          This parameter can be a value of @ref LPC_MODE. */
 #endif
 
 #if ((LPC_SUPPORT_VOLTAGE_DETECT_L == 1) || (LPC_SUPPORT_HYSTERESIS_FUNCTION == 1))
-    LPCThreshold_TypeDef LPC_ThresholdL; /**< Specifies the voltage threshold in divide mode.
-                                             This parameter can be a value of @ref LPC_DIVIDE_THRESHOLD. */
+    LPCThreshold_TypeDef
+    LPC_ThresholdL;                                  /**< Specifies the voltage threshold in divide mode.
+                                                          This parameter can be a value of @ref LPC_DIVIDE_THRESHOLD. */
 
 #if (LPC_SUPPORT_BYPASS_DIVIDE_MODE == 1)
     LPCBypassThreshold_TypeDef LPC_BypassThresholdL; /**< Specifies the voltage threshold
@@ -273,22 +280,15 @@ typedef struct
 #endif
 
 #if (LPC_SUPPORT_TRIGGER_MODE == 1)
-    LPCTriggerMode_TypeDef LPC_TriggerMode; /**< Specifies the LPC trigger mode.
-                                             This parameter can be a value of @ref LPC_TRIGGER_MODE. */
+    LPCTriggerMode_TypeDef LPC_TriggerMode;          /**< Specifies the LPC trigger mode.
+                                                          This parameter can be a value of @ref LPC_TRIGGER_MODE. */
 #endif
 
 #if (LPC_SUPPORT_HYSTERESIS_FUNCTION == 1)
-    FunctionalState LPC_HysteresisEn;   /**< Specifies the hysteresis function.
-                                             This parameter can be a value of DISABLE or ENABLE. */
+    FunctionalState LPC_HysteresisEn;                /**< Specifies the hysteresis function.
+                                                          This parameter can be a value of DISABLE or ENABLE. */
 #endif
 } LPC_InitTypeDef;
-
-/** @} */ /* End of group LPC_Exported_Types */
-
-/**
- * @defgroup LPC_Exported_Functions LPC Exported Functions
- * @{
- */
 
 /**
  * @brief Reset LPC.
@@ -296,7 +296,6 @@ typedef struct
  * @param[in] LPCx Specifies the LPC peripheral. Refer to @ref LPC_DECLARATION.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -314,7 +313,6 @@ void LPC_DeInit(LPC_TypeDef *LPCx);
  *            the configuration information for the specified LPC peripheral.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -345,7 +343,6 @@ void LPC_Init(LPC_TypeDef *LPCx, LPC_InitTypeDef *LPC_InitStruct);
  * @param[in]  LPC_InitStruct Pointer to a LPC_InitTypeDef structure which will be initialized.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -368,7 +365,6 @@ void LPC_StructInit(LPC_InitTypeDef *LPC_InitStruct);
  *             This parameter can be: ENABLE or DISABLE.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -379,39 +375,36 @@ void LPC_StructInit(LPC_InitTypeDef *LPC_InitStruct);
 void LPC_Cmd(LPC_TypeDef *LPCx, FunctionalState NewState);
 
 /**
-  * \brief  Configure LPC trigger edge.
-  *
-  * \param[in] LPCx: Select the LPC peripheral. \ref LPC_Declaration
-  * \param[in] LPC_Edge: Specifies the LPC trigger edge.
-  *            This parameter can be one of the following values:
-  *            \arg LPC_VIN_BELOW_VTH: The input voltage is below the threshold voltage.
-  *            \arg LPC_VIN_OVER_VTH: The input voltage is above the threshold voltage.
-  *
-  * \return None.
-  *
-  * <b>Example usage</b>
-  * \code{.c}
-  *
-  * void lpc_sample(void)
-  * {
-  *     LPC_InitTypeDef LPC_InitStruct;
-  *     LPC_StructInit(&LPC_InitStruct);
-  *     LPC_InitStruct.LPC_Channel   = LPC_CAPTURE_CHANNEL;
-  *     LPC_InitStruct.LPC_Edge      = LPC_VOLTAGE_DETECT_EDGE;
-  *     LPC_InitStruct.LPC_Threshold = LPC_VOLTAGE_DETECT_THRESHOLD;
-  *     LPC_Init(LPC0,&LPC_InitStruct);
-  *
-  *     NVIC_InitTypeDef NVIC_InitStruct;
-  *     NVIC_InitStruct.NVIC_IRQChannel = LPC0_IRQn;
-  *     NVIC_InitStruct.NVIC_IRQChannelPriority = 2;
-  *     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-  *     NVIC_Init(&NVIC_InitStruct);
-  *
-  *     LPC_SetTriggerEdge(LPC0, LPC_VIN_OVER_VTH);
-  *     LPC_Cmd(LPC0, ENABLE);
-  * }
-  * \endcode
-  */
+ * @brief Configure LPC trigger edge.
+ *
+ * @param[in] LPCx Select the LPC peripheral. @ref LPC_Declaration
+ * @param[in] LPC_Edge Specifies the LPC trigger edge.
+ *            This parameter can be one of the following values:
+ *            - LPC_VIN_BELOW_VTH: The input voltage is below the threshold voltage.
+ *            - LPC_VIN_OVER_VTH: The input voltage is above the threshold voltage.
+ *
+ * <b>Example usage</b>
+ * @code{.c}
+ * void lpc_sample(void)
+ * {
+ *     LPC_InitTypeDef LPC_InitStruct;
+ *     LPC_StructInit(&LPC_InitStruct);
+ *     LPC_InitStruct.LPC_Channel   = LPC_CAPTURE_CHANNEL;
+ *     LPC_InitStruct.LPC_Edge      = LPC_VOLTAGE_DETECT_EDGE;
+ *     LPC_InitStruct.LPC_Threshold = LPC_VOLTAGE_DETECT_THRESHOLD;
+ *     LPC_Init(LPC0,&LPC_InitStruct);
+ *
+ *     NVIC_InitTypeDef NVIC_InitStruct;
+ *     NVIC_InitStruct.NVIC_IRQChannel = LPC0_IRQn;
+ *     NVIC_InitStruct.NVIC_IRQChannelPriority = 2;
+ *     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+ *     NVIC_Init(&NVIC_InitStruct);
+ *
+ *     LPC_SetTriggerEdge(LPC0, LPC_VIN_OVER_VTH);
+ *     LPC_Cmd(LPC0, ENABLE);
+ * }
+ * @endcode
+ */
 void LPC_SetTriggerEdge(LPC_TypeDef *LPCx, LPCEdge_TypeDef LPC_Edge);
 
 /**
@@ -426,7 +419,6 @@ void LPC_SetTriggerEdge(LPC_TypeDef *LPCx, LPCEdge_TypeDef LPC_Edge);
  *             This parameter can be: ENABLE or DISABLE.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -457,7 +449,6 @@ void LPC_INTConfig(LPC_TypeDef *LPCx, uint32_t LPC_INT, FunctionalState NewState
  *            This parameter can be: ENABLE or DISABLE.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -490,7 +481,6 @@ void LPC_WakeUpConfig(LPC_TypeDef *LPCx, FunctionalState NewState);
  *             - LPC_INT_COUNTER_COMPARE: Counter compare interrupt.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -504,7 +494,7 @@ void LPC_ClearINTStatus(LPC_TypeDef *LPCx, uint32_t LPC_INT);
  * @brief Get the interrupt status of the specified LPC.
  *
  * @param[in]  LPCx Specifies the LPC peripheral. Refer to @ref LPC_DECLARATION.
- * @param[in]  LPC_INT specifies the LPC interrupt to check. Refer to @ref LPC_INTERRUPT.
+ * @param[in]  LPC_INT Specifies the LPC interrupt to check. Refer to @ref LPC_INTERRUPT.
  *             This parameter can be one of the following values:
  *             - LPC_INT_VOLTAGE_DETECT: Voltage detection interrupt.
  *             - LPC_INT_COUNTER_COMPARE: Counter compare interrupt.
@@ -514,7 +504,6 @@ void LPC_ClearINTStatus(LPC_TypeDef *LPCx, uint32_t LPC_INT);
  * @retval RESET  The interrupt flag is not set.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -534,7 +523,6 @@ ITStatus LPC_GetINTStatus(LPC_TypeDef *LPCx, uint32_t LPC_INT);
  * @retval RESET  The wakeup status is not set.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -552,7 +540,6 @@ ITStatus LPC_GetWakeUpStatus(LPC_TypeDef *LPCx);
  *                 This parameter can be 0 to 0xfff.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -570,7 +557,6 @@ void LPC_SetComparator(LPC_TypeDef *LPCx, uint32_t data);
  * @return The comparator counter value of the specified LPC.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -588,7 +574,6 @@ uint16_t LPC_GetComparator(LPC_TypeDef *LPCx);
  * @return The current counter of the specified LPC.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -604,7 +589,6 @@ uint16_t LPC_GetCounter(LPC_TypeDef *LPCx);
  * @param[in] LPCx Specifies the LPC peripheral. Refer to @ref LPC_DECLARATION.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -624,7 +608,6 @@ void LPC_CounterReset(LPC_TypeDef *LPCx);
  *             - DISABLE: Stop LPCOMP counter.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_sample(void)
  * {
@@ -644,7 +627,6 @@ void LPC_CounterCmd(LPC_TypeDef *LPCx, FunctionalState NewState);
  *            This parameter can be: ENABLE or DISABLE.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_demo(void)
  * {
@@ -662,7 +644,6 @@ void LPC_RAPModeCmd(LPC_TypeDef *LPCx, FunctionalState NewState);
  *            This parameter can be a value of @ref LPC_ACTION.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_demo(void)
  * {
@@ -684,7 +665,6 @@ void LPC_ActionTrigger(LPC_TypeDef *LPCx, LPCAction_TypeDef LPC_Action);
  *            This parameter can be: ENABLE or DISABLE.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_demo(void)
  * {
@@ -702,10 +682,9 @@ void LPC_ShortcutCmd(LPC_TypeDef *LPCx, uint32_t Action, uint32_t Event, Functio
  * @brief Enable or disable GPIO clock auto mode of the specified LPC.
  *
  * @param[in] LPCx Specifies the LPC peripheral. Refer to @ref LPC_DECLARATION.
- * @param[in] Newstate Enable or disable the clock auto mode.
+ * @param[in] ENABLE Enable or disable the clock auto mode.
  *
  * <b>Example usage</b>
- * @code{.c}
  *
  * void lpc_demo(void)
  * {
@@ -717,9 +696,7 @@ void LPC_ClockAutoModeCmd(LPC_TypeDef *LPCx, FunctionalState ENABLE);
 
 #endif
 
-/** @} */ /* End of group LPC_Exported_Functions */
-
-/** @} */ /* End of group LPC */
+/** @} */ /* End of group LPC_DRIVER */
 
 #ifdef __cplusplus
 }

@@ -55,7 +55,7 @@ typedef struct
 /**
  * @defgroup LPC_DECLARATION LPC Declaration
  * @{
- * @ingroup  LPC_Exported_Constants
+ * @ingroup  LPC_DRIVER
  */
 
 #define LPC0                ((LPC_TypeDef *)(SYSON_BASE + AON_REG_LPC_VERSION))
@@ -66,7 +66,7 @@ typedef struct
 /**
  * @defgroup LPC_DIVIDE_THRESHOLD LPC Divide Threshold
  * @{
- * @ingroup  LPC_Exported_Constants
+ * @ingroup  LPC_DRIVER
  */
 
 #define LPC_INPUT_RANGE \
@@ -137,7 +137,7 @@ typedef struct
 /**
  * @defgroup LPC_BYPASS_THRESHOLD LPC Bypass Threshold
  * @{
- * @ingroup  LPC_Exported_Constants
+ * @ingroup  LPC_DRIVER
  */
 
 #define LPC_BYPASS_INPUT_RANGE \

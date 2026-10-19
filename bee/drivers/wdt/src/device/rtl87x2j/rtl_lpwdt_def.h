@@ -53,36 +53,16 @@ typedef struct
 /*============================================================================*
  *                          LPWDT Declaration
  *============================================================================*/
-/** \defgroup LPWDT         LPWDT
-  * \brief
-  * \{
-  */
-
-/** \defgroup LPWDT_Exported_Constants LPWDT Exported Constants
-  * \brief
-  * \{
-  */
-
-/** \defgroup LPWDT_Declaration LPWDT Declaration
-  * \brief
-  * \{
+/** @defgroup LPWDT_DECLARATION LPWDT Declaration
+  * @{
+  * @ingroup  LPWDT_DRIVER
   */
 
 #define LPWDT_REG_BASE       (SYSON_BASE + AON_REG_WDT_REG0X)
 #define LPWDT                ((LPWDT_TypeDef *) LPWDT_REG_BASE)
 
+/** @} */ /* End of group LPWDT_DECLARATION */
 
-/** End of LPWDT_Declaration
-  * \}
-  */
-
-/** End of LPWDT_Exported_Constants
-  * \}
-  */
-
-/** End of LPWDT
-  * \}
-  */
 /*============================================================================*
  *                          LPWDT Private Types
  *============================================================================*/
