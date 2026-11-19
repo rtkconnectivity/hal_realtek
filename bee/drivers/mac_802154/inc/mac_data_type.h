@@ -1,19 +1,32 @@
-/*
- * Copyright (c) 2026, Realtek Semiconductor Corporation
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 /**************************************************************************//**
- * @file     mac_data_type.h
- * @brief    IEEE802.15.4 MAC/PHY driver data structure type definition.
- *
- * @version  V1.00
- * @date     2023-06-12
+ * @file      mac_data_type.h
+ * @brief     IEEE802.15.4 MAC/PHY driver data structure type definition.
+ * @author    JustinWu
+ * @version   V1.00
+ * @date      2023-06-12
  *
  * @note
  *
+ ******************************************************************************
+ *
+ * Copyright (c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the License); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  ******************************************************************************/
+
 
 #ifndef _MAC_DATA_TYPE_H_
 #define _MAC_DATA_TYPE_H_
@@ -24,7 +37,7 @@ extern "C" {
 
 #include "stdint.h"
 #include "string.h"
-#include "zb_section.h"
+#include "mac_port_macro.h"
 
 #define MAC_ENTRY_PRIO_MIN          (-1)
 
@@ -58,6 +71,42 @@ extern "C" {
 */
 #define MAC_MAX_TX_FRM_LEN          (125)     // Maximum length(byte) of a TX frame
 #define MAC_MIN_TX_FRM_LEN          (1)       // Minimum length(byte) of a TX frame
+
+/**
+  \brief  FIFO ID
+*/
+typedef enum mac_fifo_id_e
+{
+    TXN_FIFO_ID = 0,    /* Normal TX FIFO */
+    TXB_FIFO_ID = 1,    /* Beacon TX FIFO */
+    TXG1_FIFO_ID = 2,   /* GTS1 TX FIFO */
+    TXG2_FIFO_ID = 3,   /* GTS2 TX FIFO */
+    KEY_FIFO_ID = 4,    /* Key FIFO */
+    RX_FIFO_ID = 5,     /* RX FIFO */
+
+    INVALID_FIFO_ID = 6,    /* Invalid FIFO ID */
+} mac_fifo_id_t;
+
+/**
+  \brief  Define TX/RX FIFO and Key buffer base address
+*/
+#ifdef PORT_PLATFORM_RTL8752H
+uint32_t mac_FIFO_BaseAddr(mac_fifo_id_t fifo_id);
+#define MAC_TXN_BASE_ADDR             ((uint32_t)mac_FIFO_BaseAddr(TXN_FIFO_ID))
+#define MAC_TXB_BASE_ADDR             ((uint32_t)mac_FIFO_BaseAddr(TXB_FIFO_ID))
+#define MAC_TXG1_BASE_ADDR            ((uint32_t)mac_FIFO_BaseAddr(TXG1_FIFO_ID))
+#define MAC_TXG2_BASE_ADDR            ((uint32_t)mac_FIFO_BaseAddr(TXG2_FIFO_ID))
+#define MAC_KEY_FIFO_BASE_ADDR        ((uint32_t)mac_FIFO_BaseAddr(KEY_FIFO_ID))
+#define MAC_RX_BASE_ADDR              ((uint32_t)mac_FIFO_BaseAddr(RX_FIFO_ID))
+#else
+extern uint32_t mac_FIFO_BaseAddr_rom(mac_fifo_id_t fifo_id);
+#define MAC_TXN_BASE_ADDR             ((uint32_t)mac_FIFO_BaseAddr_rom(TXN_FIFO_ID))
+#define MAC_TXB_BASE_ADDR             ((uint32_t)mac_FIFO_BaseAddr_rom(TXB_FIFO_ID))
+#define MAC_TXG1_BASE_ADDR            ((uint32_t)mac_FIFO_BaseAddr_rom(TXG1_FIFO_ID))
+#define MAC_TXG2_BASE_ADDR            ((uint32_t)mac_FIFO_BaseAddr_rom(TXG2_FIFO_ID))
+#define MAC_KEY_FIFO_BASE_ADDR        ((uint32_t)mac_FIFO_BaseAddr_rom(KEY_FIFO_ID))
+#define MAC_RX_BASE_ADDR              ((uint32_t)mac_FIFO_BaseAddr_rom(RX_FIFO_ID))
+#endif
 
 /**
   \brief  Security Key buffer base address
@@ -152,10 +201,22 @@ extern "C" {
                                                MAC.rx_set1_b.rxon2ccadt_dly */
 #define PHY_CCACHKPT_SYMB           (9)     /* CCA check duration takes in Symbol time,
                                                controlled by MAC.txprm_b.ccachkp */
-#define PHY_TXON_DELAY_US           (122)   /* RX to TX turnaround time is us, controlled by
-                                               MAC.phy_trx_dly_b.txon_delay */
+#define PHY_TXON_DELAY_US           (122)   /* MAC init TX to RF TX ready delay time is us,
+                                               controlled by MAC.phy_trx_dly_b.txon_delay */
+#define PHY_RXON_DELAY_US           (114)   /* MAC init RX to RF RX ready delay time is us,
+                                               controlled by MAC.phy_trx_dly_b.rxon_delay */
+#define PHY_RX_TO_RX_DELAY_US       (50)    /* RX to RX turnaround time is us, controlled by
+                                               MAC.phy_to_dly_b.rx2rx_delay */
+#define PHY_TX_TO_RX_DELAY_US       (131)   /* TX to RX turnaround time is us, controlled by
+                                               MAC.phy_to_dly_b.tx2rx_delay */
 #define PHY_RX_TO_TX_DELAY_US       (120)   /* RX On to TX On delay time is us, controlled by
                                                MAC.phy_to_dly_b.rx2tx_delay */
+#define PHY_RX_TO_ED_SCAN_DELAY_US  (114)   /* RX On to ED scan start time is us, controlled by
+                                               MAC.rx_set1_b.ed_scan_rxon_delay */
+#define PHY_RX_TO_CCADT_DELAY_US    (10)    /* RX On to CCADT state is us, controlled by
+                                               MAC.rx_set1_b.rxon_2_ccadt_delay */
+#define PHY_RX_TO_OFF_DELAY_US      (80)    /* Frame RX end to RX off delay time is us, controlled by
+                                               MAC.rx_set1_b.rxon_off_delay */
 #define PHY_HDR_SYMBOL_TIME_US      (PHY_SYMBOL_TIME_US*12)
 #define PREAMBLE_TO_RX_TSTAMP_US    (PHY_SYMBOL_TIME_US*11) /* the time offset from the preamble of RX frame to
                                                                the RX Time stamp is latched */
@@ -163,8 +224,6 @@ extern "C" {
 #define PHY_RX_LATENCY_US           (23)    /* RF RX to MAC RX latency */
 #define PHY_GNT_PREPARE_TIME_BTCLK  (3)     /* request a high prio grant request as least 3 btclk */
 
-#define ED_SCAN_RNDDUR_8SYMB        (120)   /* how many 8-symbols for a ED scan round duration */
-#define ED_SCAN_RNDDUR_US           (ED_SCAN_RNDDUR_8SYMB * 8 * 16) /* the duration, in us, of each ED Scan round */
 #define ED_SCAN_INVALID_RET         (128)  /* indicates an invalid ED level return value */
 #define ED_SCAN_ERR_MASK            (MAC_ed_scan_ctrl0_ed_scan_encounter_tx_trig_sts_Msk |\
                                      MAC_ed_scan_ctrl0_scan_fw_cancel_sts_Msk |\
@@ -191,7 +250,7 @@ extern "C" {
 #define PTA_TICK_TIME_US_MAX        (0x1000)  /* max time of a PTA duty control tick, in us */
 #define PTA_DUTY_TIME_TICKS_MAX     (0x100)   /* max time of a PTA high/low duty time period, in unit of ticks */
 
-#define MAC_MASK_ALL_INTERRUPT      (0x0000FFFFUL)    /* to mask all MAC interrupt */
+#define MAC_MASK_ALL_INTERRUPT      (0x000FFFFFUL)    /* to mask all MAC interrupt */
 
 typedef uint8_t bool_t;
 
@@ -265,6 +324,7 @@ typedef void (*mac_callback_t)(void *parg);
 /**
   \brief MAC Software Timer handler structure
 */
+#if !defined(CONFIG_MAC_SW_TIMER) || (CONFIG_MAC_SW_TIMER == 0)
 typedef struct mac_timer_handle_s
 {
     mac_callback_t timer_callback;  /* callback function on timeout event */
@@ -279,6 +339,28 @@ typedef struct mac_timer_handle_s
         uint32_t is_timeout: 1; /*!< [10..10] is this timer timeout triggered */
     } timer_ctrl;
 } mac_timer_handle_t, *pmac_timer_handle_t;
+#else
+typedef struct mac_softtimer_handle_s
+{
+    mac_callback_t timer_callback;   /* callback function on timeout event */
+    void          *callback_arg;     /* argument of callback function      */
+    uint32_t       timeout;          /* used as RELATIVE delay/remaining   */
+    void          *pnext;            /* next timer handle                  */
+
+    mac_callback_t user_callback;
+    void          *user_arg;
+    struct
+    {
+        uint32_t is_start: 1;
+        uint32_t is_timeout: 1;
+    } timer_ctrl;
+} mac_softtimer_handle_t, *pmac_softtimer_handle_t;
+
+/* Back-compatable */
+typedef mac_softtimer_handle_t mac_timer_handle_t;
+typedef pmac_softtimer_handle_t pmac_timer_handle_t;
+
+#endif  /* #if defined(CONFIG_MAC_SW_TIMER) && (CONFIG_MAC_SW_TIMER != 0) */
 
 /**
   \brief flags of RX frame early interrupt processing
@@ -321,8 +403,10 @@ typedef enum mac_bt_timer_id_e
     MAC_BT_TIMER1 = 1,
     MAC_BT_TIMER2 = 2,
     MAC_BT_TIMER3 = 3,
+    MAC_BT_TIMER4 = 4,
+    MAC_BT_TIMER5 = 5,
 
-    MAC_BT_TIMER_NUM = 4
+    MAC_BT_TIMER_NUM = 6
 } mac_bt_timer_id_t;
 
 typedef struct tx_pending_sts_s
@@ -344,6 +428,7 @@ typedef struct mac_ed_scan_states_s
     uint8_t channel;  /* channel for ED scan */
     uint8_t peak_ed_level;  /* the peak ED level of each ED scan round during
                                the whole ED scan process */
+    uint8_t scan_round_of_8symb;  /* number of 8-symbols per scan round */
     uint32_t duration_us;   /* duration (unit of us) for ED scan */
     uint32_t ed_level_sum;  /* sum of ED level for each ED scan round */
     uint32_t ed_scan_rounds;  /* ED scan round counter */
@@ -414,7 +499,8 @@ typedef enum mac_status_e
     MAC_STS_TIMEOUT = 0x0c,
     MAC_STS_CANCELED = 0x0d,
     MAC_STS_PENDING = 0x0e,
-    MAC_STS_HW_LIMIT = 0x0f
+    MAC_STS_HW_LIMIT = 0x0f,
+    MAC_STS_NOT_SUPPORT = 0x10
 } mac_status_t;
 
 /**
@@ -513,21 +599,6 @@ typedef enum mac_ack_type_e
 } mac_ack_type_t;
 
 /**
-  \brief  FIFO ID
-*/
-typedef enum mac_fifo_id_e
-{
-    TXN_FIFO_ID = 0,    /* Normal TX FIFO */
-    TXB_FIFO_ID = 1,    /* Beacon TX FIFO */
-    TXG1_FIFO_ID = 2,   /* GTS1 TX FIFO */
-    TXG2_FIFO_ID = 3,   /* GTS2 TX FIFO */
-    KEY_FIFO_ID = 4,    /* Key FIFO */
-    RX_FIFO_ID = 5,     /* RX FIFO */
-
-    INVALID_FIFO_ID = 6,    /* Invalid FIFO ID */
-} mac_fifo_id_t;
-
-/**
   \brief  Defines MAC Initialize attribute
 */
 typedef struct
@@ -552,7 +623,7 @@ typedef struct
                                                  arbitration retry                   */
         uint32_t default_channel : 5;       /*!< default channel                     */
 
-        uint32_t rxon2ccadt_delay : 4;      /*!< rxon to csma_state==CCADT delay     */
+        uint32_t reserved0 : 4;
         uint32_t ccachkp : 4;               /*!< The number of symbol for CCA check point */
         uint32_t phy_tx_latency : 5;        /*!< MAC TX to PHY TX latency            */
         uint32_t disdec : 1;                /*!< is disable RX decryption            */
@@ -567,7 +638,10 @@ typedef struct
         uint32_t rx_rf_mode : 2;            /*!< RF mode for RX     */
         uint32_t lna_en : 1;                /*!< is RX LNA enabled  */
         uint32_t phy_gnt_slot_offset : 5;   /*!< slot number offset from current to Grant PHY */
-        uint32_t reserved : 22;
+        uint32_t rx_on_delay_attr_valid : 1;   /*!< is PHY RX On delay attribute setting valid  */
+        uint32_t tx_on_delay_attr_valid : 1;   /*!< is PHY RX On delay attribute setting valid  */
+        uint32_t rf_fast_chnl_switch_en : 1;   /*!< is RF fast channel switching enabled  */
+        uint32_t reserved : 19;
     } phy_cfg;
 
     uint8_t phy_arbitration_en;             /*!< PHY arbitration enable control:
@@ -591,7 +665,69 @@ typedef struct
 
     /* gain table per channel, in unit of 0.5dBm */
     const int8_t *ptx_gain_tbl;
+
+    uint8_t rx2rx_delay;                    /*!< RX to RX delay for wait RF ready    */
+    uint8_t rxon_delay;                     /*!< MAC initial RX to PHY RX ready delay */
+    uint8_t tx2rx_delay;                    /*!< TX to RX delay for wait RF ready    */
+    uint8_t ed_scan_rxon_delay;             /*!< RX to ED scan RX on delay */
+    uint8_t rxon2ccadt_dly;                 /*!< RX to CCADT state delay */
+    uint8_t rxon_off_dly;                   /*!< Frame RX end to RX off delay */
 } mac_attribute_t;
+
+typedef enum mac_phy_arbitration_method_e
+{
+    MAC_PHY_ARBI_ZB_ONLY = 0,
+    MAC_PHY_ARBI_ANCH = 1,
+    MAC_PHY_ARBI_IMMEDIATE = 2,
+} mac_phy_arbitration_method;
+
+enum mac_phy_arbitration_priority_e
+{
+    MAC_PHY_ARBI_LOW_PRIORITY = 0,
+    MAC_PHY_ARBI_MID_PRIORITY = 1,
+    MAC_PHY_ARBI_HIGH_PRIORITY = 2,
+};
+
+#if defined(DUAL_CHNL_EN) && (DUAL_CHNL_EN)
+typedef struct zb_phy_2symb_correlation_cfg_s
+{
+    uint32_t sfd_timeout_2symb_off : 4; /*!< [3..0] timer for waiting sfd detection timeout
+                                             when zb_2symbol_sync = 0，0 ~ 8 for 8 ~ 16 symbol */
+    uint32_t sfd_timeout_2symb_on : 4;  /*!< [7..4] timer for waiting sfd detection timeout
+                                             after 2-preamble-symbol detected when
+                                             zb_2symbol_sync = 1，0 ~ 8 for 8 ~ 16 symbol. */
+    uint32_t two_sym_sync_timeout : 3; /*!< [10..8] timer for waiting next 2 symbol sync or
+                                            SFD, 0 ~ 7 for 1 ~ 8 symbol */
+    uint32_t zb_rx_term_1sym_en : 1; /*!< [11..11] 1-preamble symbol correlation enable */
+    uint32_t zb_rx_term_1sym_det_time : 4;  /*!< [15..12] extra time for 1-symbol detection
+                                                 0~15 for 2us~17us, unit: 1us */
+    uint32_t zb_rx_term_2sym_en : 1; /*!< [16..16] 2-preamble symbol correlation enable */
+    uint32_t zb_rx_2sym_sync_th_1st : 6; /*!< [22..17] the 1st 2-preamble symbol correlation
+                                          threshold */
+    uint32_t zb_rx_2sym_sync_th : 7; /*!< [29..23] the 2-preamble symbol correlation threshold */
+    uint32_t zb_preamb_hit_mode_sel : 1; /*!< [30..30] preamble hit mode selection */
+} zb_phy_2symb_correlation_cfg_t, *pzb_phy_2symb_correlation_cfg_t;
+
+#endif  /* #if defined(DUAL_CHNL_EN) && (DUAL_CHNL_EN) */
+
+#if defined(MULTI_PAN_EN) && (MULTI_PAN_EN != 0)
+
+#define MPAN_PAN0       0
+#define MPAN_PAN1       1
+#define MPAN_PAN2       2
+#define MPAN_PAN3       3
+#define MAX_PAN_NUM     4
+
+enum mac_mpan_chnl_sel_e
+{
+    PRIMARY_CHNL = 0,
+    SECONDARY_CHNL = 1,
+};
+
+#define THREAD_PAN      MPAN_PAN0
+#define ZB_PAN          MPAN_PAN1
+
+#endif  /* #if defined(MULTI_PAN_EN) && (MULTI_PAN_EN != 0) */
 
 #ifdef __cplusplus
 }
