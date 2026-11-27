@@ -14,13 +14,13 @@
                 {
                     "id": 1,
                     "address": "0x4002000",
-                    "name": "BANK0_boot_patch_MP_release_1.0.183.27_e91dd4ad-dffb4c6d9a02fea1a24302c6e1a76fda.bin",
+                    "name": "BANK0_boot_patch_MP_master_1.0.308.0_99dd0005-04af387916f2c4f16df7bf26a33377bb.bin",
                     "enable": "1"
                 },
                 {
                     "id": 2,
                     "address": "0x400a000",
-                    "name": "BANK1_boot_patch_MP_release_1.0.183.27_e91dd4ad-8a0390ad5ea191e414f1c00c6b4e366c.bin",
+                    "name": "BANK1_boot_patch_MP_master_1.0.308.0_99dd0005-e0f3b29a7be748d250809bd2e7e916a1.bin",
                     "enable": "1"
                 },
                 {
@@ -32,7 +32,7 @@
                 {
                     "id": 4,
                     "address": "0x4013000",
-                    "name": "BANK0_sys_patch_MP_release_1.0.183.27_e91dd4ad-59b00aef9fefc715b8fb60de65a1ffe2.bin",
+                    "name": "BANK0_sys_patch_MP_master_1.0.308.0_99dd0005-b59cd24fec24168fc5d6729e4deb9744.bin",
                     "enable": "1"
                 },
                 {
